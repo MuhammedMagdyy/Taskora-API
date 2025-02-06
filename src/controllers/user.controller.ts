@@ -9,6 +9,7 @@ import {
 } from '../utils';
 import { HashingService, userService, cloudinaryService } from '../services';
 import { IUser } from '../interfaces';
+import { Provider } from '@prisma/client';
 
 export const getUser = asyncHandler(async (req, res, next) => {
   const uuid = req.user?.uuid as string;
@@ -53,7 +54,11 @@ export const updateUser = asyncHandler(async (req, res, next) => {
   const { name, password } = updateUserSchema.parse({ ...req.body, picture });
 
   if (name) user.name = name;
-  if (password) user.password = await HashingService.hash(password);
+  if (password) {
+    user.provider = Provider.LOCAL;
+    user.providerId = null;
+    user.password = await HashingService.hash(password);
+  }
 
   await userService.updateOne(
     { uuid: userUUID },
