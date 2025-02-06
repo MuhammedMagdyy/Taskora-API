@@ -4,17 +4,23 @@ import {
   ApiError,
   BAD_REQUEST,
   INTERNAL_SERVER_ERROR,
+  PAYLOAD_TOO_LARGE,
+  SERVER,
   UNAUTHORIZED,
 } from '../utils';
 import { Prisma } from '@prisma/client';
 import { JsonWebTokenError } from 'jsonwebtoken';
+import { UploadApiErrorResponse } from 'cloudinary';
+import { MulterError } from 'multer';
 
 type ErrorType =
   | ApiError
   | ZodError
   | Error
   | Prisma.PrismaClientKnownRequestError
-  | JsonWebTokenError;
+  | JsonWebTokenError
+  | UploadApiErrorResponse
+  | MulterError;
 
 export const errorHandler: ErrorRequestHandler = (
   error: ErrorType,
@@ -37,8 +43,13 @@ export const errorHandler: ErrorRequestHandler = (
     res.status(prismaError.status).json({ message: prismaError.message });
   } else if (error instanceof JsonWebTokenError) {
     res.status(UNAUTHORIZED).json({ message: 'Invalid token' });
+  } else if (handleCloudinaryError(error)) {
+    res.status(error.http_code).json({ message: error.message });
+  } else if (error instanceof MulterError) {
+    const { status, message } = handleMulterError(error);
+    res.status(status).json({ message });
   } else {
-    if (process.env.NODE_ENV === 'development') {
+    if (process.env.NODE_ENV === SERVER.DEVELOPMENT) {
       sendErrorToDev(error, res);
     } else {
       sendErrorToProd(error, res);
@@ -78,5 +89,43 @@ const handlePrismaError = (error: Prisma.PrismaClientKnownRequestError) => {
         `Something went wront: Please make sure your database server is running`,
         INTERNAL_SERVER_ERROR
       );
+  }
+};
+
+const handleCloudinaryError = (
+  error: unknown
+): error is UploadApiErrorResponse => {
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    'http_code' in (error as Record<string, unknown>) &&
+    'message' in (error as Record<string, unknown>)
+  );
+};
+
+const handleMulterError = (
+  error: MulterError
+): { status: number; message: string } => {
+  switch (error.code) {
+    case 'LIMIT_FILE_SIZE':
+      return {
+        status: PAYLOAD_TOO_LARGE,
+        message: 'File size too large. Please upload a smaller file.',
+      };
+    case 'LIMIT_FILE_COUNT':
+      return {
+        status: BAD_REQUEST,
+        message: 'Too many files uploaded. Please upload fewer files.',
+      };
+    case 'LIMIT_UNEXPECTED_FILE':
+      return {
+        status: BAD_REQUEST,
+        message: 'Unexpected file field. Please check the field name.',
+      };
+    default:
+      return {
+        status: INTERNAL_SERVER_ERROR,
+        message: 'File upload error. Please try again later.',
+      };
   }
 };

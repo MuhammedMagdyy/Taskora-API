@@ -1,5 +1,5 @@
-import { IGoogleStrategy, IJwtPayload, IUser } from '../interfaces';
-import { userService, JwtService } from '../services';
+import { IGoogleStrategy, IUser } from '../interfaces';
+import { userService, JwtService, HashingService } from '../services';
 import { OAuth2Client } from 'google-auth-library';
 import {
   googleCallbackUrl,
@@ -10,8 +10,10 @@ import {
   API_INTEGRATION,
   ApiError,
   BAD_REQUEST,
+  CONFLICT,
   FORBIDDEN,
   INTERNAL_SERVER_ERROR,
+  OK,
   UNAUTHORIZED,
 } from '../utils';
 import { Provider } from '@prisma/client';
@@ -25,6 +27,86 @@ class AuthService {
       googleClientSecret,
       googleCallbackUrl
     );
+  }
+
+  async register(name: string, email: string, password: string) {
+    const isUserExists = await userService.findUserByEmail(email);
+
+    if (isUserExists) {
+      throw new ApiError('User already exists', CONFLICT);
+    }
+
+    const hashedPassword = await HashingService.hash(password);
+    const user = await userService.createOne({
+      name,
+      email,
+      password: hashedPassword,
+    });
+
+    const userResponse: IUser = {
+      uuid: user.uuid,
+      name: user.name as string,
+      email: user.email,
+      picture: user.picture as string,
+    };
+
+    return { data: userResponse, ...JwtService.generateTokens(user.uuid) };
+  }
+
+  async login(email: string, password: string) {
+    const user = await userService.findUserByEmail(email);
+
+    if (!user) {
+      throw new ApiError('Invalid email or password', UNAUTHORIZED);
+    }
+
+    if (!user.password) {
+      throw new ApiError('Invalid email or password', UNAUTHORIZED);
+    }
+
+    // TODO: When user resets password, the refresh token should be invalidated
+    const isPasswordMatch = await HashingService.compare(
+      password,
+      user.password as string
+    );
+
+    if (!isPasswordMatch) {
+      throw new ApiError('Invalid email or password', UNAUTHORIZED);
+    }
+
+    const userResponse: IUser = {
+      uuid: user.uuid,
+      name: user.name as string,
+      email: user.email,
+      picture: user.picture as string,
+    };
+
+    return { data: userResponse, ...JwtService.generateTokens(user.uuid) };
+  }
+
+  async logout(uuid: string) {
+    const user = await userService.findUserByUUID(uuid);
+
+    if (!user) {
+      throw new ApiError('Unauthorized', UNAUTHORIZED);
+    }
+
+    if (user.provider === Provider.LOCAL) {
+      await userService.updateOne({ uuid: user.uuid }, { refreshToken: null });
+    } else {
+      await this.revokeGoogleCredentials();
+    }
+  }
+
+  private async revokeGoogleCredentials() {
+    try {
+      await this.oAuth2Client.revokeCredentials();
+    } catch {
+      throw new ApiError(
+        'Something went wrong while revoking google credentials, please try again later...',
+        INTERNAL_SERVER_ERROR
+      );
+    }
   }
 
   async getGoogleAuthUrl() {
@@ -46,26 +128,14 @@ class AuthService {
       url: API_INTEGRATION.GOOGLE.USER_INFO_URL,
     });
 
-    switch (response.status) {
-      case UNAUTHORIZED:
-        throw new ApiError('Unauthorized', UNAUTHORIZED);
-      case FORBIDDEN:
-        throw new ApiError('Access denied', FORBIDDEN);
-      case BAD_REQUEST:
-        throw new ApiError('Bad request', BAD_REQUEST);
-      case INTERNAL_SERVER_ERROR:
-        throw new ApiError(
-          'Something went wrong: Please try agian later...',
-          INTERNAL_SERVER_ERROR
-        );
-      default: {
-        const data = response.data as IGoogleStrategy;
-        return this.handleUserLogin(data);
-      }
+    if (response.status !== OK) {
+      this.handleGoogleErrors(response.status);
     }
+
+    return this.loginWithGoogle(response.data as IGoogleStrategy);
   }
 
-  async handleUserLogin(user: IGoogleStrategy) {
+  async loginWithGoogle(user: IGoogleStrategy) {
     let existingUser = await userService.findUserByProviderId(user.id);
 
     if (!existingUser) {
@@ -79,13 +149,9 @@ class AuthService {
       });
     }
 
-    const payload: IJwtPayload = {
-      uuid: existingUser.uuid,
-    };
-
-    const accessToken = JwtService.generateAccessToken(payload);
-    const refreshToken = JwtService.generateRefreshToken(payload);
-
+    const { accessToken, refreshToken } = JwtService.generateTokens(
+      existingUser.uuid
+    );
     const userResponse: IUser = {
       uuid: existingUser.uuid,
       name: existingUser.name as string,
@@ -94,6 +160,38 @@ class AuthService {
     };
 
     return { userResponse, accessToken, refreshToken };
+  }
+
+  async refreshAccessToken(token: string) {
+    const payload = JwtService.verify(token, 'refresh');
+
+    if (!payload) {
+      throw new ApiError('Unauthorized', UNAUTHORIZED);
+    }
+
+    const user = await userService.findUserByUUID(payload.uuid);
+
+    if (!user) {
+      throw new ApiError('Unauthorized', UNAUTHORIZED);
+    }
+
+    return JwtService.generateAccessToken(payload);
+  }
+
+  private handleGoogleErrors(status: number) {
+    switch (status) {
+      case UNAUTHORIZED:
+        throw new ApiError('Unauthorized', UNAUTHORIZED);
+      case FORBIDDEN:
+        throw new ApiError('Access denied', FORBIDDEN);
+      case BAD_REQUEST:
+        throw new ApiError('Bad request', BAD_REQUEST);
+      default:
+        throw new ApiError(
+          'Something went wrong: Please try agian later...',
+          INTERNAL_SERVER_ERROR
+        );
+    }
   }
 }
 
