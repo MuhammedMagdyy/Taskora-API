@@ -22,6 +22,10 @@ export class UserService {
   async findUserByUUID(uuid: string) {
     return await this.userRepository.findOne({ uuid });
   }
+
+  async findUserByEmail(email: string) {
+    return await this.userRepository.findOne({ email });
+  }
 }
 
 export const userService = new UserService(userRepository);
