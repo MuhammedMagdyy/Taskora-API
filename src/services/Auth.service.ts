@@ -136,7 +136,7 @@ class AuthService {
   }
 
   async loginWithGoogle(user: IGoogleStrategy) {
-    let existingUser = await userService.findUserByProviderId(user.id);
+    let existingUser = await userService.findUserByEmail(user.email);
 
     if (!existingUser) {
       existingUser = await userService.createOne({
