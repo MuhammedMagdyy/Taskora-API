@@ -8,3 +8,4 @@ export const bcryptSaltRounds = env('BCRYPT_SALT_ROUNDS');
 export const cloudinaryCloudName = env('CLOUDINARY_CLOUD_NAME');
 export const cloudinaryApiKey = env('CLOUDINARY_API_KEY');
 export const cloudinaryApiSecret = env('CLOUDINARY_API_SECRET');
+export const statusUuid = env('STATUS_UUID');

@@ -46,7 +46,6 @@ CREATE TABLE IF NOT EXISTS tasks (
 );
 
 -- Insert data into statuses
--- Insert data into statuses
 INSERT INTO statuses (uuid, name, color, created_at, updated_at) VALUES
 (uuid(), 'IN_PROGRESS', '#007bff', NOW(), NOW()),
 (uuid(), 'DONE', '#28a745', NOW(), NOW()),

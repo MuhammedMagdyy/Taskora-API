@@ -12,7 +12,10 @@ import { ISortQuery } from '../types';
 
 export const createTag = asyncHandler(async (req, res) => {
   const schema = tagSchema.parse(req.body);
-  const tag = await tagService.createOne(schema);
+  const tag = await tagService.createOne({
+    ...schema,
+    userUuid: req.user?.uuid as string,
+  });
 
   res.status(CREATED).json({ message: 'Tag created successfully!', data: tag });
 });
@@ -45,6 +48,7 @@ export const getAllTags = asyncHandler(async (req, res) => {
   }));
 
   const tags = await tagService.findMany(
+    { userUuid: req.user?.uuid as string },
     orderBy.length > 0 ? orderBy : undefined
   );
 

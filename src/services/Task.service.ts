@@ -14,8 +14,8 @@ export class TaskService {
     return await this.taskRepository.findOne(query);
   }
 
-  async findMany(orderBy?: ISortQuery) {
-    return await this.taskRepository.findMany(orderBy);
+  async findMany(query: Prisma.TaskWhereInput, orderBy?: ISortQuery) {
+    return await this.taskRepository.findMany(query, orderBy);
   }
 
   async updateOne(

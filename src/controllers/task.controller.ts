@@ -28,7 +28,10 @@ export const createTask = asyncHandler(async (req, res) => {
 
   await statusSerivce.isStatusExists(statusUuid);
 
-  const task = await taskService.createOne(schema);
+  const task = await taskService.createOne({
+    ...schema,
+    userUuid: req.user?.uuid as string,
+  });
 
   res
     .status(CREATED)
@@ -63,6 +66,7 @@ export const getAllTasks = asyncHandler(async (req, res) => {
   }));
 
   const tasks = await taskService.findMany(
+    { userUuid: req.user?.uuid as string },
     orderBy.length > 0 ? orderBy : undefined
   );
 

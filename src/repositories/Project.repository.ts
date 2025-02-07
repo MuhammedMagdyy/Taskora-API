@@ -13,8 +13,8 @@ export class ProjectRepository {
     return await this.prisma.project.findUnique({ where: query });
   }
 
-  async findMany(orderBy?: ISortQuery) {
-    return await this.prisma.project.findMany({ orderBy });
+  async findMany(query: Prisma.ProjectWhereInput, orderBy?: ISortQuery) {
+    return await this.prisma.project.findMany({ where: query, orderBy });
   }
 
   async updateOne(

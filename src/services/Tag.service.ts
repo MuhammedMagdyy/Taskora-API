@@ -14,8 +14,8 @@ export class TagService {
     return await this.tagRepository.findOne(query);
   }
 
-  async findMany(orderBy?: ISortQuery) {
-    return await this.tagRepository.findMany(orderBy);
+  async findMany(query: Prisma.TagWhereInput, orderBy?: ISortQuery) {
+    return await this.tagRepository.findMany(query, orderBy);
   }
 
   async isTagExists(uuid: string) {

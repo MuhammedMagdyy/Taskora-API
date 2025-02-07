@@ -13,10 +13,8 @@ export class TagRepository {
     return await this.prisma.tag.findUnique({ where: query });
   }
 
-  async findMany(orderBy?: ISortQuery) {
-    return await this.prisma.tag.findMany({
-      orderBy,
-    });
+  async findMany(query: Prisma.TagWhereInput, orderBy?: ISortQuery) {
+    return await this.prisma.tag.findMany({ where: query, orderBy });
   }
 }
 

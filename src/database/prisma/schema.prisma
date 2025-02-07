@@ -20,6 +20,10 @@ model User {
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @updatedAt @map("updated_at")
 
+  projects Project[]
+  tasks    Task[]
+  tags     Tag[]
+
   @@index([provider, providerId])
   @@map("users")
 }
@@ -41,6 +45,9 @@ model Project {
   tagUuid String? @map("tag_uuid")
   tag     Tag?    @relation(fields: [tagUuid], references: [uuid])
 
+  userUuid String @map("user_uuid")
+  user     User   @relation(fields: [userUuid], references: [uuid])
+
   @@map("projects")
 }
 
@@ -61,6 +68,9 @@ model Task {
   statusUuid String @map("status_uuid")
   status     Status @relation(fields: [statusUuid], references: [uuid])
 
+  userUuid String @map("user_uuid")
+  user     User   @relation(fields: [userUuid], references: [uuid])
+
   @@map("tasks")
 }
 
@@ -71,8 +81,10 @@ model Tag {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  tasks   Task[]
-  Project Project[]
+  tasks    Task[]
+  Project  Project[]
+  userUuid String    @map("user_uuid")
+  user     User      @relation(fields: [userUuid], references: [uuid])
 
   @@map("tags")
 }

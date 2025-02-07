@@ -55,3 +55,16 @@ export const MAGIC_NUMBERS = {
   ONE_DAY: 24 * 60 * 60 * 1000,
   MAX_FILE_SIZE: 5 * 1024 * 1024,
 };
+export const DEFAULT_VALUES = {
+  PROJECTS: {
+    name: '🚀 First Launch',
+    description:
+      'Every great journey begins with a single step. Use this project to plan and achieve your first milestone!',
+    color: '#007bff',
+  },
+  TASKS: {
+    name: '📅 Plan Your Week',
+    description:
+      'Add your top three priorities for the week and start managing your time effectively',
+  },
+};
