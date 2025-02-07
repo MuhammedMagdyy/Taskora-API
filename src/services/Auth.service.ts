@@ -171,6 +171,22 @@ class AuthService {
         picture: user.picture,
         isVerified: user.verified_email,
       });
+
+      const project = await projectSerivce.createOne({
+        name: DEFAULT_VALUES.PROJECTS.name,
+        description: DEFAULT_VALUES.PROJECTS.description,
+        userUuid: existingUser.uuid,
+        statusUuid: statusUuid,
+        color: DEFAULT_VALUES.PROJECTS.color,
+      });
+
+      await taskService.createOne({
+        name: DEFAULT_VALUES.TASKS.name,
+        description: DEFAULT_VALUES.TASKS.description,
+        userUuid: existingUser.uuid,
+        statusUuid: statusUuid,
+        projectUuid: project.uuid,
+      });
     }
 
     const { accessToken, refreshToken } = JwtService.generateTokens(
