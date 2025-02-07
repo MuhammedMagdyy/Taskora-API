@@ -55,14 +55,18 @@ export const updateUser = asyncHandler(async (req, res, next) => {
 
   if (name) user.name = name;
   if (password) {
-    user.provider = Provider.LOCAL;
-    user.providerId = null;
     user.password = await HashingService.hash(password);
   }
 
   await userService.updateOne(
     { uuid: userUUID },
-    { name: user.name, password: user.password, picture }
+    {
+      name: user.name,
+      password: user.password,
+      picture,
+      provider: Provider.LOCAL,
+      providerId: null,
+    }
   );
 
   res.status(OK).json({ message: 'User updated successfully!' });
