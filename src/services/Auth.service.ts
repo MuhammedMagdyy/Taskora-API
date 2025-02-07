@@ -1,16 +1,24 @@
 import { IGoogleStrategy, IUser } from '../interfaces';
-import { userService, JwtService, HashingService } from '../services';
+import {
+  userService,
+  JwtService,
+  HashingService,
+  projectSerivce,
+  taskService,
+} from '../services';
 import { OAuth2Client } from 'google-auth-library';
 import {
   googleCallbackUrl,
   googleClientId,
   googleClientSecret,
+  statusUuid,
 } from '../config';
 import {
   API_INTEGRATION,
   ApiError,
   BAD_REQUEST,
   CONFLICT,
+  DEFAULT_VALUES,
   FORBIDDEN,
   INTERNAL_SERVER_ERROR,
   OK,
@@ -41,6 +49,22 @@ class AuthService {
       name,
       email,
       password: hashedPassword,
+    });
+
+    const project = await projectSerivce.createOne({
+      name: DEFAULT_VALUES.PROJECTS.name,
+      description: DEFAULT_VALUES.PROJECTS.description,
+      userUuid: user.uuid,
+      statusUuid: statusUuid,
+      color: DEFAULT_VALUES.PROJECTS.color,
+    });
+
+    await taskService.createOne({
+      name: DEFAULT_VALUES.TASKS.name,
+      description: DEFAULT_VALUES.TASKS.description,
+      userUuid: user.uuid,
+      statusUuid: statusUuid,
+      projectUuid: project.uuid,
     });
 
     const userResponse: IUser = {

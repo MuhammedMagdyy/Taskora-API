@@ -13,8 +13,8 @@ export class TaskRepository {
     return await this.prisma.task.findUnique({ where: query });
   }
 
-  async findMany(orderBy?: ISortQuery) {
-    return await this.prisma.task.findMany({ orderBy });
+  async findMany(query: Prisma.TaskWhereInput, orderBy?: ISortQuery) {
+    return await this.prisma.task.findMany({ where: query, orderBy });
   }
 
   async updateOne(

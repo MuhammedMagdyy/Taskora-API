@@ -22,7 +22,10 @@ export const createProject = asyncHandler(async (req, res) => {
     await tagService.isTagExists(tagUuid);
   }
 
-  const project = await projectSerivce.createOne(schema);
+  const project = await projectSerivce.createOne({
+    ...schema,
+    userUuid: req.user?.uuid as string,
+  });
 
   res
     .status(CREATED)
@@ -59,6 +62,7 @@ export const getAllProjects = asyncHandler(async (req, res) => {
   }));
 
   const projects = await projectSerivce.findMany(
+    { userUuid: req.user?.uuid as string },
     orderBy.length > 0 ? orderBy : undefined
   );
 

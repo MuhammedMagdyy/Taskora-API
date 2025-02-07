@@ -14,8 +14,8 @@ export class ProjectSerivce {
     return await this.projectRepository.findOne(query);
   }
 
-  async findMany(sort?: ISortQuery) {
-    return await this.projectRepository.findMany(sort);
+  async findMany(query: Prisma.ProjectWhereInput, sort?: ISortQuery) {
+    return await this.projectRepository.findMany(query, sort);
   }
 
   async updateOne(
