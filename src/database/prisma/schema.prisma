@@ -46,7 +46,7 @@ model Project {
   tag     Tag?    @relation(fields: [tagUuid], references: [uuid])
 
   userUuid String @map("user_uuid")
-  user     User   @relation(fields: [userUuid], references: [uuid])
+  user     User   @relation(fields: [userUuid], references: [uuid], onDelete: Cascade)
 
   @@map("projects")
 }
@@ -69,7 +69,7 @@ model Task {
   status     Status @relation(fields: [statusUuid], references: [uuid])
 
   userUuid String @map("user_uuid")
-  user     User   @relation(fields: [userUuid], references: [uuid])
+  user     User   @relation(fields: [userUuid], references: [uuid], onDelete: Cascade)
 
   @@map("tasks")
 }
@@ -84,7 +84,7 @@ model Tag {
   tasks    Task[]
   Project  Project[]
   userUuid String    @map("user_uuid")
-  user     User      @relation(fields: [userUuid], references: [uuid])
+  user     User      @relation(fields: [userUuid], references: [uuid], onDelete: Cascade)
 
   @@map("tags")
 }
