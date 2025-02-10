@@ -1,23 +1,27 @@
 import { Prisma, PrismaClient } from '@prisma/client';
-import prisma from '../database/client';
+import { prismaClient } from '../database';
 
 export class UserRepository {
-  constructor(private readonly prisma: PrismaClient) {}
+  private readonly dbClient: PrismaClient;
+
+  constructor(dbClient: PrismaClient) {
+    this.dbClient = dbClient;
+  }
 
   async createOne(data: Prisma.UserUncheckedCreateInput) {
-    return await this.prisma.user.create({ data });
+    return await this.dbClient.user.create({ data });
   }
 
   async findOne(query: Prisma.UserWhereInput) {
-    return await this.prisma.user.findFirst({ where: query });
+    return await this.dbClient.user.findFirst({ where: query });
   }
 
   async updateOne(
     query: Prisma.UserWhereUniqueInput,
     data: Prisma.UserUncheckedUpdateInput
   ) {
-    return await this.prisma.user.update({ where: query, data });
+    return await this.dbClient.user.update({ where: query, data });
   }
 }
 
-export const userRepository = new UserRepository(prisma);
+export const userRepository = new UserRepository(prismaClient);

@@ -1,31 +1,21 @@
 import { Prisma, PrismaClient } from '@prisma/client';
-import prisma from '../database/client';
+import { prismaClient } from '../database';
 import { ISortQuery } from '../types';
 
 export class StatusRepository {
-  constructor(private readonly prisma: PrismaClient) {}
+  private readonly dbClient: PrismaClient;
+
+  constructor(dbClient: PrismaClient) {
+    this.dbClient = dbClient;
+  }
 
   async findOne(query: Prisma.StatusWhereUniqueInput) {
-    return await this.prisma.status.findUnique({
-      where: query,
-      select: {
-        uuid: true,
-        name: true,
-        color: true,
-      },
-    });
+    return await this.dbClient.status.findUnique({ where: query });
   }
 
   async findMany(orderBy?: ISortQuery) {
-    return await this.prisma.status.findMany({
-      select: {
-        uuid: true,
-        name: true,
-        color: true,
-      },
-      orderBy,
-    });
+    return await this.dbClient.status.findMany({ orderBy });
   }
 }
 
-export const statusRepository = new StatusRepository(prisma);
+export const statusRepository = new StatusRepository(prismaClient);

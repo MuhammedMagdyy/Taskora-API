@@ -1,17 +1,17 @@
 import { Prisma } from '@prisma/client';
-import { statusRepository, StatusRepository } from '../repositories';
+import { statusRepository } from '../repositories';
 import { ApiError, NOT_FOUND } from '../utils';
 import { ISortQuery } from '../types';
 
 export class StatusSerivce {
-  constructor(private readonly statusRepository: StatusRepository) {}
+  constructor(private readonly statusDataSource = statusRepository) {}
 
   async findOne(query: Prisma.StatusWhereUniqueInput) {
-    return await this.statusRepository.findOne(query);
+    return this.statusDataSource.findOne(query);
   }
 
   async findMany(orderBy?: ISortQuery) {
-    return await this.statusRepository.findMany(orderBy);
+    return this.statusDataSource.findMany(orderBy);
   }
 
   async isStatusExists(uuid: string) {
@@ -23,4 +23,4 @@ export class StatusSerivce {
   }
 }
 
-export const statusSerivce = new StatusSerivce(statusRepository);
+export const statusSerivce = new StatusSerivce();

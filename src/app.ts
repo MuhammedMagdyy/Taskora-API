@@ -11,9 +11,11 @@ import routes from './routes';
 import { errorHandler } from './middlewares';
 import { nodeEnv, port, corsConfig } from './config';
 import { SERVER, INTERNAL_SERVER_ERROR } from './utils';
+import { PrismaDatabaseClient } from './database';
+import { refreshTokenService } from './services';
 
 const app = express();
-
+const prismaClient = PrismaDatabaseClient.getInstance();
 const logger =
   nodeEnv === SERVER.DEVELOPMENT
     ? morgan('dev')
@@ -30,18 +32,21 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use('/api/v1', routes);
 app.use(errorHandler);
 
-export function up() {
-  return new Promise((resolve, reject) => {
-    const server = app.listen(port || SERVER.DEFAULT_PORT_NUMBER);
-
-    server.once('listening', () => {
-      console.log(colors.green(`Server is running on port ${port} 🚀`));
-      resolve(server);
+export const up = async () => {
+  try {
+    await prismaClient.connect();
+    refreshTokenService.scheduleTokenCleanupTask();
+    app.listen(port, () => {
+      console.log(
+        colors.green(
+          `Server is running on ${port || SERVER.DEFAULT_PORT_NUMBER} 🚀`
+        )
+      );
     });
-
-    server.once('error', (err) => {
-      console.error(colors.red(`Error starting server: ${err.message}`));
-      reject(err);
-    });
-  });
-}
+  } catch (error) {
+    console.error(
+      colors.red(`Error occurred while starting the server - ${error} ❌`)
+    );
+    process.exit(1);
+  }
+};

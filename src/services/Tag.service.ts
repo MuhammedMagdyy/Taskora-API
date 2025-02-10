@@ -1,21 +1,21 @@
 import { Prisma } from '@prisma/client';
-import { tagRepository, TagRepository } from '../repositories';
+import { tagRepository } from '../repositories';
 import { ApiError, NOT_FOUND } from '../utils';
 import { ISortQuery } from '../types';
 
 export class TagService {
-  constructor(private readonly tagRepository: TagRepository) {}
+  constructor(private readonly tagDataSource = tagRepository) {}
 
   async createOne(data: Prisma.TagUncheckedCreateInput) {
-    return await this.tagRepository.createOne(data);
+    return this.tagDataSource.createOne(data);
   }
 
   async findOne(query: Prisma.TagWhereUniqueInput) {
-    return await this.tagRepository.findOne(query);
+    return this.tagDataSource.findOne(query);
   }
 
   async findMany(query: Prisma.TagWhereInput, orderBy?: ISortQuery) {
-    return await this.tagRepository.findMany(query, orderBy);
+    return this.tagDataSource.findMany(query, orderBy);
   }
 
   async isTagExists(uuid: string) {
@@ -27,4 +27,4 @@ export class TagService {
   }
 }
 
-export const tagService = new TagService(tagRepository);
+export const tagService = new TagService();

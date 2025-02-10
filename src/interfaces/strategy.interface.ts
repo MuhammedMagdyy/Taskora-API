@@ -6,3 +6,12 @@ export interface IGoogleStrategy {
   name: string;
   picture?: string;
 }
+
+export interface IGitHubStrategy {
+  id: string;
+  provider: string;
+  email: string;
+  verified: boolean;
+  name: string;
+  avatar_url: string;
+}

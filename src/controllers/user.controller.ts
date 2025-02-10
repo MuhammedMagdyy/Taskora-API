@@ -14,17 +14,18 @@ import { Provider } from '@prisma/client';
 export const getUser = asyncHandler(async (req, res, next) => {
   const uuid = req.user?.uuid as string;
 
-  const isUserExists = (await userService.findUserByUUID(uuid)) as IUser;
+  const userExists = (await userService.findUserByUUID(uuid)) as IUser;
 
-  if (!isUserExists) {
+  if (!userExists) {
     return next(new ApiError('User not found', NOT_FOUND));
   }
 
   const user: IUser = {
-    uuid: isUserExists.uuid,
-    name: isUserExists.name,
-    email: isUserExists.email,
-    picture: isUserExists.picture,
+    uuid: userExists.uuid,
+    name: userExists.name,
+    email: userExists.email,
+    picture: userExists.picture,
+    createdAt: userExists.createdAt,
   };
 
   res.json({ message: 'User retrieved successfully!', data: user });

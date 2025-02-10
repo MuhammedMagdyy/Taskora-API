@@ -8,24 +8,36 @@ datasource db {
 }
 
 model User {
-  uuid         String   @id @default(uuid())
-  email        String   @unique
-  password     String?
-  name         String?
-  picture      String?
-  provider     Provider @default(LOCAL)
-  providerId   String?  @map("provider_id")
-  isVerified   Boolean  @default(false) @map("is_verified")
-  refreshToken String?  @map("refresh_token")
-  createdAt    DateTime @default(now()) @map("created_at")
-  updatedAt    DateTime @updatedAt @map("updated_at")
+  uuid       String   @id @default(uuid())
+  email      String   @unique
+  password   String?
+  name       String?
+  picture    String?
+  provider   Provider @default(LOCAL)
+  providerId String?  @map("provider_id")
+  isVerified Boolean  @default(false) @map("is_verified")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
 
-  projects Project[]
-  tasks    Task[]
-  tags     Tag[]
+  projects     Project[]
+  tasks        Task[]
+  tags         Tag[]
+  RefreshToken RefreshToken[]
 
   @@index([provider, providerId])
   @@map("users")
+}
+
+model RefreshToken {
+  uuid      String   @id @default(uuid())
+  token     String   @unique
+  userUuid  String   @map("user_uuid")
+  user      User     @relation(fields: [userUuid], references: [uuid], onDelete: Cascade)
+  expiresAt DateTime @map("expires_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("refresh_tokens")
 }
 
 model Project {

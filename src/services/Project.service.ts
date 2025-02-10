@@ -1,32 +1,32 @@
 import { Prisma } from '@prisma/client';
-import { projectRepository, ProjectRepository } from '../repositories';
+import { projectRepository } from '../repositories';
 import { ApiError, NOT_FOUND } from '../utils';
 import { ISortQuery } from '../types';
 
-export class ProjectSerivce {
-  constructor(private readonly projectRepository: ProjectRepository) {}
+export class ProjectService {
+  constructor(private readonly projectDataSource = projectRepository) {}
 
   async createOne(data: Prisma.ProjectUncheckedCreateInput) {
-    return await this.projectRepository.createOne(data);
+    return this.projectDataSource.createOne(data);
   }
 
   async findOne(query: Prisma.ProjectWhereUniqueInput) {
-    return await this.projectRepository.findOne(query);
+    return this.projectDataSource.findOne(query);
   }
 
   async findMany(query: Prisma.ProjectWhereInput, sort?: ISortQuery) {
-    return await this.projectRepository.findMany(query, sort);
+    return this.projectDataSource.findMany(query, sort);
   }
 
   async updateOne(
     query: Prisma.ProjectWhereUniqueInput,
     data: Prisma.ProjectUncheckedUpdateInput
   ) {
-    return await this.projectRepository.updateOne(query, data);
+    return this.projectDataSource.updateOne(query, data);
   }
 
   async deleteOne(query: Prisma.ProjectWhereUniqueInput) {
-    return await this.projectRepository.deleteOne(query);
+    return this.projectDataSource.deleteOne(query);
   }
 
   async isProjectExists(uuid: string) {
@@ -43,4 +43,4 @@ export class ProjectSerivce {
   }
 }
 
-export const projectSerivce = new ProjectSerivce(projectRepository);
+export const projectSerivce = new ProjectService();

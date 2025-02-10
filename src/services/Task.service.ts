@@ -1,32 +1,32 @@
 import { Prisma } from '@prisma/client';
-import { taskRepository, TaskRepository } from '../repositories';
+import { taskRepository } from '../repositories';
 import { ApiError, NOT_FOUND } from '../utils';
 import { ISortQuery } from '../types';
 
 export class TaskService {
-  constructor(private readonly taskRepository: TaskRepository) {}
+  constructor(private readonly taskDataSource = taskRepository) {}
 
   async createOne(data: Prisma.TaskUncheckedCreateInput) {
-    return await this.taskRepository.createOne(data);
+    return this.taskDataSource.createOne(data);
   }
 
   async findOne(query: Prisma.TaskWhereUniqueInput) {
-    return await this.taskRepository.findOne(query);
+    return this.taskDataSource.findOne(query);
   }
 
   async findMany(query: Prisma.TaskWhereInput, orderBy?: ISortQuery) {
-    return await this.taskRepository.findMany(query, orderBy);
+    return this.taskDataSource.findMany(query, orderBy);
   }
 
   async updateOne(
     query: Prisma.TaskWhereUniqueInput,
     data: Prisma.TaskUncheckedUpdateInput
   ) {
-    return await this.taskRepository.updateOne(query, data);
+    return this.taskDataSource.updateOne(query, data);
   }
 
   async deleteOne(query: Prisma.TaskWhereUniqueInput) {
-    return await this.taskRepository.deleteOne(query);
+    return this.taskDataSource.deleteOne(query);
   }
 
   async isTaskExists(uuid: string) {
@@ -43,4 +43,4 @@ export class TaskService {
   }
 }
 
-export const taskService = new TaskService(taskRepository);
+export const taskService = new TaskService();
