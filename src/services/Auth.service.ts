@@ -1,16 +1,20 @@
-import { IGoogleStrategy, IUser } from '../interfaces';
+import { IGitHubStrategy, IGoogleStrategy, IUser } from '../interfaces';
 import {
   userService,
   JwtService,
   HashingService,
   projectSerivce,
   taskService,
+  refreshTokenService,
 } from '../services';
 import { OAuth2Client } from 'google-auth-library';
 import {
   googleCallbackUrl,
   googleClientId,
   googleClientSecret,
+  githubClientId,
+  githubClientSecret,
+  githubCallbackUrl,
   statusUuid,
 } from '../config';
 import {
@@ -21,26 +25,39 @@ import {
   DEFAULT_VALUES,
   FORBIDDEN,
   INTERNAL_SERVER_ERROR,
+  MAGIC_NUMBERS,
+  NOT_FOUND,
   OK,
   UNAUTHORIZED,
 } from '../utils';
 import { Provider } from '@prisma/client';
+import axios from 'axios';
 
 class AuthService {
-  private oAuth2Client: OAuth2Client;
+  private googleOAuth2Client: OAuth2Client;
+  private githubOAuth2Client: {
+    clientId: string;
+    clientSecret: string;
+    callbackUrl: string;
+  };
 
   constructor() {
-    this.oAuth2Client = new OAuth2Client(
+    this.googleOAuth2Client = new OAuth2Client(
       googleClientId,
       googleClientSecret,
       googleCallbackUrl
     );
+    this.githubOAuth2Client = {
+      clientId: githubClientId,
+      clientSecret: githubClientSecret,
+      callbackUrl: githubCallbackUrl,
+    };
   }
 
   async register(name: string, email: string, password: string) {
-    const isUserExists = await userService.findUserByEmail(email);
+    const userExists = await userService.findUserByEmail(email);
 
-    if (isUserExists) {
+    if (userExists) {
       throw new ApiError('User already exists', CONFLICT);
     }
 
@@ -51,90 +68,59 @@ class AuthService {
       password: hashedPassword,
     });
 
-    const project = await projectSerivce.createOne({
-      name: DEFAULT_VALUES.PROJECTS.name,
-      description: DEFAULT_VALUES.PROJECTS.description,
+    const project = await this.handleCreateUserProject(user as IUser);
+    await this.handleCreateUserTask(user as IUser, project.uuid);
+
+    const tokens = JwtService.generateTokens(user.uuid);
+    await refreshTokenService.createOne({
+      token: tokens.refreshToken,
       userUuid: user.uuid,
-      statusUuid: statusUuid,
-      color: DEFAULT_VALUES.PROJECTS.color,
+      expiresAt: new Date(Date.now() + MAGIC_NUMBERS.ONE_WEEK),
     });
 
-    await taskService.createOne({
-      name: DEFAULT_VALUES.TASKS.name,
-      description: DEFAULT_VALUES.TASKS.description,
-      userUuid: user.uuid,
-      statusUuid: statusUuid,
-      projectUuid: project.uuid,
-    });
-
-    const userResponse: IUser = {
-      uuid: user.uuid,
-      name: user.name as string,
-      email: user.email,
-      picture: user.picture as string,
-    };
-
-    return { data: userResponse, ...JwtService.generateTokens(user.uuid) };
+    return tokens;
   }
 
   async login(email: string, password: string) {
-    const user = await userService.findUserByEmail(email);
+    const userExists = await userService.findUserByEmail(email);
 
-    if (!user) {
-      throw new ApiError('Invalid email or password', UNAUTHORIZED);
-    }
-
-    if (!user.password) {
+    if (!userExists || !userExists.password) {
       throw new ApiError('Invalid email or password', UNAUTHORIZED);
     }
 
     // TODO: When user resets password, the refresh token should be invalidated
-    const isPasswordMatch = await HashingService.compare(
+    const passwordMatches = await HashingService.compare(
       password,
-      user.password as string
+      userExists.password as string
     );
 
-    if (!isPasswordMatch) {
+    if (!passwordMatches) {
       throw new ApiError('Invalid email or password', UNAUTHORIZED);
     }
 
-    const userResponse: IUser = {
-      uuid: user.uuid,
-      name: user.name as string,
-      email: user.email,
-      picture: user.picture as string,
-    };
+    const tokens = JwtService.generateTokens(userExists.uuid);
+    await refreshTokenService.createOne({
+      token: tokens.refreshToken,
+      userUuid: userExists.uuid,
+      expiresAt: new Date(Date.now() + MAGIC_NUMBERS.ONE_WEEK),
+    });
 
-    return { data: userResponse, ...JwtService.generateTokens(user.uuid) };
+    return tokens;
   }
 
-  async logout(uuid: string) {
-    const user = await userService.findUserByUUID(uuid);
+  async logout(refreshToken: string) {
+    const storedToken =
+      await refreshTokenService.refreshTokenExists(refreshToken);
 
-    if (!user) {
+    if (!storedToken) {
       throw new ApiError('Unauthorized', UNAUTHORIZED);
     }
 
-    if (user.provider === Provider.LOCAL) {
-      await userService.updateOne({ uuid: user.uuid }, { refreshToken: null });
-    } else {
-      await this.revokeGoogleCredentials();
-    }
-  }
-
-  private async revokeGoogleCredentials() {
-    try {
-      await this.oAuth2Client.revokeCredentials();
-    } catch {
-      throw new ApiError(
-        'Something went wrong while revoking google credentials, please try again later...',
-        INTERNAL_SERVER_ERROR
-      );
-    }
+    await refreshTokenService.deleteOne({ token: refreshToken });
   }
 
   async getGoogleAuthUrl() {
-    const authorizeUrl = this.oAuth2Client.generateAuthUrl({
+    const authorizeUrl = this.googleOAuth2Client.generateAuthUrl({
       access_type: 'offline',
       scope: API_INTEGRATION.GOOGLE.USER_INFO_SCOPES,
     });
@@ -142,28 +128,28 @@ class AuthService {
   }
 
   async getGoogleTokens(code: string) {
-    const tokensResponse = await this.oAuth2Client.getToken(code);
-    this.oAuth2Client.setCredentials(tokensResponse.tokens);
+    const tokensResponse = await this.googleOAuth2Client.getToken(code);
+    this.googleOAuth2Client.setCredentials(tokensResponse.tokens);
     return tokensResponse.tokens;
   }
 
   async getGoogleUserInfo() {
-    const response = await this.oAuth2Client.request({
+    const response = await this.googleOAuth2Client.request({
       url: API_INTEGRATION.GOOGLE.USER_INFO_URL,
     });
 
     if (response.status !== OK) {
-      this.handleGoogleErrors(response.status);
+      this.handleAxiosResponseErrors(response.status);
     }
 
     return this.loginWithGoogle(response.data as IGoogleStrategy);
   }
 
   async loginWithGoogle(user: IGoogleStrategy) {
-    let existingUser = await userService.findUserByEmail(user.email);
+    let userExists = await userService.findUserByEmail(user.email);
 
-    if (!existingUser) {
-      existingUser = await userService.createOne({
+    if (!userExists) {
+      userExists = await userService.createOne({
         name: user.name,
         email: user.email,
         provider: Provider.GOOGLE,
@@ -172,38 +158,108 @@ class AuthService {
         isVerified: user.verified_email,
       });
 
-      const project = await projectSerivce.createOne({
-        name: DEFAULT_VALUES.PROJECTS.name,
-        description: DEFAULT_VALUES.PROJECTS.description,
-        userUuid: existingUser.uuid,
-        statusUuid: statusUuid,
-        color: DEFAULT_VALUES.PROJECTS.color,
-      });
-
-      await taskService.createOne({
-        name: DEFAULT_VALUES.TASKS.name,
-        description: DEFAULT_VALUES.TASKS.description,
-        userUuid: existingUser.uuid,
-        statusUuid: statusUuid,
-        projectUuid: project.uuid,
-      });
+      const project = await this.handleCreateUserProject(userExists as IUser);
+      await this.handleCreateUserTask(userExists as IUser, project.uuid);
     }
 
-    const { accessToken, refreshToken } = JwtService.generateTokens(
-      existingUser.uuid
-    );
-    const userResponse: IUser = {
-      uuid: existingUser.uuid,
-      name: existingUser.name as string,
-      email: existingUser.email,
-      picture: existingUser.picture as string,
-    };
+    const tokens = JwtService.generateTokens(userExists.uuid);
+    await refreshTokenService.createOne({
+      token: tokens.refreshToken,
+      userUuid: userExists.uuid,
+      expiresAt: new Date(Date.now() + MAGIC_NUMBERS.ONE_WEEK),
+    });
 
-    return { userResponse, accessToken, refreshToken };
+    return tokens;
   }
 
-  async refreshAccessToken(token: string) {
-    const payload = JwtService.verify(token, 'refresh');
+  async loginWithGitHub(user: IGitHubStrategy) {
+    let userExists = await userService.findUserByEmail(user.email);
+
+    if (!userExists) {
+      userExists = await userService.createOne({
+        name: user.name,
+        email: user.email,
+        provider: Provider.GITHUB,
+        providerId: user.id.toString(),
+        picture: user.avatar_url,
+        isVerified: user.verified,
+      });
+
+      const project = await this.handleCreateUserProject(userExists as IUser);
+      await this.handleCreateUserTask(userExists as IUser, project.uuid);
+    }
+
+    const tokens = JwtService.generateTokens(userExists.uuid);
+    await refreshTokenService.createOne({
+      token: tokens.refreshToken,
+      userUuid: userExists.uuid,
+      expiresAt: new Date(Date.now() + MAGIC_NUMBERS.ONE_WEEK),
+    });
+
+    return tokens;
+  }
+
+  async getGitHubUserInfo(token: string) {
+    const userInfo = await axios.get(API_INTEGRATION.GITHUB.USER_INFO_URL, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    const userEmails = await axios.get(API_INTEGRATION.GITHUB.EMAILS_URL, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    if (userInfo.status !== OK || userEmails.status !== OK) {
+      this.handleAxiosResponseErrors(userInfo.status);
+    }
+
+    const primaryEmail = userEmails.data.find(
+      (email: { primary: boolean }) => email.primary || userEmails.data[0]
+    );
+
+    if (!primaryEmail) {
+      throw new ApiError('Primary email not found', NOT_FOUND);
+    }
+
+    return this.loginWithGitHub({
+      id: userInfo.data.id,
+      provider: Provider.GITHUB,
+      email: primaryEmail.email,
+      verified: primaryEmail.verified,
+      name: userInfo.data.name,
+      avatar_url: userInfo.data.avatar_url,
+    });
+  }
+
+  async getGitHubAccessToken(code: string) {
+    if (!code) {
+      throw new ApiError('Missing code', BAD_REQUEST);
+    }
+
+    const response = await axios.post(
+      API_INTEGRATION.GITHUB.TOKEN_URL,
+      {
+        client_id: this.githubOAuth2Client.clientId,
+        client_secret: this.githubOAuth2Client.clientSecret,
+        code,
+        redirect_uri: this.githubOAuth2Client.callbackUrl,
+      },
+      {
+        headers: { Accept: 'application/json' },
+      }
+    );
+
+    if (response.status !== OK || !response.data.access_token) {
+      throw new ApiError(
+        `GitHub token exchange failed: ${response.data.error || 'Unknown error'}`,
+        UNAUTHORIZED
+      );
+    }
+
+    return response.data.access_token;
+  }
+
+  async refreshAccessToken(refreshToken: string) {
+    const payload = JwtService.verify(refreshToken, 'refresh');
 
     if (!payload) {
       throw new ApiError('Unauthorized', UNAUTHORIZED);
@@ -215,10 +271,26 @@ class AuthService {
       throw new ApiError('Unauthorized', UNAUTHORIZED);
     }
 
-    return JwtService.generateAccessToken(payload);
+    const storedToken =
+      await refreshTokenService.refreshTokenExists(refreshToken);
+
+    if (!storedToken || storedToken.expiresAt < new Date()) {
+      throw new ApiError('Unauthorized', UNAUTHORIZED);
+    }
+
+    const tokens = JwtService.generateTokens(payload.uuid);
+
+    await refreshTokenService.deleteOne({ token: refreshToken });
+    await refreshTokenService.createOne({
+      token: tokens.refreshToken,
+      userUuid: payload.uuid,
+      expiresAt: new Date(Date.now() + MAGIC_NUMBERS.ONE_WEEK),
+    });
+
+    return tokens;
   }
 
-  private handleGoogleErrors(status: number) {
+  private handleAxiosResponseErrors(status: number) {
     switch (status) {
       case UNAUTHORIZED:
         throw new ApiError('Unauthorized', UNAUTHORIZED);
@@ -226,12 +298,34 @@ class AuthService {
         throw new ApiError('Access denied', FORBIDDEN);
       case BAD_REQUEST:
         throw new ApiError('Bad request', BAD_REQUEST);
+      case NOT_FOUND:
+        throw new ApiError('Not found', NOT_FOUND);
       default:
         throw new ApiError(
           'Something went wrong: Please try agian later...',
           INTERNAL_SERVER_ERROR
         );
     }
+  }
+
+  private async handleCreateUserProject(user: IUser) {
+    return await projectSerivce.createOne({
+      name: DEFAULT_VALUES.PROJECTS.name,
+      description: DEFAULT_VALUES.PROJECTS.description,
+      userUuid: user.uuid,
+      statusUuid: statusUuid,
+      color: DEFAULT_VALUES.PROJECTS.color,
+    });
+  }
+
+  private async handleCreateUserTask(user: IUser, projectUuid: string) {
+    return await taskService.createOne({
+      name: DEFAULT_VALUES.TASKS.name,
+      description: DEFAULT_VALUES.TASKS.description,
+      userUuid: user.uuid,
+      statusUuid: statusUuid,
+      projectUuid,
+    });
   }
 }
 

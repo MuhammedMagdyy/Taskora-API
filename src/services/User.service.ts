@@ -1,31 +1,31 @@
 import { Prisma } from '@prisma/client';
-import { userRepository, UserRepository } from '../repositories';
+import { userRepository } from '../repositories';
 
 export class UserService {
-  constructor(private readonly userRepository: UserRepository) {}
+  constructor(private readonly userDataSource = userRepository) {}
 
   async createOne(data: Prisma.UserUncheckedCreateInput) {
-    return await this.userRepository.createOne(data);
+    return this.userDataSource.createOne(data);
   }
 
   async updateOne(
     query: Prisma.UserWhereUniqueInput,
     data: Prisma.UserUncheckedUpdateInput
   ) {
-    return await this.userRepository.updateOne(query, data);
+    return this.userDataSource.updateOne(query, data);
   }
 
   async findUserByProviderId(providerId: string) {
-    return await this.userRepository.findOne({ providerId });
+    return this.userDataSource.findOne({ providerId });
   }
 
   async findUserByUUID(uuid: string) {
-    return await this.userRepository.findOne({ uuid });
+    return this.userDataSource.findOne({ uuid });
   }
 
   async findUserByEmail(email: string) {
-    return await this.userRepository.findOne({ email });
+    return this.userDataSource.findOne({ email });
   }
 }
 
-export const userService = new UserService(userRepository);
+export const userService = new UserService();
