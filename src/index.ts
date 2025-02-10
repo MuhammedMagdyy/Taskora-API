@@ -1,16 +1,9 @@
 import * as server from './app';
 import colors from 'colors';
-import { databaseConnection } from './database/client';
 
-databaseConnection()
-  .then(() => {
-    return server.up();
-  })
-  .catch((error) => {
-    console.error(
-      colors.red(
-        `${error instanceof Error ? error.message : (error as string)}`
-      )
-    );
-    process.exit(1);
-  });
+server.up().catch((error) => {
+  console.error(
+    colors.red(`Error occurred while starting the server: ${error} ❌`)
+  );
+  process.exit(1);
+});
