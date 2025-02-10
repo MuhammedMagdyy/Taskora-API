@@ -1,3 +1,4 @@
+// TODO: Need to make DB_COLUMNS a type
 export const DB_COLUMNS = {
   PROJECT: {
     UUID: 'uuid',
@@ -50,9 +51,17 @@ export const API_INTEGRATION = {
     ],
     USER_INFO_URL: 'https://www.googleapis.com/oauth2/v2/userinfo',
   },
+  GITHUB: {
+    TOKEN_URL: 'https://github.com/login/oauth/access_token',
+    USER_INFO_URL: 'https://api.github.com/user',
+    EMAILS_URL: 'https://api.github.com/user/emails',
+    REVOKE_URL: (clientId: string) =>
+      `https://api.github.com/applications/${clientId}/token`,
+  },
 };
 export const MAGIC_NUMBERS = {
   ONE_DAY: 24 * 60 * 60 * 1000,
+  ONE_WEEK: 7 * 24 * 60 * 60 * 1000,
   MAX_FILE_SIZE: 5 * 1024 * 1024,
 };
 export const DEFAULT_VALUES = {
