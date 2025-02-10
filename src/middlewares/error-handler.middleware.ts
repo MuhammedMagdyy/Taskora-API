@@ -3,15 +3,16 @@ import { ZodError } from 'zod';
 import {
   ApiError,
   BAD_REQUEST,
+  FORBIDDEN,
   INTERNAL_SERVER_ERROR,
   PAYLOAD_TOO_LARGE,
   SERVER,
-  UNAUTHORIZED,
 } from '../utils';
 import { Prisma } from '@prisma/client';
 import { JsonWebTokenError } from 'jsonwebtoken';
 import { UploadApiErrorResponse } from 'cloudinary';
 import { MulterError } from 'multer';
+import { AxiosError } from 'axios';
 
 type ErrorType =
   | ApiError
@@ -20,7 +21,8 @@ type ErrorType =
   | Prisma.PrismaClientKnownRequestError
   | JsonWebTokenError
   | UploadApiErrorResponse
-  | MulterError;
+  | MulterError
+  | AxiosError;
 
 export const errorHandler: ErrorRequestHandler = (
   error: ErrorType,
@@ -30,30 +32,55 @@ export const errorHandler: ErrorRequestHandler = (
 ): void => {
   if (error instanceof ApiError) {
     res.status(error.status).json({ message: error.message });
-  } else if (error instanceof ZodError) {
-    const errors = error.issues.map((issue) => {
-      return {
+    return;
+  }
+
+  if (error instanceof ZodError) {
+    res.status(BAD_REQUEST).json({
+      message: 'Validation failed',
+      errors: error.issues.map((issue) => ({
         field: issue.path.join('.'),
         message: issue.message,
-      };
+      })),
     });
-    res.status(BAD_REQUEST).json({ message: 'Validation failed', errors });
-  } else if (error instanceof Prisma.PrismaClientKnownRequestError) {
-    const prismaError = handlePrismaError(error);
-    res.status(prismaError.status).json({ message: prismaError.message });
-  } else if (error instanceof JsonWebTokenError) {
-    res.status(UNAUTHORIZED).json({ message: 'Invalid token' });
-  } else if (handleCloudinaryError(error)) {
+    return;
+  }
+
+  if (error instanceof Prisma.PrismaClientKnownRequestError) {
+    const { status, message } = handlePrismaError(error);
+    res.status(status).json({ message });
+    return;
+  }
+
+  if (error instanceof JsonWebTokenError) {
+    res.status(FORBIDDEN).json({ message: 'Invalid or expired token' });
+    return;
+  }
+
+  if (isCloudinaryError(error)) {
     res.status(error.http_code).json({ message: error.message });
-  } else if (error instanceof MulterError) {
+    return;
+  }
+
+  if (error instanceof MulterError) {
     const { status, message } = handleMulterError(error);
     res.status(status).json({ message });
+    return;
+  }
+
+  if (error instanceof AxiosError) {
+    res.status(error.response?.status || INTERNAL_SERVER_ERROR).json({
+      message:
+        error.response?.data ||
+        'Something went wrong, please try again later...',
+    });
+    return;
+  }
+
+  if (process.env.NODE_ENV === SERVER.DEVELOPMENT) {
+    sendErrorToDev(error, res);
   } else {
-    if (process.env.NODE_ENV === SERVER.DEVELOPMENT) {
-      sendErrorToDev(error, res);
-    } else {
-      sendErrorToProd(error, res);
-    }
+    sendErrorToProd(res);
   }
 };
 
@@ -65,36 +92,32 @@ const sendErrorToDev = (error: ErrorType, res: Response): void => {
   });
 };
 
-const sendErrorToProd = (error: ErrorType, res: Response): void => {
-  res
-    .status(INTERNAL_SERVER_ERROR)
-    .json({ message: 'Internal server error: Please try again later...' });
+const sendErrorToProd = (res: Response): void => {
+  res.status(INTERNAL_SERVER_ERROR).json({
+    message: 'Internal server error: Please try again later...',
+  });
 };
 
-const handlePrismaError = (error: Prisma.PrismaClientKnownRequestError) => {
-  // TODO: Gonna handle more errors in the future
-
+const handlePrismaError = (
+  error: Prisma.PrismaClientKnownRequestError
+): { status: number; message: string } => {
   switch (error.code) {
     case 'P2002':
-      return new ApiError(
-        `Duplicate field value: ${error.meta?.target as string}`,
-        BAD_REQUEST
-      );
-
+      return {
+        status: BAD_REQUEST,
+        message: `Duplicate field value: ${error.meta?.target as string}`,
+      };
     case 'P2003':
-      return new ApiError('Foreign key constraint failed', BAD_REQUEST);
-
+      return { status: BAD_REQUEST, message: 'Foreign key constraint failed' };
     default:
-      return new ApiError(
-        `Something went wront: Please make sure your database server is running`,
-        INTERNAL_SERVER_ERROR
-      );
+      return {
+        status: INTERNAL_SERVER_ERROR,
+        message: 'Database error: Ensure the server is running correctly',
+      };
   }
 };
 
-const handleCloudinaryError = (
-  error: unknown
-): error is UploadApiErrorResponse => {
+const isCloudinaryError = (error: unknown): error is UploadApiErrorResponse => {
   return (
     typeof error === 'object' &&
     error !== null &&
@@ -106,26 +129,25 @@ const handleCloudinaryError = (
 const handleMulterError = (
   error: MulterError
 ): { status: number; message: string } => {
-  switch (error.code) {
-    case 'LIMIT_FILE_SIZE':
-      return {
-        status: PAYLOAD_TOO_LARGE,
-        message: 'File size too large. Please upload a smaller file.',
-      };
-    case 'LIMIT_FILE_COUNT':
-      return {
-        status: BAD_REQUEST,
-        message: 'Too many files uploaded. Please upload fewer files.',
-      };
-    case 'LIMIT_UNEXPECTED_FILE':
-      return {
-        status: BAD_REQUEST,
-        message: 'Unexpected file field. Please check the field name.',
-      };
-    default:
-      return {
-        status: INTERNAL_SERVER_ERROR,
-        message: 'File upload error. Please try again later.',
-      };
-  }
+  const errorMap: Record<string, { status: number; message: string }> = {
+    LIMIT_FILE_SIZE: {
+      status: PAYLOAD_TOO_LARGE,
+      message: 'File size too large. Please upload a smaller file.',
+    },
+    LIMIT_FILE_COUNT: {
+      status: BAD_REQUEST,
+      message: 'Too many files uploaded. Please upload fewer files.',
+    },
+    LIMIT_UNEXPECTED_FILE: {
+      status: BAD_REQUEST,
+      message: 'Unexpected file field. Please check the field name.',
+    },
+  };
+
+  return (
+    errorMap[error.code] || {
+      status: INTERNAL_SERVER_ERROR,
+      message: 'File upload error. Please try again later.',
+    }
+  );
 };
