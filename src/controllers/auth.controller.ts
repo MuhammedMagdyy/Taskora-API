@@ -12,16 +12,24 @@ import {
 
 export const localRegister = asyncHandler(async (req, res) => {
   const { name, email, password } = registerSchema.parse(req.body);
-  const tokens = await authService.register(name, email, password);
+  const userInfo = await authService.register(name, email, password);
 
-  res.status(CREATED).json({ message: 'Registered successfully', tokens });
+  res.status(CREATED).json({
+    message: 'Registered successfully',
+    data: userInfo.data,
+    tokens: userInfo.tokens,
+  });
 });
 
 export const localLogin = asyncHandler(async (req, res) => {
   const { email, password } = loginSchema.parse(req.body);
-  const tokens = await authService.login(email, password);
+  const userInfo = await authService.login(email, password);
 
-  res.status(OK).json({ message: 'Logged in successfully', tokens });
+  res.status(OK).json({
+    message: 'Logged in successfully',
+    data: userInfo.data,
+    tokens: userInfo.tokens,
+  });
 });
 
 export const logout = asyncHandler(async (req, res) => {
@@ -60,9 +68,10 @@ export const handleGoogleCallback = asyncHandler(async (req, res, next) => {
 
   res.json({
     message: 'Logged in successfully!',
+    data: userInfo.userResponse,
     tokens: {
-      accessToken: userInfo.accessToken,
-      refreshToken: userInfo.refreshToken,
+      accessToken: userInfo.tokens.accessToken,
+      refreshToken: userInfo.tokens.refreshToken,
     },
   });
 });
@@ -79,9 +88,10 @@ export const handleGitHubCallback = asyncHandler(async (req, res, next) => {
 
   res.json({
     message: 'Logged in successfully!',
+    data: userInfo.userResponse,
     tokens: {
-      accessToken: userInfo?.accessToken,
-      refreshToken: userInfo?.refreshToken,
+      accessToken: userInfo.tokens.accessToken,
+      refreshToken: userInfo.tokens.refreshToken,
     },
   });
 });

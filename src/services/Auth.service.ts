@@ -78,7 +78,15 @@ class AuthService {
       expiresAt: new Date(Date.now() + MAGIC_NUMBERS.ONE_WEEK),
     });
 
-    return tokens;
+    const userResponse: IUser = {
+      uuid: user.uuid,
+      name: user.name as string,
+      email: user.email,
+      picture: user.picture as string,
+      createdAt: user.createdAt,
+    };
+
+    return { data: userResponse, tokens };
   }
 
   async login(email: string, password: string) {
@@ -105,7 +113,15 @@ class AuthService {
       expiresAt: new Date(Date.now() + MAGIC_NUMBERS.ONE_WEEK),
     });
 
-    return tokens;
+    const userResponse: IUser = {
+      uuid: userExists.uuid,
+      name: userExists.name as string,
+      email: userExists.email,
+      picture: userExists.picture as string,
+      createdAt: userExists.createdAt,
+    };
+
+    return { data: userResponse, tokens };
   }
 
   async logout(refreshToken: string) {
@@ -169,7 +185,15 @@ class AuthService {
       expiresAt: new Date(Date.now() + MAGIC_NUMBERS.ONE_WEEK),
     });
 
-    return tokens;
+    const userResponse: IUser = {
+      uuid: userExists.uuid,
+      name: userExists.name as string,
+      email: userExists.email,
+      picture: userExists.picture as string,
+      createdAt: userExists.createdAt,
+    };
+
+    return { userResponse, tokens };
   }
 
   async loginWithGitHub(user: IGitHubStrategy) {
@@ -196,7 +220,15 @@ class AuthService {
       expiresAt: new Date(Date.now() + MAGIC_NUMBERS.ONE_WEEK),
     });
 
-    return tokens;
+    const userResponse: IUser = {
+      uuid: userExists.uuid,
+      name: userExists.name as string,
+      email: userExists.email,
+      picture: userExists.picture as string,
+      createdAt: userExists.createdAt,
+    };
+
+    return { userResponse, tokens };
   }
 
   async getGitHubUserInfo(token: string) {
