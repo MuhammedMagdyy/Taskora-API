@@ -8,14 +8,15 @@ import colors from 'colors';
 import compression from 'compression';
 import swaggerDocument from '../swagger.json';
 import routes from './routes';
-import { errorHandler } from './middlewares';
+import { errorHandler, xss } from './middlewares';
 import { nodeEnv, port, corsConfig } from './config';
 import { SERVER, INTERNAL_SERVER_ERROR } from './utils';
-import { PrismaDatabaseClient } from './database';
+import { PrismaDatabaseClient, RedisDatabaseClient } from './database';
 import { refreshTokenService } from './services';
 
 const app = express();
 const prismaClient = PrismaDatabaseClient.getInstance();
+const redisClient = RedisDatabaseClient.getInstance();
 const logger =
   nodeEnv === SERVER.DEVELOPMENT
     ? morgan('dev')
@@ -24,24 +25,37 @@ const logger =
       });
 
 app.use(logger);
-app.use(cors(corsConfig));
 app.use(helmet());
+app.use(cors(corsConfig));
 app.use(compression());
 app.use(express.json());
+app.use(xss);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use('/api/v1', routes);
 app.use(errorHandler);
 
 export const up = async () => {
   try {
-    await prismaClient.connect();
+    await Promise.all([prismaClient.connect(), redisClient.connect()]);
     refreshTokenService.scheduleTokenCleanupTask();
-    app.listen(port, () => {
+
+    const server = app.listen(port, () => {
       console.log(
         colors.green(
           `Server is running on ${port || SERVER.DEFAULT_PORT_NUMBER} 🚀`
         )
       );
+    });
+
+    process.on('SIGINT', async () => {
+      console.log(colors.yellow('\nShutting down gracefully...'));
+
+      await Promise.all([prismaClient.disconnect(), redisClient.disconnect()]);
+
+      server.close(() => {
+        console.log(colors.yellow('Server closed successfully! 👋'));
+        process.exit(0);
+      });
     });
   } catch (error) {
     console.error(
