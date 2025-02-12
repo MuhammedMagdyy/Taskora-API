@@ -11,5 +11,6 @@ export const xss = (req: Request, res: Response, next: NextFunction) => {
       req.body[key] = DOMPurify.sanitize(req.body[key], { ALLOWED_TAGS: [] });
     }
   }
+
   next();
 };
