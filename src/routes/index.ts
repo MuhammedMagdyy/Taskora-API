@@ -7,6 +7,7 @@ import { taskRouter } from './task.routes';
 import { statusRouter } from './status.routes';
 import { authRouter } from './auth.routes';
 import { userRouter } from './user.routes';
+import { isVerified } from '../middlewares';
 
 const router = Router();
 
@@ -15,11 +16,11 @@ router.get('/health', (_, res) => {
 });
 
 router.use('/auth', authRouter);
-router.use('/projects', projectRouter);
-router.use('/tags', tagRouter);
-router.use('/tasks', taskRouter);
-router.use('/statuses', statusRouter);
-router.use('/users', userRouter);
+router.use('/projects', isVerified, projectRouter);
+router.use('/tags', isVerified, tagRouter);
+router.use('/tasks', isVerified, taskRouter);
+router.use('/statuses', isVerified, statusRouter);
+router.use('/users', isVerified, userRouter);
 
 router.all('*', (request, _res, next) => {
   return next(
