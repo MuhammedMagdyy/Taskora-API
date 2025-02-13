@@ -47,7 +47,7 @@ export class EmailService {
     userUuid: string
   ) {
     const verifyEmailTemplate = getVerifyEmailTemplate();
-    const verifyEmailUrl = `${frontendUrl}/verify-email?token=${token}&userUuid=${userUuid}`;
+    const verifyEmailUrl = `${frontendUrl}?token=${token}&userUuid=${userUuid}`;
 
     const html = verifyEmailTemplate
       .replace(/{{verifyEmailUrl}}/g, verifyEmailUrl)
