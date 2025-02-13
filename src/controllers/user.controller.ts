@@ -24,6 +24,7 @@ export const getUser = asyncHandler(async (req, res, next) => {
     uuid: userExists.uuid,
     name: userExists.name,
     email: userExists.email,
+    isVerified: userExists.isVerified,
     picture: userExists.picture,
     createdAt: userExists.createdAt,
   };

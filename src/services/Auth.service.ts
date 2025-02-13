@@ -6,6 +6,8 @@ import {
   projectSerivce,
   taskService,
   refreshTokenService,
+  emailService,
+  redisService,
 } from '../services';
 import { OAuth2Client } from 'google-auth-library';
 import {
@@ -24,6 +26,7 @@ import {
   CONFLICT,
   DEFAULT_VALUES,
   FORBIDDEN,
+  GONE,
   INTERNAL_SERVER_ERROR,
   MAGIC_NUMBERS,
   NOT_FOUND,
@@ -32,6 +35,7 @@ import {
 } from '../utils';
 import { Provider } from '@prisma/client';
 import axios from 'axios';
+import crypto from 'crypto';
 
 class AuthService {
   private googleOAuth2Client: OAuth2Client;
@@ -82,9 +86,25 @@ class AuthService {
       uuid: user.uuid,
       name: user.name as string,
       email: user.email,
+      isVerified: user.isVerified,
       picture: user.picture as string,
       createdAt: user.createdAt,
     };
+
+    const verificationToken = crypto.randomBytes(32).toString('hex');
+
+    await redisService.set(
+      `verify-email:${user.uuid}`,
+      verificationToken,
+      MAGIC_NUMBERS.HALF_HOUR
+    );
+
+    await emailService.sendVerifyEmail(
+      email,
+      name,
+      verificationToken,
+      user.uuid
+    );
 
     return { data: userResponse, tokens };
   }
@@ -106,6 +126,13 @@ class AuthService {
       throw new ApiError('Invalid email or password', UNAUTHORIZED);
     }
 
+    if (!userExists.isVerified) {
+      throw new ApiError(
+        'Account not verified. Please check your email.',
+        FORBIDDEN
+      );
+    }
+
     const tokens = JwtService.generateTokens(userExists.uuid);
     await refreshTokenService.createOne({
       token: tokens.refreshToken,
@@ -117,6 +144,7 @@ class AuthService {
       uuid: userExists.uuid,
       name: userExists.name as string,
       email: userExists.email,
+      isVerified: userExists.isVerified,
       picture: userExists.picture as string,
       createdAt: userExists.createdAt,
     };
@@ -189,6 +217,7 @@ class AuthService {
       uuid: userExists.uuid,
       name: userExists.name as string,
       email: userExists.email,
+      isVerified: userExists.isVerified,
       picture: userExists.picture as string,
       createdAt: userExists.createdAt,
     };
@@ -224,6 +253,7 @@ class AuthService {
       uuid: userExists.uuid,
       name: userExists.name as string,
       email: userExists.email,
+      isVerified: userExists.isVerified,
       picture: userExists.picture as string,
       createdAt: userExists.createdAt,
     };
@@ -320,6 +350,52 @@ class AuthService {
     });
 
     return tokens;
+  }
+
+  async verifyEmail(token: string, userUuid: string) {
+    const storedToken = await redisService.get<string>(
+      `verify-email:${userUuid}`
+    );
+
+    if (!storedToken || storedToken !== token) {
+      throw new ApiError('Verification token is invalid or expired', GONE);
+    }
+
+    const user = await userService.findUserByUUID(userUuid);
+
+    if (!user) {
+      throw new ApiError('User not found', NOT_FOUND);
+    }
+
+    await userService.updateOne({ uuid: userUuid }, { isVerified: true });
+    await redisService.delete(`verify-email:${userUuid}`);
+  }
+
+  async resendVerificationEmail(email: string) {
+    const user = await userService.findUserByEmail(email);
+
+    if (!user) {
+      throw new ApiError('User not found', NOT_FOUND);
+    }
+
+    if (user.isVerified) {
+      throw new ApiError('Email already verified', CONFLICT);
+    }
+
+    const verificationToken = crypto.randomBytes(32).toString('hex');
+
+    await redisService.set(
+      `verify-email:${user.uuid}`,
+      verificationToken,
+      MAGIC_NUMBERS.HALF_HOUR
+    );
+
+    await emailService.sendVerifyEmail(
+      email,
+      user.name as string,
+      verificationToken,
+      user.uuid
+    );
   }
 
   private handleAxiosResponseErrors(status: number) {

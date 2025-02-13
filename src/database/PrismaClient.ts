@@ -23,19 +23,23 @@ export class PrismaDatabaseClient implements IDatabaseClient {
   }
 
   async connect(): Promise<void> {
-    await this.getClient().$connect();
-    console.log(colors.green(`Database connected successfully! ✅`));
+    try {
+      await this.getClient().$connect();
+      console.log(colors.green(`Prisma connected successfully! ✅`));
+    } catch (error) {
+      console.error(colors.red(`Prisma connection failed - ${error} ❌`));
+      process.exit(1);
+    }
   }
 
   async disconnect(): Promise<void> {
-    await this.getClient().$disconnect();
-    console.log(colors.red(`Database disconnected successfully! ❌`));
+    try {
+      await this.getClient().$disconnect();
+      console.log(colors.red(`Prisma disconnected successfully! ❌`));
+    } catch (error) {
+      console.error(colors.red(`Prisma disconnection failed - ${error} ❌`));
+    }
   }
 }
-
-process.on('SIGINT', async () => {
-  await PrismaDatabaseClient.getInstance().disconnect();
-  process.exit(0);
-});
 
 export const prismaClient = PrismaDatabaseClient.getInstance().getClient();

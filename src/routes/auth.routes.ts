@@ -12,5 +12,7 @@ router.post('/register', auth.localRegister);
 router.post('/login', auth.localLogin);
 router.post('/logout', isAuth, auth.logout);
 router.post('/refresh-token', auth.refreshToken);
+router.get('/verify-email', auth.verifyEmail);
+router.post('/resend-verify-email', auth.resendVerificationEmail);
 
 export { router as authRouter };
