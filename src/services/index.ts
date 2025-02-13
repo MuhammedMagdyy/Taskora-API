@@ -10,3 +10,5 @@ export * from './User.service';
 export * from './Hashing.service';
 export * from './Cloudinary.service';
 export * from './Refresh-Token.service';
+export * from './Redis.service';
+export * from './Email.service';
