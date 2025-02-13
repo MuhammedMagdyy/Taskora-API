@@ -12,6 +12,7 @@ export const FORBIDDEN: HttpExceptionStatusCodes = 403;
 export const NOT_FOUND: HttpExceptionStatusCodes = 404;
 export const METHOD_NOT_ALLOWED: HttpExceptionStatusCodes = 405;
 export const CONFLICT: HttpExceptionStatusCodes = 409;
+export const GONE: HttpExceptionStatusCodes = 410;
 export const PAYLOAD_TOO_LARGE: HttpExceptionStatusCodes = 413;
 export const UNSUPPORTED_MEDIA_TYPE: HttpExceptionStatusCodes = 415;
 export const INTERNAL_SERVER_ERROR: HttpExceptionStatusCodes = 500;

@@ -6,6 +6,7 @@ export type HttpExceptionStatusCodes =
   | 404
   | 405
   | 409
+  | 410
   | 413
   | 415
   | 500;

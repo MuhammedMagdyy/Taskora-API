@@ -113,3 +113,27 @@ export const refreshToken = asyncHandler(async (req, res, next) => {
 
   res.status(OK).json({ message: 'Token refreshed successfully', tokens });
 });
+
+export const verifyEmail = asyncHandler(async (req, res, next) => {
+  const { token, userUuid } = req.query as { token: string; userUuid: string };
+
+  if (!token || !userUuid) {
+    return next(new ApiError('Invalid or expired token', BAD_REQUEST));
+  }
+
+  await authService.verifyEmail(token, userUuid);
+
+  res.status(OK).json({ message: 'Email verified successfully' });
+});
+
+export const resendVerificationEmail = asyncHandler(async (req, res) => {
+  const { email } = req.body as { email: string };
+
+  if (!email) {
+    throw new ApiError('Email is required', BAD_REQUEST);
+  }
+
+  await authService.resendVerificationEmail(email);
+
+  res.status(OK).json({ message: 'Verification email sent successfully' });
+});

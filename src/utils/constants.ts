@@ -62,6 +62,7 @@ export const API_INTEGRATION = {
 export const MAGIC_NUMBERS = {
   ONE_DAY: 24 * 60 * 60 * 1000,
   ONE_WEEK: 7 * 24 * 60 * 60 * 1000,
+  HALF_HOUR: 5 * 60,
   MAX_FILE_SIZE: 5 * 1024 * 1024,
 };
 export const DEFAULT_VALUES = {
