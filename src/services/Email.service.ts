@@ -60,6 +60,16 @@ export class EmailService {
       html,
     });
   }
+
+  async sendForgetPasswordEmail(email: string, name: string, otp: string) {
+    await this.sendEmail({
+      to: email,
+      subject: 'Reset your password',
+      text: 'Reset your password',
+      html: `<p>Hi ${name},</p>
+      <p>Your OTP to reset your password is <strong>${otp}</strong></p>`,
+    });
+  }
 }
 
 export const emailService = new EmailService();
