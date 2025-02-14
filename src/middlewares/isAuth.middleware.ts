@@ -1,11 +1,11 @@
 import { Request, Response, NextFunction } from 'express';
 import asyncHandler from 'express-async-handler';
-import { JwtService } from '../services';
+import { JwtService, redisService } from '../services';
 import { ApiError, UNAUTHORIZED } from '../utils';
 import { IJwtPayload } from '../interfaces';
 
 export const isAuth = asyncHandler(
-  (req: Request, res: Response, next: NextFunction) => {
+  async (req: Request, res: Response, next: NextFunction) => {
     const authHeader = req.headers.authorization;
 
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -18,9 +18,15 @@ export const isAuth = asyncHandler(
       return next(new ApiError('Unauthorized', UNAUTHORIZED));
     }
 
+    const isInvalidated = await redisService.get(`invalidated-tokens:${token}`);
+
+    if (isInvalidated) {
+      throw new ApiError('Session expired, please log in again', UNAUTHORIZED);
+    }
+
     const decoded = JwtService.verify(token, 'access') as IJwtPayload;
 
-    req.user = { uuid: decoded.uuid };
+    req.user = { uuid: decoded.uuid as string };
     next();
   }
 );

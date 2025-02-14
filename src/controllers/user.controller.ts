@@ -53,7 +53,10 @@ export const updateUser = asyncHandler(async (req, res, next) => {
     picture = image;
   }
 
-  const { name, password } = updateUserSchema.parse({ ...req.body, picture });
+  const { name, password } = updateUserSchema.parse({
+    ...req.body,
+    picture: req.file ? picture : undefined,
+  });
 
   if (name) user.name = name;
   if (password) {

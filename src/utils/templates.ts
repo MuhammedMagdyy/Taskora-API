@@ -10,3 +10,10 @@ export const getVerifyEmailTemplate = () => {
 
   return fs.readFileSync(verificationEmailTemplatePath, 'utf-8');
 };
+
+export const getOTPTemplate = () => {
+  const otpHtmlTemplate = '../templates/otp.html';
+  const otpTemplatePath = path.join(__dirname, otpHtmlTemplate);
+
+  return fs.readFileSync(otpTemplatePath, 'utf-8');
+};
