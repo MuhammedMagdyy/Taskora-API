@@ -36,6 +36,7 @@ import {
 import { Provider } from '@prisma/client';
 import axios from 'axios';
 import crypto from 'crypto';
+import { generateCode } from '../utils';
 
 class AuthService {
   private googleOAuth2Client: OAuth2Client;
@@ -79,7 +80,7 @@ class AuthService {
     await refreshTokenService.createOne({
       token: tokens.refreshToken,
       userUuid: user.uuid,
-      expiresAt: new Date(Date.now() + MAGIC_NUMBERS.ONE_WEEK),
+      expiresAt: new Date(Date.now() + MAGIC_NUMBERS.ONE_WEEK_IN_MILLISECONDS),
     });
 
     const userResponse: IUser = {
@@ -96,7 +97,7 @@ class AuthService {
     await redisService.set(
       `verify-email:${user.uuid}`,
       verificationToken,
-      MAGIC_NUMBERS.HALF_HOUR
+      MAGIC_NUMBERS.ONE_DAY_IN_SECONDS
     );
 
     await emailService.sendVerifyEmail(
@@ -116,7 +117,6 @@ class AuthService {
       throw new ApiError('Invalid email or password', UNAUTHORIZED);
     }
 
-    // TODO: When user resets password, the refresh token should be invalidated
     const passwordMatches = await HashingService.compare(
       password,
       userExists.password as string
@@ -137,7 +137,7 @@ class AuthService {
     await refreshTokenService.createOne({
       token: tokens.refreshToken,
       userUuid: userExists.uuid,
-      expiresAt: new Date(Date.now() + MAGIC_NUMBERS.ONE_WEEK),
+      expiresAt: new Date(Date.now() + MAGIC_NUMBERS.ONE_WEEK_IN_MILLISECONDS),
     });
 
     const userResponse: IUser = {
@@ -210,7 +210,7 @@ class AuthService {
     await refreshTokenService.createOne({
       token: tokens.refreshToken,
       userUuid: userExists.uuid,
-      expiresAt: new Date(Date.now() + MAGIC_NUMBERS.ONE_WEEK),
+      expiresAt: new Date(Date.now() + MAGIC_NUMBERS.ONE_WEEK_IN_MILLISECONDS),
     });
 
     const userResponse: IUser = {
@@ -246,7 +246,7 @@ class AuthService {
     await refreshTokenService.createOne({
       token: tokens.refreshToken,
       userUuid: userExists.uuid,
-      expiresAt: new Date(Date.now() + MAGIC_NUMBERS.ONE_WEEK),
+      expiresAt: new Date(Date.now() + MAGIC_NUMBERS.ONE_WEEK_IN_MILLISECONDS),
     });
 
     const userResponse: IUser = {
@@ -327,7 +327,7 @@ class AuthService {
       throw new ApiError('Unauthorized', UNAUTHORIZED);
     }
 
-    const user = await userService.findUserByUUID(payload.uuid);
+    const user = await userService.findUserByUUID(payload.uuid as string);
 
     if (!user) {
       throw new ApiError('Unauthorized', UNAUTHORIZED);
@@ -340,13 +340,13 @@ class AuthService {
       throw new ApiError('Unauthorized', UNAUTHORIZED);
     }
 
-    const tokens = JwtService.generateTokens(payload.uuid);
+    const tokens = JwtService.generateTokens(payload.uuid as string);
 
     await refreshTokenService.deleteOne({ token: refreshToken });
     await refreshTokenService.createOne({
       token: tokens.refreshToken,
-      userUuid: payload.uuid,
-      expiresAt: new Date(Date.now() + MAGIC_NUMBERS.ONE_WEEK),
+      userUuid: payload.uuid as string,
+      expiresAt: new Date(Date.now() + MAGIC_NUMBERS.ONE_WEEK_IN_MILLISECONDS),
     });
 
     return tokens;
@@ -387,7 +387,7 @@ class AuthService {
     await redisService.set(
       `verify-email:${user.uuid}`,
       verificationToken,
-      MAGIC_NUMBERS.HALF_HOUR
+      MAGIC_NUMBERS.ONE_DAY_IN_SECONDS
     );
 
     await emailService.sendVerifyEmail(
@@ -395,6 +395,96 @@ class AuthService {
       user.name as string,
       verificationToken,
       user.uuid
+    );
+  }
+
+  async generateOTP(email: string) {
+    const user = await userService.findUserByEmail(email);
+
+    if (user) {
+      const existingOTP = await redisService.exists(`otp:${user.uuid}`);
+
+      if (existingOTP) {
+        throw new ApiError('OTP already sent', CONFLICT);
+      }
+
+      const otp = generateCode();
+
+      await redisService.set(
+        `otp:${user.uuid}`,
+        otp,
+        MAGIC_NUMBERS.FIVE_MINUTES_IN_SECONDS
+      );
+
+      await emailService.sendForgetPasswordEmail(
+        email,
+        user.name as string,
+        otp
+      );
+    }
+  }
+
+  async verifyOTP(email: string, otp: string) {
+    const user = await userService.findUserByEmail(email);
+
+    if (!user) {
+      throw new ApiError('User not found', NOT_FOUND);
+    }
+
+    const storedOTP = await redisService.get<string>(`otp:${user.uuid}`);
+
+    if (!storedOTP || String(storedOTP).trim() !== String(otp).trim()) {
+      throw new ApiError('Invalid or expired OTP', GONE);
+    }
+
+    await redisService.delete(`otp:${user.uuid}`);
+
+    const resetTokenPassword = JwtService.generateAccessToken({
+      email: user.email,
+    });
+
+    await redisService.set(
+      `reset-token:${user.uuid}`,
+      resetTokenPassword,
+      MAGIC_NUMBERS.FIFTEEN_MINUTES_IN_SECONDS
+    );
+
+    return resetTokenPassword;
+  }
+
+  async resetPassword(password: string, token: string) {
+    const payload = JwtService.verify(token, 'access');
+
+    if (!payload) {
+      throw new ApiError('Unauthorized', UNAUTHORIZED);
+    }
+
+    const user = await userService.findUserByEmail(payload.email as string);
+
+    if (!user) {
+      throw new ApiError('User not found', NOT_FOUND);
+    }
+
+    const storedToken = await redisService.get<string>(
+      `reset-token:${user.uuid}`
+    );
+
+    if (!storedToken || String(storedToken).trim() !== String(token).trim()) {
+      throw new ApiError('Invalid or expired token', GONE);
+    }
+
+    const hashedPassword = await HashingService.hash(password);
+
+    await userService.updateOne(
+      { uuid: user.uuid },
+      { password: hashedPassword }
+    );
+    await refreshTokenService.deleteMany({ userUuid: user.uuid });
+    await redisService.delete(`reset-token:${user.uuid}`);
+    await redisService.set(
+      `invalidated-tokens:${token}`,
+      'true',
+      MAGIC_NUMBERS.FIFTEEN_MINUTES_IN_SECONDS
     );
   }
 

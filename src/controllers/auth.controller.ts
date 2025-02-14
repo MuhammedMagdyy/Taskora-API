@@ -4,10 +4,15 @@ import {
   ApiError,
   BAD_REQUEST,
   CREATED,
+  forgotPasswordSchema,
   loginSchema,
   OK,
   registerSchema,
+  resendVerificationEmailSchema,
+  resetPasswordSchema,
   UNAUTHORIZED,
+  verifyEmailSchema,
+  verifyOtpSchema,
 } from '../utils';
 
 export const localRegister = asyncHandler(async (req, res) => {
@@ -115,7 +120,7 @@ export const refreshToken = asyncHandler(async (req, res, next) => {
 });
 
 export const verifyEmail = asyncHandler(async (req, res, next) => {
-  const { token, userUuid } = req.query as { token: string; userUuid: string };
+  const { token, userUuid } = verifyEmailSchema.parse(req.query);
 
   if (!token || !userUuid) {
     return next(new ApiError('Invalid or expired token', BAD_REQUEST));
@@ -127,7 +132,7 @@ export const verifyEmail = asyncHandler(async (req, res, next) => {
 });
 
 export const resendVerificationEmail = asyncHandler(async (req, res) => {
-  const { email } = req.body as { email: string };
+  const { email } = resendVerificationEmailSchema.parse(req.body);
 
   if (!email) {
     throw new ApiError('Email is required', BAD_REQUEST);
@@ -136,4 +141,46 @@ export const resendVerificationEmail = asyncHandler(async (req, res) => {
   await authService.resendVerificationEmail(email);
 
   res.status(OK).json({ message: 'Verification email sent successfully' });
+});
+
+export const forgotPassword = asyncHandler(async (req, res) => {
+  const { email } = forgotPasswordSchema.parse(req.body);
+
+  if (!email) {
+    throw new ApiError('Email is required', BAD_REQUEST);
+  }
+
+  await authService.generateOTP(email);
+
+  res.status(OK).json({ message: 'Password reset email sent successfully' });
+});
+
+export const verifyOtp = asyncHandler(async (req, res) => {
+  const { email, otp } = verifyOtpSchema.parse(req.body);
+
+  if (!email || !otp) {
+    throw new ApiError('Email and OTP are required', BAD_REQUEST);
+  }
+
+  const token = await authService.verifyOTP(email, otp);
+
+  res.status(OK).json({ message: 'OTP verified successfully', token });
+});
+
+export const resetPassword = asyncHandler(async (req, res) => {
+  const token = req.headers.authorization?.split(' ')[1];
+
+  if (!token) {
+    throw new ApiError('Unauthorized', UNAUTHORIZED);
+  }
+
+  const { password } = resetPasswordSchema.parse(req.body);
+
+  if (!password) {
+    throw new ApiError('Password is required', BAD_REQUEST);
+  }
+
+  await authService.resetPassword(password, token);
+
+  res.status(OK).json({ message: 'Password reset successfully' });
 });
