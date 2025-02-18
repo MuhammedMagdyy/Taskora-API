@@ -2,7 +2,11 @@ import { Router } from 'express';
 import { googleRouter } from './google.routes';
 import { githubRouter } from './github.routes';
 import { auth } from '../controllers';
-import { isAuth } from '../middlewares';
+import {
+  isAuth,
+  oneMinuteLimiter,
+  twentyFourHourLimiter,
+} from '../middlewares';
 
 const router = Router();
 
@@ -13,9 +17,18 @@ router.post('/login', auth.localLogin);
 router.post('/logout', isAuth, auth.logout);
 router.post('/refresh-token', auth.refreshToken);
 router.get('/verify-email', auth.verifyEmail);
-router.post('/resend-verify-email', auth.resendVerificationEmail);
-router.post('/forgot-password', auth.forgotPassword);
+router.post(
+  '/resend-verify-email',
+  oneMinuteLimiter,
+  twentyFourHourLimiter,
+  auth.resendVerificationEmail
+);
+router.post(
+  '/forgot-password',
+  oneMinuteLimiter,
+  twentyFourHourLimiter,
+  auth.forgotPassword
+);
 router.post('/verify-otp', auth.verifyOtp);
-router.post('/reset-password', auth.resetPassword);
 
 export { router as authRouter };
