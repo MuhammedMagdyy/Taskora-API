@@ -14,7 +14,8 @@ model User {
   name       String?
   picture    String?
   provider   Provider @default(LOCAL)
-  providerId String?  @map("provider_id")
+  googleId   String?  @unique @map("google_id")
+  githubId   String?  @unique @map("github_id")
   isVerified Boolean  @default(false) @map("is_verified")
   createdAt  DateTime @default(now()) @map("created_at")
   updatedAt  DateTime @updatedAt @map("updated_at")
@@ -23,8 +24,8 @@ model User {
   tasks        Task[]
   tags         Tag[]
   RefreshToken RefreshToken[]
+  GeneratedOtp GeneratedOtp[]
 
-  @@index([provider, providerId])
   @@map("users")
 }
 
@@ -34,10 +35,23 @@ model RefreshToken {
   userUuid  String   @map("user_uuid")
   user      User     @relation(fields: [userUuid], references: [uuid], onDelete: Cascade)
   expiresAt DateTime @map("expires_at")
+  isActive  Boolean  @default(true) @map("is_active")
+  isDeleted Boolean  @default(false) @map("is_deleted")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("refresh_tokens")
+}
+
+model GeneratedOtp {
+  uuid      String   @id @default(uuid())
+  otp       String   @unique
+  userUuid  String   @map("user_uuid")
+  user      User     @relation(fields: [userUuid], references: [uuid], onDelete: Cascade)
+  expiresAt DateTime @map("expires_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("generated_otps")
 }
 
 model Project {
