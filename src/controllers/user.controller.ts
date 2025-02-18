@@ -9,7 +9,6 @@ import {
 } from '../utils';
 import { HashingService, userService, cloudinaryService } from '../services';
 import { IUser } from '../interfaces';
-import { Provider } from '@prisma/client';
 
 export const getUser = asyncHandler(async (req, res, next) => {
   const uuid = req.user?.uuid as string;
@@ -65,13 +64,7 @@ export const updateUser = asyncHandler(async (req, res, next) => {
 
   await userService.updateOne(
     { uuid: userUUID },
-    {
-      name: user.name,
-      password: user.password,
-      picture,
-      provider: Provider.LOCAL,
-      providerId: null,
-    }
+    { name: user.name, password: user.password, picture }
   );
 
   res.status(OK).json({ message: 'User updated successfully!' });

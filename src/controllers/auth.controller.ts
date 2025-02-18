@@ -9,7 +9,6 @@ import {
   OK,
   registerSchema,
   resendVerificationEmailSchema,
-  resetPasswordSchema,
   UNAUTHORIZED,
   verifyEmailSchema,
   verifyOtpSchema,
@@ -156,31 +155,9 @@ export const forgotPassword = asyncHandler(async (req, res) => {
 });
 
 export const verifyOtp = asyncHandler(async (req, res) => {
-  const { email, otp } = verifyOtpSchema.parse(req.body);
+  const { email, password, otp } = verifyOtpSchema.parse(req.body);
 
-  if (!email || !otp) {
-    throw new ApiError('Email and OTP are required', BAD_REQUEST);
-  }
-
-  const token = await authService.verifyOTP(email, otp);
+  const token = await authService.verifyOTP(email, password, otp);
 
   res.status(OK).json({ message: 'OTP verified successfully', token });
-});
-
-export const resetPassword = asyncHandler(async (req, res) => {
-  const token = req.headers.authorization?.split(' ')[1];
-
-  if (!token) {
-    throw new ApiError('Unauthorized', UNAUTHORIZED);
-  }
-
-  const { password } = resetPasswordSchema.parse(req.body);
-
-  if (!password) {
-    throw new ApiError('Password is required', BAD_REQUEST);
-  }
-
-  await authService.resetPassword(password, token);
-
-  res.status(OK).json({ message: 'Password reset successfully' });
 });
