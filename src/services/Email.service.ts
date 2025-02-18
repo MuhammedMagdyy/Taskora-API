@@ -40,14 +40,9 @@ export class EmailService {
     }
   }
 
-  async sendVerifyEmail(
-    email: string,
-    name: string,
-    token: string,
-    userUuid: string
-  ) {
+  async sendVerificationEmail(email: string, name: string, token: string) {
     const verifyEmailTemplate = getVerifyEmailTemplate();
-    const verifyEmailUrl = `${frontendUrl}/verify-email?token=${token}&userUuid=${userUuid}`;
+    const verifyEmailUrl = `${frontendUrl}/verify-email?token=${token}`;
 
     const html = verifyEmailTemplate
       .replace(/{{verifyEmailUrl}}/g, verifyEmailUrl)

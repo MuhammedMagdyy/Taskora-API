@@ -15,16 +15,24 @@ export class UserService {
     return this.userDataSource.updateOne(query, data);
   }
 
-  async findUserByProviderId(providerId: string) {
-    return this.userDataSource.findOne({ providerId });
-  }
-
   async findUserByUUID(uuid: string) {
     return this.userDataSource.findOne({ uuid });
   }
 
   async findUserByEmail(email: string) {
     return this.userDataSource.findOne({ email });
+  }
+
+  async initializeUserWithProjectAndTasks(
+    userData: Prisma.UserUncheckedCreateInput,
+    projectData: Omit<Prisma.ProjectUncheckedCreateInput, 'userUuid'>,
+    taskData: Omit<Prisma.TaskUncheckedCreateInput, 'projectUuid' | 'userUuid'>
+  ) {
+    return this.userDataSource.initializeUserWithProjectAndTasks(
+      userData,
+      projectData,
+      taskData
+    );
   }
 }
 
