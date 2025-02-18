@@ -15,4 +15,5 @@ export const CONFLICT: HttpExceptionStatusCodes = 409;
 export const GONE: HttpExceptionStatusCodes = 410;
 export const PAYLOAD_TOO_LARGE: HttpExceptionStatusCodes = 413;
 export const UNSUPPORTED_MEDIA_TYPE: HttpExceptionStatusCodes = 415;
+export const TOO_MANY_REQUESTS: HttpExceptionStatusCodes = 429;
 export const INTERNAL_SERVER_ERROR: HttpExceptionStatusCodes = 500;
