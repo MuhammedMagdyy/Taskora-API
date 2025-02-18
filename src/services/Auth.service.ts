@@ -3,11 +3,10 @@ import {
   userService,
   JwtService,
   HashingService,
-  projectSerivce,
-  taskService,
   refreshTokenService,
   emailService,
   redisService,
+  otpService,
 } from '../services';
 import { OAuth2Client } from 'google-auth-library';
 import {
@@ -36,6 +35,7 @@ import {
 import { Provider } from '@prisma/client';
 import axios from 'axios';
 import crypto from 'crypto';
+import { generateCode } from '../utils';
 
 class AuthService {
   private googleOAuth2Client: OAuth2Client;
@@ -66,20 +66,27 @@ class AuthService {
     }
 
     const hashedPassword = await HashingService.hash(password);
-    const user = await userService.createOne({
-      name,
-      email,
-      password: hashedPassword,
-    });
 
-    const project = await this.handleCreateUserProject(user as IUser);
-    await this.handleCreateUserTask(user as IUser, project.uuid);
+    const user = await userService.initializeUserWithProjectAndTasks(
+      { name, email, password: hashedPassword },
+      {
+        name: DEFAULT_VALUES.PROJECTS.name,
+        description: DEFAULT_VALUES.PROJECTS.description,
+        color: DEFAULT_VALUES.PROJECTS.color,
+        statusUuid,
+      },
+      {
+        name: DEFAULT_VALUES.TASKS.name,
+        description: DEFAULT_VALUES.TASKS.description,
+        statusUuid,
+      }
+    );
 
     const tokens = JwtService.generateTokens(user.uuid);
     await refreshTokenService.createOne({
       token: tokens.refreshToken,
       userUuid: user.uuid,
-      expiresAt: new Date(Date.now() + MAGIC_NUMBERS.ONE_WEEK),
+      expiresAt: new Date(Date.now() + MAGIC_NUMBERS.ONE_WEEK_IN_MILLISECONDS),
     });
 
     const userResponse: IUser = {
@@ -91,20 +98,17 @@ class AuthService {
       createdAt: user.createdAt,
     };
 
-    const verificationToken = crypto.randomBytes(32).toString('hex');
+    const verificationToken = crypto
+      .randomBytes(MAGIC_NUMBERS.NUMBER_OF_BYTES)
+      .toString('hex');
 
     await redisService.set(
-      `verify-email:${user.uuid}`,
+      `verify-email:${verificationToken}`,
       verificationToken,
-      MAGIC_NUMBERS.HALF_HOUR
+      MAGIC_NUMBERS.ONE_DAY_IN_SECONDS
     );
 
-    await emailService.sendVerifyEmail(
-      email,
-      name,
-      verificationToken,
-      user.uuid
-    );
+    emailService.sendVerificationEmail(email, name, verificationToken);
 
     return { data: userResponse, tokens };
   }
@@ -116,7 +120,6 @@ class AuthService {
       throw new ApiError('Invalid email or password', UNAUTHORIZED);
     }
 
-    // TODO: When user resets password, the refresh token should be invalidated
     const passwordMatches = await HashingService.compare(
       password,
       userExists.password as string
@@ -137,7 +140,7 @@ class AuthService {
     await refreshTokenService.createOne({
       token: tokens.refreshToken,
       userUuid: userExists.uuid,
-      expiresAt: new Date(Date.now() + MAGIC_NUMBERS.ONE_WEEK),
+      expiresAt: new Date(Date.now() + MAGIC_NUMBERS.ONE_WEEK_IN_MILLISECONDS),
     });
 
     const userResponse: IUser = {
@@ -174,6 +177,7 @@ class AuthService {
   async getGoogleTokens(code: string) {
     const tokensResponse = await this.googleOAuth2Client.getToken(code);
     this.googleOAuth2Client.setCredentials(tokensResponse.tokens);
+    console.log(tokensResponse);
     return tokensResponse.tokens;
   }
 
@@ -192,25 +196,48 @@ class AuthService {
   async loginWithGoogle(user: IGoogleStrategy) {
     let userExists = await userService.findUserByEmail(user.email);
 
-    if (!userExists) {
+    if (userExists?.email && !userExists?.googleId) {
+      throw new ApiError(
+        'You have an account, please link your Google account',
+        CONFLICT
+      );
+    }
+
+    if (!userExists?.email && !userExists?.password) {
       userExists = await userService.createOne({
         name: user.name,
         email: user.email,
         provider: Provider.GOOGLE,
-        providerId: user.id,
+        googleId: user.id,
         picture: user.picture,
         isVerified: user.verified_email,
       });
 
-      const project = await this.handleCreateUserProject(userExists as IUser);
-      await this.handleCreateUserTask(userExists as IUser, project.uuid);
+      const projectData = {
+        name: DEFAULT_VALUES.PROJECTS.name,
+        description: DEFAULT_VALUES.PROJECTS.description,
+        color: DEFAULT_VALUES.PROJECTS.color,
+        statusUuid,
+      };
+
+      const taskData = {
+        name: DEFAULT_VALUES.TASKS.name,
+        description: DEFAULT_VALUES.TASKS.description,
+        statusUuid,
+      };
+
+      await userService.initializeUserWithProjectAndTasks(
+        { name: userExists.name, email: userExists.email },
+        projectData,
+        taskData
+      );
     }
 
     const tokens = JwtService.generateTokens(userExists.uuid);
     await refreshTokenService.createOne({
       token: tokens.refreshToken,
       userUuid: userExists.uuid,
-      expiresAt: new Date(Date.now() + MAGIC_NUMBERS.ONE_WEEK),
+      expiresAt: new Date(Date.now() + MAGIC_NUMBERS.ONE_WEEK_IN_MILLISECONDS),
     });
 
     const userResponse: IUser = {
@@ -228,25 +255,48 @@ class AuthService {
   async loginWithGitHub(user: IGitHubStrategy) {
     let userExists = await userService.findUserByEmail(user.email);
 
-    if (!userExists) {
+    if (userExists?.email && !userExists?.githubId) {
+      throw new ApiError(
+        'You have an account, please link you Github account',
+        CONFLICT
+      );
+    }
+
+    if (!userExists?.email && !userExists?.password) {
       userExists = await userService.createOne({
         name: user.name,
         email: user.email,
         provider: Provider.GITHUB,
-        providerId: user.id.toString(),
+        githubId: user.id.toString(),
         picture: user.avatar_url,
         isVerified: user.verified,
       });
 
-      const project = await this.handleCreateUserProject(userExists as IUser);
-      await this.handleCreateUserTask(userExists as IUser, project.uuid);
+      const projectData = {
+        name: DEFAULT_VALUES.PROJECTS.name,
+        description: DEFAULT_VALUES.PROJECTS.description,
+        color: DEFAULT_VALUES.PROJECTS.color,
+        statusUuid,
+      };
+
+      const taskData = {
+        name: DEFAULT_VALUES.TASKS.name,
+        description: DEFAULT_VALUES.TASKS.description,
+        statusUuid,
+      };
+
+      await userService.initializeUserWithProjectAndTasks(
+        { name: userExists.name, email: userExists.email },
+        projectData,
+        taskData
+      );
     }
 
     const tokens = JwtService.generateTokens(userExists.uuid);
     await refreshTokenService.createOne({
       token: tokens.refreshToken,
       userUuid: userExists.uuid,
-      expiresAt: new Date(Date.now() + MAGIC_NUMBERS.ONE_WEEK),
+      expiresAt: new Date(Date.now() + MAGIC_NUMBERS.ONE_WEEK_IN_MILLISECONDS),
     });
 
     const userResponse: IUser = {
@@ -265,6 +315,8 @@ class AuthService {
     const userInfo = await axios.get(API_INTEGRATION.GITHUB.USER_INFO_URL, {
       headers: { Authorization: `Bearer ${token}` },
     });
+
+    console.log(userInfo.data);
 
     const userEmails = await axios.get(API_INTEGRATION.GITHUB.EMAILS_URL, {
       headers: { Authorization: `Bearer ${token}` },
@@ -317,6 +369,8 @@ class AuthService {
       );
     }
 
+    console.log(response.data);
+
     return response.data.access_token;
   }
 
@@ -327,7 +381,7 @@ class AuthService {
       throw new ApiError('Unauthorized', UNAUTHORIZED);
     }
 
-    const user = await userService.findUserByUUID(payload.uuid);
+    const user = await userService.findUserByUUID(payload.uuid as string);
 
     if (!user) {
       throw new ApiError('Unauthorized', UNAUTHORIZED);
@@ -336,26 +390,24 @@ class AuthService {
     const storedToken =
       await refreshTokenService.refreshTokenExists(refreshToken);
 
-    if (!storedToken || storedToken.expiresAt < new Date()) {
+    if (!storedToken) {
       throw new ApiError('Unauthorized', UNAUTHORIZED);
     }
 
-    const tokens = JwtService.generateTokens(payload.uuid);
+    const tokens = JwtService.generateTokens(payload.uuid as string);
 
     await refreshTokenService.deleteOne({ token: refreshToken });
     await refreshTokenService.createOne({
       token: tokens.refreshToken,
-      userUuid: payload.uuid,
-      expiresAt: new Date(Date.now() + MAGIC_NUMBERS.ONE_WEEK),
+      userUuid: payload.uuid as string,
+      expiresAt: new Date(Date.now() + MAGIC_NUMBERS.ONE_WEEK_IN_MILLISECONDS),
     });
 
     return tokens;
   }
 
   async verifyEmail(token: string, userUuid: string) {
-    const storedToken = await redisService.get<string>(
-      `verify-email:${userUuid}`
-    );
+    const storedToken = await redisService.get<string>(`verify-email:${token}`);
 
     if (!storedToken || storedToken !== token) {
       throw new ApiError('Verification token is invalid or expired', GONE);
@@ -368,7 +420,7 @@ class AuthService {
     }
 
     await userService.updateOne({ uuid: userUuid }, { isVerified: true });
-    await redisService.delete(`verify-email:${userUuid}`);
+    await redisService.delete(`verify-email:${token}`);
   }
 
   async resendVerificationEmail(email: string) {
@@ -382,20 +434,69 @@ class AuthService {
       throw new ApiError('Email already verified', CONFLICT);
     }
 
-    const verificationToken = crypto.randomBytes(32).toString('hex');
+    const verificationToken = crypto
+      .randomBytes(MAGIC_NUMBERS.NUMBER_OF_BYTES)
+      .toString('hex');
 
     await redisService.set(
-      `verify-email:${user.uuid}`,
+      `verify-email:${verificationToken}`,
       verificationToken,
-      MAGIC_NUMBERS.HALF_HOUR
+      MAGIC_NUMBERS.ONE_DAY_IN_SECONDS
     );
 
-    await emailService.sendVerifyEmail(
+    emailService.sendVerificationEmail(
       email,
       user.name as string,
-      verificationToken,
-      user.uuid
+      verificationToken
     );
+  }
+
+  async generateOTP(email: string) {
+    const user = await userService.findUserByEmail(email);
+
+    if (user) {
+      const otp = generateCode();
+
+      await otpService.createOne({
+        otp,
+        userUuid: user.uuid,
+        expiresAt: new Date(
+          Date.now() + MAGIC_NUMBERS.FIFTEEN_MINUTES_IN_MILLISECONDS
+        ),
+      });
+
+      await redisService.set(
+        `otp:${user.uuid}`,
+        otp,
+        MAGIC_NUMBERS.FIFTEEN_MINUTES_IN_SECONDS
+      );
+
+      emailService.sendForgetPasswordEmail(email, user.name as string, otp);
+    }
+  }
+
+  async verifyOTP(email: string, password: string, otp: string) {
+    const user = await userService.findUserByEmail(email);
+
+    if (!user) {
+      throw new ApiError('User not found', NOT_FOUND);
+    }
+
+    const storedOTP = await redisService.get<string>(`otp:${user.uuid}`);
+
+    if (!storedOTP || String(storedOTP).trim() !== String(otp).trim()) {
+      throw new ApiError('Invalid or expired OTP', GONE);
+    }
+
+    await redisService.delete(`otp:${user.uuid}`);
+
+    const hashedPassword = await HashingService.hash(password);
+
+    await userService.updateOne(
+      { uuid: user.uuid },
+      { password: hashedPassword }
+    );
+    await refreshTokenService.deleteMany({ userUuid: user.uuid });
   }
 
   private handleAxiosResponseErrors(status: number) {
@@ -414,26 +515,6 @@ class AuthService {
           INTERNAL_SERVER_ERROR
         );
     }
-  }
-
-  private async handleCreateUserProject(user: IUser) {
-    return await projectSerivce.createOne({
-      name: DEFAULT_VALUES.PROJECTS.name,
-      description: DEFAULT_VALUES.PROJECTS.description,
-      userUuid: user.uuid,
-      statusUuid: statusUuid,
-      color: DEFAULT_VALUES.PROJECTS.color,
-    });
-  }
-
-  private async handleCreateUserTask(user: IUser, projectUuid: string) {
-    return await taskService.createOne({
-      name: DEFAULT_VALUES.TASKS.name,
-      description: DEFAULT_VALUES.TASKS.description,
-      userUuid: user.uuid,
-      statusUuid: statusUuid,
-      projectUuid,
-    });
   }
 }
 

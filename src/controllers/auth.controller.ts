@@ -4,10 +4,14 @@ import {
   ApiError,
   BAD_REQUEST,
   CREATED,
+  forgotPasswordSchema,
   loginSchema,
   OK,
   registerSchema,
+  resendVerificationEmailSchema,
   UNAUTHORIZED,
+  verifyEmailSchema,
+  verifyOtpSchema,
 } from '../utils';
 
 export const localRegister = asyncHandler(async (req, res) => {
@@ -115,7 +119,7 @@ export const refreshToken = asyncHandler(async (req, res, next) => {
 });
 
 export const verifyEmail = asyncHandler(async (req, res, next) => {
-  const { token, userUuid } = req.query as { token: string; userUuid: string };
+  const { token, userUuid } = verifyEmailSchema.parse(req.query);
 
   if (!token || !userUuid) {
     return next(new ApiError('Invalid or expired token', BAD_REQUEST));
@@ -127,7 +131,7 @@ export const verifyEmail = asyncHandler(async (req, res, next) => {
 });
 
 export const resendVerificationEmail = asyncHandler(async (req, res) => {
-  const { email } = req.body as { email: string };
+  const { email } = resendVerificationEmailSchema.parse(req.body);
 
   if (!email) {
     throw new ApiError('Email is required', BAD_REQUEST);
@@ -136,4 +140,24 @@ export const resendVerificationEmail = asyncHandler(async (req, res) => {
   await authService.resendVerificationEmail(email);
 
   res.status(OK).json({ message: 'Verification email sent successfully' });
+});
+
+export const forgotPassword = asyncHandler(async (req, res) => {
+  const { email } = forgotPasswordSchema.parse(req.body);
+
+  if (!email) {
+    throw new ApiError('Email is required', BAD_REQUEST);
+  }
+
+  await authService.generateOTP(email);
+
+  res.status(OK).json({ message: 'Password reset email sent successfully' });
+});
+
+export const verifyOtp = asyncHandler(async (req, res) => {
+  const { email, password, otp } = verifyOtpSchema.parse(req.body);
+
+  const token = await authService.verifyOTP(email, password, otp);
+
+  res.status(OK).json({ message: 'OTP verified successfully', token });
 });

@@ -1,5 +1,5 @@
 import nodemailer, { Transporter } from 'nodemailer';
-import { getVerifyEmailTemplate, SERVER } from '../utils';
+import { getVerifyEmailTemplate, getOTPTemplate, SERVER } from '../utils';
 import {
   nodeEnv,
   frontendUrl,
@@ -40,14 +40,9 @@ export class EmailService {
     }
   }
 
-  async sendVerifyEmail(
-    email: string,
-    name: string,
-    token: string,
-    userUuid: string
-  ) {
+  async sendVerificationEmail(email: string, name: string, token: string) {
     const verifyEmailTemplate = getVerifyEmailTemplate();
-    const verifyEmailUrl = `${frontendUrl}/verify-email?token=${token}&userUuid=${userUuid}`;
+    const verifyEmailUrl = `${frontendUrl}/verify-email?token=${token}`;
 
     const html = verifyEmailTemplate
       .replace(/{{verifyEmailUrl}}/g, verifyEmailUrl)
@@ -57,6 +52,19 @@ export class EmailService {
       to: email,
       subject: 'Verify your email',
       text: 'Verify your email',
+      html,
+    });
+  }
+
+  async sendForgetPasswordEmail(email: string, name: string, otp: string) {
+    const html = getOTPTemplate()
+      .replace(/{{otp}}/g, otp)
+      .replace(/{{name}}/g, name);
+
+    await this.sendEmail({
+      to: email,
+      subject: 'Reset your password',
+      text: 'Reset your password',
       html,
     });
   }

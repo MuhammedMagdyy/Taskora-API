@@ -56,7 +56,6 @@
     "multer": "^1.4.5-lts.1",
     "node-cron": "^3.0.3",
     "nodemailer": "^6.10.0",
-    "otp-generator": "^4.0.1",
     "redis": "^4.7.0",
     "swagger-ui-express": "^5.0.1",
     "zod": "^3.24.1"
@@ -80,7 +79,7 @@
     "eslint-plugin-prettier": "^5.2.3",
     "globals": "^15.14.0",
     "prettier": "^3.4.2",
-    "prisma": "^6.3.0",
+    "prisma": "^6.3.1",
     "tsc-watch": "^6.2.1",
     "typescript": "^5.7.3",
     "typescript-eslint": "^8.23.0"

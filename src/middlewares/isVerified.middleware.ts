@@ -19,7 +19,7 @@ export const isVerified = asyncHandler(
     }
 
     const decoded = JwtService.verify(token, 'access') as IJwtPayload;
-    const userInfo = await userService.findUserByUUID(decoded.uuid);
+    const userInfo = await userService.findUserByUUID(decoded.uuid as string);
 
     if (!userInfo) {
       return next(

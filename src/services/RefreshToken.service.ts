@@ -25,21 +25,30 @@ export class RefreshTokenService {
   }
 
   async deleteOne(query: Prisma.RefreshTokenWhereUniqueInput) {
-    return this.refreshTokenDataSource.deleteOne(query);
+    return this.refreshTokenDataSource.updateOne(query, {
+      isActive: false,
+      isDeleted: true,
+    });
   }
 
   async deleteMany(query: Prisma.RefreshTokenWhereInput) {
-    return this.refreshTokenDataSource.deleteMany(query);
+    return this.refreshTokenDataSource.updateMany(query, {
+      isActive: false,
+      isDeleted: true,
+    });
   }
 
   async refreshTokenExists(refreshToken: string) {
-    const token = await this.findOne({ token: refreshToken });
+    const now = new Date();
+
+    const token = await this.findOne({
+      token: refreshToken,
+      expiresAt: { gt: now },
+      isActive: true,
+      isDeleted: false,
+    });
 
     if (!token) {
-      throw new ApiError('Invalid or expired token', UNAUTHORIZED);
-    }
-
-    if (token.expiresAt < new Date()) {
       throw new ApiError('Invalid or expired token', UNAUTHORIZED);
     }
 
@@ -52,7 +61,7 @@ export class RefreshTokenService {
     return this.deleteMany({ expiresAt: { lt: now } });
   }
 
-  async scheduleTokenCleanupTask() {
+  scheduleTokenCleanupTask() {
     cron.schedule('0 0 * * *', async () => {
       console.log(colors.yellow('Cleanup tokens cron job started 🕛'));
       await this.deleteExpiredTokens();

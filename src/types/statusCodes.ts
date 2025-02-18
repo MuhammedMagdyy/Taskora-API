@@ -9,4 +9,5 @@ export type HttpExceptionStatusCodes =
   | 410
   | 413
   | 415
+  | 429
   | 500;

@@ -22,6 +22,26 @@ export class UserRepository {
   ) {
     return await this.dbClient.user.update({ where: query, data });
   }
+
+  async initializeUserWithProjectAndTasks(
+    userData: Prisma.UserUncheckedCreateInput,
+    projectData: Omit<Prisma.ProjectUncheckedCreateInput, 'userUuid'>,
+    taskData: Omit<Prisma.TaskUncheckedCreateInput, 'projectUuid' | 'userUuid'>
+  ) {
+    return await this.dbClient.$transaction(async (dbTransaction) => {
+      const user = await dbTransaction.user.create({ data: userData });
+
+      const project = await dbTransaction.project.create({
+        data: { ...projectData, userUuid: user.uuid },
+      });
+
+      await dbTransaction.task.create({
+        data: { ...taskData, projectUuid: project.uuid, userUuid: user.uuid },
+      });
+
+      return user;
+    });
+  }
 }
 
 export const userRepository = new UserRepository(prismaClient);

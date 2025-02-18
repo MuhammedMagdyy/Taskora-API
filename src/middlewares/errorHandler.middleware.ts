@@ -108,6 +108,7 @@ const handlePrismaError = (
         message: `Duplicate field value: ${error.meta?.target as string}`,
       };
     case 'P2003':
+      console.log(error.message);
       return { status: BAD_REQUEST, message: 'Foreign key constraint failed' };
     default:
       return {
