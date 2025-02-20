@@ -33,7 +33,7 @@ These instructions will get you a copy of the project up and running on your loc
 
 ### Schema
 
-![Schema](https://github.com/user-attachments/assets/6d2a8099-f628-41ef-a4d1-9c6e5cb57a2b)
+![Schema](https://github.com/user-attachments/assets/24559322-e78b-4cd8-b646-cb39927db7f9)
 
 ### Installing
 
