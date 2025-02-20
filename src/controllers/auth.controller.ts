@@ -1,5 +1,5 @@
 import asyncHandler from 'express-async-handler';
-import { authService } from '../services';
+import { authService, githubService, googleService } from '../services';
 import {
   ApiError,
   BAD_REQUEST,
@@ -55,7 +55,11 @@ export const logout = asyncHandler(async (req, res) => {
 });
 
 export const generateAuthUrl = asyncHandler(async (req, res) => {
-  const authorizeUrl = await authService.getGoogleAuthUrl();
+  const authorizeUrl = await googleService.getGoogleAuthUrl();
+
+  if (!authorizeUrl) {
+    throw new ApiError('Failed to generate Google auth URL', BAD_REQUEST);
+  }
 
   res.redirect(authorizeUrl);
 });
@@ -67,15 +71,22 @@ export const handleGoogleCallback = asyncHandler(async (req, res, next) => {
     return next(new ApiError('No code found in query parameters', BAD_REQUEST));
   }
 
-  await authService.getGoogleTokens(code);
-  const userInfo = await authService.getGoogleUserInfo();
+  const token = await googleService.getGoogleAccessToken(code);
+
+  if (!token) {
+    return next(
+      new ApiError('Failed to fetch Google access token', UNAUTHORIZED)
+    );
+  }
+
+  const userInfo = await googleService.getGoogleUserInfo(token);
 
   res.json({
     message: 'Logged in successfully!',
-    data: userInfo.userResponse,
+    data: userInfo?.userResponse,
     tokens: {
-      accessToken: userInfo.tokens.accessToken,
-      refreshToken: userInfo.tokens.refreshToken,
+      accessToken: userInfo?.tokens.accessToken,
+      refreshToken: userInfo?.tokens.refreshToken,
     },
   });
 });
@@ -87,15 +98,15 @@ export const handleGitHubCallback = asyncHandler(async (req, res, next) => {
     return next(new ApiError('No code found in query parameters', BAD_REQUEST));
   }
 
-  const accessToken = await authService.getGitHubAccessToken(code);
-  const userInfo = await authService.getGitHubUserInfo(accessToken);
+  const accessToken = await githubService.getGitHubAccessToken(code);
+  const userInfo = await githubService.getGitHubUserInfo(accessToken);
 
   res.json({
     message: 'Logged in successfully!',
-    data: userInfo.userResponse,
+    data: userInfo?.userResponse,
     tokens: {
-      accessToken: userInfo.tokens.accessToken,
-      refreshToken: userInfo.tokens.refreshToken,
+      accessToken: userInfo?.tokens.accessToken,
+      refreshToken: userInfo?.tokens.refreshToken,
     },
   });
 });
@@ -119,13 +130,13 @@ export const refreshToken = asyncHandler(async (req, res, next) => {
 });
 
 export const verifyEmail = asyncHandler(async (req, res, next) => {
-  const { token, userUuid } = verifyEmailSchema.parse(req.query);
+  const { token } = verifyEmailSchema.parse(req.query);
 
-  if (!token || !userUuid) {
+  if (!token) {
     return next(new ApiError('Invalid or expired token', BAD_REQUEST));
   }
 
-  await authService.verifyEmail(token, userUuid);
+  await authService.verifyEmail(token);
 
   res.status(OK).json({ message: 'Email verified successfully' });
 });
