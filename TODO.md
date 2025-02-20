@@ -14,8 +14,10 @@
 - [ ] Rename files to be more descriptive
 - [ ] Add more security
 - [ ] Learn how to link local account with social account
-- [ ] Handle transactions correctly
-- [ ] Handle SRP correctly
+- [x] Handle transactions correctly
+- [x] Handle SRP correctly
+- [ ] Create a decorator for less use of try-catch blocks
+- [ ] Handle AxiosErrors in OAuth2 Clients
 
 ## Improvements
 
