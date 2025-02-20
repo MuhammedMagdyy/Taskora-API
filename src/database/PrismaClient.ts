@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { IDatabaseClient } from '../interfaces';
-import colors from 'colors';
+import { logger } from '../utils';
 
 export class PrismaDatabaseClient implements IDatabaseClient {
   private static instance: PrismaDatabaseClient;
@@ -25,9 +25,9 @@ export class PrismaDatabaseClient implements IDatabaseClient {
   async connect(): Promise<void> {
     try {
       await this.getClient().$connect();
-      console.log(colors.green(`Prisma connected successfully! ✅`));
+      logger.info(`Prisma connected successfully! ✅`);
     } catch (error) {
-      console.error(colors.red(`Prisma connection failed - ${error} ❌`));
+      logger.error(`Prisma connection failed - ${error} ❌`);
       process.exit(1);
     }
   }
@@ -35,9 +35,9 @@ export class PrismaDatabaseClient implements IDatabaseClient {
   async disconnect(): Promise<void> {
     try {
       await this.getClient().$disconnect();
-      console.log(colors.red(`Prisma disconnected successfully! ❌`));
+      logger.info(`Prisma disconnected successfully! ❌`);
     } catch (error) {
-      console.error(colors.red(`Prisma disconnection failed - ${error} ❌`));
+      logger.error(`Prisma disconnection failed - ${error} ❌`);
     }
   }
 }
