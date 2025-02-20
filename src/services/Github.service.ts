@@ -124,6 +124,7 @@ export class GithubService extends BaseAuthService {
   private async fetchGitHubUserInfo(token: string) {
     return axios.get(API_INTEGRATION.GITHUB.USER_INFO_URL, {
       headers: {
+        Accept: 'application/vnd.github+json',
         Authorization: `Bearer ${token}`,
       },
     });
@@ -132,6 +133,7 @@ export class GithubService extends BaseAuthService {
   private async fetchGitHubUserEmails(token: string) {
     return axios.get(API_INTEGRATION.GITHUB.EMAILS_URL, {
       headers: {
+        Accept: 'application/vnd.github+json',
         Authorization: `Bearer ${token}`,
       },
     });
