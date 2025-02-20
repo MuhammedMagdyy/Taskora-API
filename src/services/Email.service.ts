@@ -1,5 +1,10 @@
 import nodemailer, { Transporter } from 'nodemailer';
-import { getVerifyEmailTemplate, getOTPTemplate, SERVER } from '../utils';
+import {
+  getVerifyEmailTemplate,
+  getOTPTemplate,
+  SERVER,
+  logger,
+} from '../utils';
 import {
   nodeEnv,
   frontendUrl,
@@ -35,7 +40,7 @@ export class EmailService {
     try {
       await this.transporter.sendMail(args);
     } catch (error) {
-      console.error(error);
+      logger.error(`Error sending email - ${error} ❌`);
       throw new Error('Error sending email. Please try again later...');
     }
   }

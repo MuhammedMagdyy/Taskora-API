@@ -9,13 +9,12 @@ import { JwtType } from '../types';
 import { IJwtPayload } from '../interfaces';
 
 export class JwtService {
-  static generateAccessToken({
-    exp: _exp,
-    iat: _iat,
-    ...payload
-  }: IJwtPayload) {
+  static generateAccessToken(
+    { exp: _exp, iat: _iat, ...payload }: IJwtPayload,
+    expiresIn = accessTokenExpiry
+  ) {
     return sign(payload, accessTokenSecret as Secret, {
-      expiresIn: accessTokenExpiry,
+      expiresIn,
     });
   }
 

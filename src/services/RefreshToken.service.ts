@@ -1,8 +1,7 @@
 import { Prisma } from '@prisma/client';
 import { refreshTokenRepository } from '../repositories';
-import { ApiError, UNAUTHORIZED } from '../utils';
+import { ApiError, logger, UNAUTHORIZED } from '../utils';
 import cron from 'node-cron';
-import colors from 'colors';
 
 export class RefreshTokenService {
   constructor(
@@ -63,9 +62,9 @@ export class RefreshTokenService {
 
   scheduleTokenCleanupTask() {
     cron.schedule('0 0 * * *', async () => {
-      console.log(colors.yellow('Cleanup tokens cron job started 🕛'));
+      logger.info('Cleanup tokens cron job started 🕛');
       await this.deleteExpiredTokens();
-      console.log(colors.green('Cleanup tokens cron job completed ✅'));
+      logger.info('Cleanup tokens cron job completed ✅');
     });
   }
 }

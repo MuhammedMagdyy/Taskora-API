@@ -24,8 +24,7 @@ export class RedisService {
       } catch {
         return value as T;
       }
-    } catch (error) {
-      console.error('Redis get error:', error);
+    } catch {
       throw new ApiError(
         'Failed to get value from Redis',
         INTERNAL_SERVER_ERROR
