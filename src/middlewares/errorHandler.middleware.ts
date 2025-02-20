@@ -70,9 +70,12 @@ export const errorHandler: ErrorRequestHandler = (
 
   if (error instanceof AxiosError) {
     res.status(error.response?.status || INTERNAL_SERVER_ERROR).json({
-      message:
-        error.response?.data ||
-        'Something went wrong, please try again later...',
+      message: error.response?.data?.message || 'External API request failed',
+      errorDetails: {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+      },
     });
     return;
   }
@@ -108,7 +111,6 @@ const handlePrismaError = (
         message: `Duplicate field value: ${error.meta?.target as string}`,
       };
     case 'P2003':
-      console.log(error.message);
       return { status: BAD_REQUEST, message: 'Foreign key constraint failed' };
     default:
       return {

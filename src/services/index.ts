@@ -13,3 +13,5 @@ export * from './RefreshToken.service';
 export * from './Redis.service';
 export * from './Email.service';
 export * from './Otp.service';
+export * from './Google.service';
+export * from './Github.service';

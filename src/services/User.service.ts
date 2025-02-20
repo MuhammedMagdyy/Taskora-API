@@ -1,5 +1,9 @@
 import { Prisma } from '@prisma/client';
 import { userRepository } from '../repositories';
+import {
+  CustomProjectUncheckedCreateInput,
+  CustomTaskUncheckedCreateInput,
+} from '../types/prisma';
 
 export class UserService {
   constructor(private readonly userDataSource = userRepository) {}
@@ -25,8 +29,8 @@ export class UserService {
 
   async initializeUserWithProjectAndTasks(
     userData: Prisma.UserUncheckedCreateInput,
-    projectData: Omit<Prisma.ProjectUncheckedCreateInput, 'userUuid'>,
-    taskData: Omit<Prisma.TaskUncheckedCreateInput, 'projectUuid' | 'userUuid'>
+    projectData: CustomProjectUncheckedCreateInput,
+    taskData: CustomTaskUncheckedCreateInput
   ) {
     return this.userDataSource.initializeUserWithProjectAndTasks(
       userData,

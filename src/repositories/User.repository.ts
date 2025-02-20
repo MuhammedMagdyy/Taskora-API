@@ -1,5 +1,9 @@
 import { Prisma, PrismaClient } from '@prisma/client';
 import { prismaClient } from '../database';
+import {
+  CustomProjectUncheckedCreateInput,
+  CustomTaskUncheckedCreateInput,
+} from '../types/prisma';
 
 export class UserRepository {
   private readonly dbClient: PrismaClient;
@@ -25,8 +29,8 @@ export class UserRepository {
 
   async initializeUserWithProjectAndTasks(
     userData: Prisma.UserUncheckedCreateInput,
-    projectData: Omit<Prisma.ProjectUncheckedCreateInput, 'userUuid'>,
-    taskData: Omit<Prisma.TaskUncheckedCreateInput, 'projectUuid' | 'userUuid'>
+    projectData: CustomProjectUncheckedCreateInput,
+    taskData: CustomTaskUncheckedCreateInput
   ) {
     return await this.dbClient.$transaction(async (dbTransaction) => {
       const user = await dbTransaction.user.create({ data: userData });

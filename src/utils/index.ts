@@ -4,3 +4,4 @@ export * from './statusCodes';
 export * from './constants';
 export * from './templates';
 export * from './generateCode';
+export * from './logger';

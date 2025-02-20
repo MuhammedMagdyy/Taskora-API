@@ -7,6 +7,12 @@ export interface IGoogleStrategy {
   picture?: string;
 }
 
+export interface IGoogleOAuthClient {
+  clientId: string;
+  clientSecret: string;
+  callbackUrl: string;
+}
+
 export interface IGitHubStrategy {
   id: string;
   provider: string;
@@ -14,4 +20,10 @@ export interface IGitHubStrategy {
   verified: boolean;
   name: string;
   avatar_url: string;
+}
+
+export interface IGitHubOAuthClient {
+  clientId: string;
+  clientSecret: string;
+  callbackUrl: string;
 }

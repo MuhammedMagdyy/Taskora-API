@@ -1,7 +1,7 @@
 import { createClient, RedisClientType } from 'redis';
 import { IDatabaseClient } from '../interfaces';
 import { redisUrl } from '../config';
-import colors from 'colors';
+import { logger } from '../utils';
 
 export class RedisDatabaseClient implements IDatabaseClient {
   private static instance: RedisDatabaseClient;
@@ -26,9 +26,9 @@ export class RedisDatabaseClient implements IDatabaseClient {
   async connect(): Promise<void> {
     try {
       await this.getClient().connect();
-      console.log(colors.green(`Redis connected successfully! ✅`));
+      logger.info(`Redis connected successfully! ✅`);
     } catch (error) {
-      console.error(colors.red(`Redis connection failed - ${error} ❌`));
+      logger.error(`Redis connection failed - ${error} ❌`);
       process.exit(1);
     }
   }
@@ -36,9 +36,9 @@ export class RedisDatabaseClient implements IDatabaseClient {
   async disconnect(): Promise<void> {
     try {
       await this.getClient().disconnect();
-      console.log(colors.red(`Redis disconnected successfully! ❌`));
+      logger.info(`Redis disconnected successfully! ❌`);
     } catch (error) {
-      console.error(colors.red(`Redis disconnection failed - ${error} ❌`));
+      logger.error(`Redis disconnection failed - ${error} ❌`);
     }
   }
 }

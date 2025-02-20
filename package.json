@@ -14,7 +14,8 @@
     "db:migrate": "prisma migrate dev --schema=src/database/prisma/schema.prisma",
     "db:generate": "prisma generate --schema=src/database/prisma/schema.prisma",
     "db:push": "prisma db push --schema=src/database/prisma/schema.prisma",
-    "db:studio": "prisma studio --schema=src/database/prisma/schema.prisma"
+    "db:studio": "prisma studio --schema=src/database/prisma/schema.prisma",
+    "clean:logs": "rm -rf logs/*"
   },
   "keywords": [
     "taskora",
@@ -40,7 +41,6 @@
     "axios": "^1.7.9",
     "bcryptjs": "^2.4.3",
     "cloudinary": "^2.5.1",
-    "colors": "^1.4.0",
     "compression": "^1.7.5",
     "cors": "^2.8.5",
     "dompurify": "^3.2.4",
@@ -58,6 +58,7 @@
     "nodemailer": "^6.10.0",
     "redis": "^4.7.0",
     "swagger-ui-express": "^5.0.1",
+    "winston": "^3.17.0",
     "zod": "^3.24.1"
   },
   "devDependencies": {
