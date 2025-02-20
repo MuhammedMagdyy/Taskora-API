@@ -13,7 +13,6 @@ export const loginSchema = z.object({
 
 export const verifyEmailSchema = z.object({
   token: z.string().trim(),
-  userUuid: z.string().trim(),
 });
 
 export const resendVerificationEmailSchema = z.object({
