@@ -6,7 +6,7 @@ export const registerSchema = z.object({
   password: z
     .string()
     .regex(
-      /^(?=.*[A-Z])(?=.*[!@#$&*])(?=.*[0-9])(?=.*[a-z].*[a-z].*[a-z].*[a-z].*[a-z]).{8}$/,
+      /^(?=.*[A-Z])(?=.*[!@#$&*])(?=.*[0-9])(?=.*[a-z].*[a-z].*[a-z].*[a-z].*[a-z]).{8,}$/,
       'Password: 8+ chars, 1 uppercase, 5 lowercase, 1 number, 1 special'
     )
     .trim(),
@@ -31,6 +31,12 @@ export const forgotPasswordSchema = z.object({
 
 export const verifyOtpSchema = z.object({
   email: z.string().email('Invalid email format').toLowerCase().trim(),
-  password: z.string().min(6, 'Password must be at least 6 characters').trim(),
+  password: z
+    .string()
+    .regex(
+      /^(?=.*[A-Z])(?=.*[!@#$&*])(?=.*[0-9])(?=.*[a-z].*[a-z].*[a-z].*[a-z].*[a-z]).{8,}$/,
+      'Password: 8+ chars, 1 uppercase, 5 lowercase, 1 number, 1 special'
+    )
+    .trim(),
   otp: z.string().length(6, 'Invalid OTP').trim(),
 });

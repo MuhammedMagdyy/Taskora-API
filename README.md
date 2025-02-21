@@ -7,6 +7,8 @@
 ![MySQL](https://img.shields.io/badge/MySQL-4479A1?logo=mysql&logoColor=fff)
 ![Prisma](https://img.shields.io/badge/Prisma-2D3748?logo=prisma&logoColor=white)
 ![Redis](https://img.shields.io/badge/Redis-%23DD0031.svg?logo=redis&logoColor=white)
+![Nginx](https://img.shields.io/badge/Nginx-009639.svg?logo=nginx&logoColor=white)
+![Microsoft Azure](https://custom-icon-badges.demolab.com/badge/Microsoft%20Azure-0089D6?logo=msazure&logoColor=white)
 
 Taskora API built using Node.js, Express.js, TypeScript, Prisma ORM, and Redis. It allows users to create, read, update, and delete projects & tasks and follows the RESTful API design principles.
 
@@ -33,7 +35,7 @@ These instructions will get you a copy of the project up and running on your loc
 
 ### Schema
 
-![Schema](https://github.com/user-attachments/assets/24559322-e78b-4cd8-b646-cb39927db7f9)
+![Schema](https://github.com/user-attachments/assets/8a01c4be-3c6e-47e4-8a6a-52ded2f661f5)
 
 ### Installing
 
