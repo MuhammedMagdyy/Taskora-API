@@ -1,15 +1,10 @@
 import { z } from 'zod';
 
 export const taskSchema = z.object({
-  name: z
-    .string()
-    .min(3, 'Name must be at least 3 characters')
-    .max(30, 'Name must be at most 30 characters')
-    .trim(),
+  name: z.string().min(1, 'Name must be at least 1 character').trim(),
   description: z
     .string()
-    .min(3, 'Description must be at least 3 characters')
-    .max(100, 'Description must be at most 100 characters')
+    .min(1, 'Description must be at least 1 characters')
     .trim()
     .optional(),
   dueDate: z.coerce.date().optional(),
@@ -20,15 +15,10 @@ export const taskSchema = z.object({
 
 export const taskUpdateSchema = z
   .object({
-    name: z
-      .string()
-      .min(3, 'Name must be at least 3 characters')
-      .max(30, 'Name must be at most 30 characters')
-      .trim(),
+    name: z.string().min(1, 'Name must be at least 1 character').trim(),
     description: z
       .string()
-      .min(3, 'Description must be at least 3 characters')
-      .max(100, 'Description must be at most 100 characters')
+      .min(1, 'Description must be at least 1 characters')
       .trim()
       .optional(),
     dueDate: z.coerce.date({ message: 'Due date is required' }),
