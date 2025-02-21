@@ -1,0 +1,27 @@
+name: Deploy to Azure VM
+
+on:
+  workflow_run:
+    workflows: ['Node.js CI']
+    types:
+      - completed
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Execute commands on remote server
+        uses: appleboy/ssh-action@v1.2.1
+        with:
+          host: ${{ secrets.VM_HOST }}
+          username: ${{ secrets.VM_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.VM_PORT }}
+          script: |
+            cd ~/Taskora-API
+            chmod +x deploy.sh
+            ./deploy.sh
