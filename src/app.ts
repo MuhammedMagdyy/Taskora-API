@@ -29,6 +29,7 @@ app.get('/', (_, res) => {
   );
 });
 
+app.set('trust proxy', true);
 app.use(morganLogger);
 app.use(helmet());
 app.use(cors(corsConfig));
@@ -44,7 +45,7 @@ export const up = async () => {
     await Promise.all([prismaClient.connect(), redisClient.connect()]);
     refreshTokenService.scheduleTokenCleanupTask();
 
-    const server = app.listen(port, () => {
+    const server = app.listen(Number(port), '0.0.0.0', () => {
       logger.info(
         `Server is running on ${port || SERVER.DEFAULT_PORT_NUMBER} 🚀`
       );
