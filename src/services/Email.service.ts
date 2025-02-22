@@ -1,14 +1,7 @@
 import nodemailer, { Transporter } from 'nodemailer';
+import { getVerifyEmailTemplate, getOTPTemplate, logger } from '../utils';
 import {
-  getVerifyEmailTemplate,
-  getOTPTemplate,
-  SERVER,
-  logger,
-} from '../utils';
-import {
-  nodeEnv,
   frontendUrl,
-  mailService,
   mailHost,
   mailPort,
   mailAuthUser,
@@ -20,14 +13,14 @@ export class EmailService {
 
   constructor() {
     this.transporter = nodemailer.createTransport({
-      service: mailService,
       host: mailHost,
       port: Number(mailPort),
-      secure: nodeEnv === SERVER.PRODUCTION,
+      secure: false,
       auth: {
         user: mailAuthUser,
         pass: mailAuthPassword,
       },
+      requireTLS: true,
     });
   }
 
@@ -38,7 +31,13 @@ export class EmailService {
     html: string;
   }) {
     try {
-      await this.transporter.sendMail(args);
+      await this.transporter.sendMail({
+        from: `Taskora support <support@taskora.live>`,
+        to: args.to,
+        subject: args.subject,
+        text: args.text,
+        html: args.html,
+      });
     } catch (error) {
       logger.error(`Error sending email - ${error} ❌`);
       throw new Error('Error sending email. Please try again later...');
