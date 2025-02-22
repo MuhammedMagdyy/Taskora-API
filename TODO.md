@@ -18,11 +18,14 @@
 - [x] Handle SRP correctly
 - [ ] Create a decorator for less use of try-catch blocks
 - [ ] Handle AxiosErrors in OAuth2 Clients
+- [ ] Migrate to a Docker container with Nginx
 
 ## Improvements
 
 - [x] Add logging
-- [ ] Enhance API documentation (e.g., Swagger, Postman)
+- [ ] Enhance API documentation
+  - [ ] Postman
+  - [ ] Swagger
 
 ## Testing
 
@@ -33,4 +36,4 @@
 
 - [x] Set up CI/CD pipeline
 - [ ] Containerize application with Docker
-- [ ] Deploy to cloud provider (e.g., AWS, Azure, GCP)
+- [x] Deploy to cloud provider (e.g., AWS, Azure, GCP)

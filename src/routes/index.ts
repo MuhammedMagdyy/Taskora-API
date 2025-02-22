@@ -11,8 +11,14 @@ import { isVerified } from '../middlewares';
 
 const router = Router();
 
-router.get('/health', (_, res) => {
-  res.status(OK).json({ message: `I'm healthy 🤸‍♂️` });
+router.get('/health', (req, res) => {
+  const uptime = process.uptime();
+
+  res.status(OK).json({
+    message: `I'm healthy 🏋️‍♂️`,
+    uptime: `${Math.floor(uptime / 60)} minutes`,
+    timestamp: new Date().toISOString(),
+  });
 });
 
 router.use('/auth', authRouter);

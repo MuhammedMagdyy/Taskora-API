@@ -113,7 +113,7 @@ export class GithubService extends BaseAuthService {
         provider: Provider.GITHUB,
         email: primaryEmail.email,
         verified: primaryEmail.verified,
-        name: userInfo.data.name,
+        name: userInfo.data.name || userInfo.data.login,
         avatar_url: userInfo.data.avatar_url,
       });
     } catch (error) {
