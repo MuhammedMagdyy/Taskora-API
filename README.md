@@ -39,6 +39,7 @@ Taskora API built using **Node.js**, **Express.js**, **TypeScript**, **Prisma OR
 - 📥 **Redis Caching** for Improved Performance.
 - 📧 **Email Notifications** for Verification & Password Reset.
 - 🌐 **Deployed on Azure** with **Nginx** as Reverse Proxy.
+- 🔄️ **CI/CD** using GitHub Actions.
 - 📝 **[Todo](https://github.com/MuhammedMagdyy/Taskora-API/blob/main/TODO.md)** – 🚀 Explore finished & upcoming features, enhancements, and what's next for Taskora!
 
 ---
