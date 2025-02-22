@@ -1,4 +1,4 @@
-# Taskora
+# Taskora 🚀
 
 ![NodeJS](https://img.shields.io/badge/Node.js-6DA55F?logo=node.js&logoColor=white)
 ![Express.js](https://img.shields.io/badge/Express.js-%23404d59.svg?logo=express&logoColor=%2361DAFB)
@@ -8,71 +8,115 @@
 ![Prisma](https://img.shields.io/badge/Prisma-2D3748?logo=prisma&logoColor=white)
 ![Redis](https://img.shields.io/badge/Redis-%23DD0031.svg?logo=redis&logoColor=white)
 ![Nginx](https://img.shields.io/badge/Nginx-009639.svg?logo=nginx&logoColor=white)
+![Postman](https://img.shields.io/badge/Postman-FF6C37?logo=postman&logoColor=white)
 ![Microsoft Azure](https://custom-icon-badges.demolab.com/badge/Microsoft%20Azure-0089D6?logo=msazure&logoColor=white)
 
-Taskora API built using Node.js, Express.js, TypeScript, Prisma ORM, and Redis. It allows users to create, read, update, and delete projects & tasks and follows the RESTful API design principles.
+Taskora API built using **Node.js**, **Express.js**, **TypeScript**, **Prisma ORM**, and **Redis**. It allows users to **create**, **read**, **update**, and **delete** projects & tasks while following RESTful API design principles.
 
-## Table of Contents
+🌐 **[Frontend Repository](https://github.com/amatter23/Taskora)** | 🚀 **[Live Demo](https://Taskora.live)**
 
-- [Getting started](#getting-started)
-- [Prerequisites](#prerequisites)
-- [Schema](#schema)
-- [Installing](#installing)
-- [API Documentation](#api-documentation-swagger)
+---
 
-### Getting started
+## 📚 Table of Contents
+
+- [🌟 Features](#-features)
+- [📖 API Documentation](#-api-documentation)
+  - [🚀 Postman](#-postman)
+- [🛠️ Getting Started](#️-getting-started)
+  - [⚡ Prerequisites](#-prerequisites)
+  - [📦 Installing](#-installing)
+- [🤝 Contributing](#-contributing)
+
+---
+
+## 🌟Features
+
+- 🔒 **Authentication & Authorization** (JWT & OAuth2 with Google & GitHub).
+- ✅ **CRUD** Operations for Projects, Tasks, and Tags.
+- 📅 **Task Management** with Tags & Status.
+- 📊 **User Profile** Handling.
+- 🔄 **Token Refresh** & Password Reset via Email.
+- 📥 **Redis Caching** for Improved Performance.
+- 📧 **Email Notifications** for Verification & Password Reset.
+- 🌐 **Deployed on Azure** with **Nginx** as Reverse Proxy.
+- 📝 **[Todo](https://github.com/MuhammedMagdyy/Taskora-API/blob/main/TODO.md)** – 🚀 Explore finished & upcoming features, enhancements, and what's next for Taskora!
+
+---
+
+## 📖 API Documentation
+
+### 🚀 Postman
+
+Easily test and interact with the API documentation using Postman
+
+[![Run in Postman](https://run.pstmn.io/button.svg)](https://documenter.getpostman.com/view/10107969/2sAYdZuZDa)
+
+---
+
+## 🛠️ Getting Started
 
 These instructions will get you a copy of the project up and running on your local machine for development and testing.
 
-### Prerequisites
+### ⚡ Prerequisites
 
-- Download and install [Nodejs](https://nodejs.org/en)
-- Download and install [MySQL](https://www.mysql.com/downloads/) using [Docker](https://www.docker.com/) from [Docker Hub](https://hub.docker.com/_/mysql)
-- A web browser (e.g. [Google Chrome](https://www.google.com/intl/ar_eg/chrome/))
-- A text editor (e.g. `recommended` [Visual Studio Code](https://code.visualstudio.com/download))
-- A platform for testing APIs like [Postman](https://www.postman.com/downloads/)
-- Database engine (e.g [DBeaver](https://dbeaver.io/download/))
+- 🟢 [Node.js](https://nodejs.org/en)
+- 🐬 [MySQL](https://www.mysql.com/downloads/) using 🐳 [Docker](https://www.docker.com/) from [Docker Hub](https://hub.docker.com/_/mysql)
+- 🌐 A web browser like [Google Chrome](https://www.google.com/intl/ar_eg/chrome/)
+- 💻 A text editor (_recommended_: [Visual Studio Code](https://code.visualstudio.com/download))
+- 🧪 API Testing Tool — [Postman](https://www.postman.com/downloads/)
+- 🐘 Database Engine — [DBeaver](https://dbeaver.io/download/)
 
-### Schema
+---
 
-![Schema](https://github.com/user-attachments/assets/8a01c4be-3c6e-47e4-8a6a-52ded2f661f5)
+## 📦 Installing
 
-### Installing
+1. **Clone the repository** 🔗:
 
-To set up this project locally, follow these steps:
+   ```bash
+   git clone https://github.com/MuhammedMagdyy/Taskora-API.git
+   ```
 
-1. Clone the repository to your local machine:
+2. **Navigate to the project directory** 📁:
 
-```
-  https://github.com/MuhammedMagdyy/Taskora-API.git
-```
+   ```bash
+   cd Taskora-API
+   ```
 
-2. Change the project's directory
+3. **Install required packages** 📦:
 
-```
-  cd Taskora-API
-```
+   ```bash
+   npm install
+   ```
 
-3. Install required [packages](https://github.com/MuhammedMagdyy/Taskora-API/blob/main/package.json) using `npm install`
+4. **Configure Environment Variables** 🛡️:
 
-4. Rename the `.env.example` file to `.env`, then add your [environment variables](https://github.com/MuhammedMagdyy/Taskora-API/blob/main/.env.example)
+   - Rename `.env.example` ➔ `.env`
+   - Add your environment variables based on [`.env.example`](https://github.com/MuhammedMagdyy/Taskora-API/blob/main/.env.example)
 
-5. Run the following commands in order:
+5. **Run Database Migrations** 🗄️:
 
-```
-  npm run db:migrate
-  npm run db:generate
-  npm run db:push
-```
+   ```bash
+   npm run db:migrate
+   npm run db:generate
+   npm run db:push
+   ```
 
-6. Start the application:
-   - Production: `npm start`
-   - Development: `npm run dev`
+6. **Start the Application** ⚡:
+   - **Production** 🏆: `npm start`
+   - **Development** 🧑‍💻: `npm run dev`
 
-### API Documentation [Swagger](https://swagger.io/)
+---
 
-After setting up the project locally, you can view the Swagger API Documentation to learn how to use the API.
+## 🤝 Contributing
 
-```
-  http://localhost:{port}/api-docs
-```
+💡 **Found a bug?** Have an idea for a new feature? Contributions are welcome!
+
+1. **Fork the repository** 🚀
+2. **Create a new branch** `git checkout -b feature/awesome-feature` 🌟
+3. **Commit your changes** `git commit -m 'Add some awesome feature'` 🔥
+4. **Push to your branch** `git push origin feature/awesome-feature` 🚀
+5. **Create a Pull Request** 🎉
+
+---
+
+🚀 **Happy Coding!**
