@@ -22,6 +22,7 @@ Taskora API built using **Node.js**, **Express.js**, **TypeScript**, **Prisma OR
 - [🌟 Features](#-features)
 - [📖 API Documentation](#-api-documentation)
   - [🚀 Postman](#-postman)
+- [🗄️ Database Schema](#️-database-schema)
 - [🛠️ Getting Started](#️-getting-started)
   - [⚡ Prerequisites](#-prerequisites)
   - [📦 Installing](#-installing)
@@ -51,6 +52,12 @@ Taskora API built using **Node.js**, **Express.js**, **TypeScript**, **Prisma OR
 Easily test and interact with the API documentation using Postman
 
 [![Run in Postman](https://run.pstmn.io/button.svg)](https://documenter.getpostman.com/view/10107969/2sAYdZuZDa)
+
+---
+
+## 🗄️ Database Schema
+
+![Schema](https://github.com/user-attachments/assets/8a01c4be-3c6e-47e4-8a6a-52ded2f661f5)
 
 ---
 
