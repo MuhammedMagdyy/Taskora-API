@@ -29,7 +29,7 @@ app.get('/', (_, res) => {
   );
 });
 
-app.set('trust proxy', true);
+app.set('trust proxy', 1);
 app.use(morganLogger);
 app.use(helmet());
 app.use(cors(corsConfig));
