@@ -1,10 +1,16 @@
 import asyncHandler from 'express-async-handler';
 import { statusSerivce } from '../services';
-import { BAD_REQUEST, DB_COLUMNS, OK, sortSchema } from '../utils';
+import {
+  BAD_REQUEST,
+  DB_COLUMNS,
+  OK,
+  paramsSchema,
+  sortSchema,
+} from '../utils';
 import { ISortQuery } from '../types';
 
 export const getStatus = asyncHandler(async (req, res) => {
-  const { uuid } = req.params;
+  const { uuid } = paramsSchema.parse(req.params);
   const status = await statusSerivce.isStatusExists(uuid);
 
   res

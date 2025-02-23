@@ -9,6 +9,7 @@ import {
   sortSchema,
   DB_COLUMNS,
   BAD_REQUEST,
+  paramsSchema,
 } from '../utils';
 import { ISortQuery } from '../types';
 
@@ -33,7 +34,7 @@ export const createProject = asyncHandler(async (req, res) => {
 });
 
 export const getProject = asyncHandler(async (req, res) => {
-  const { uuid } = req.params;
+  const { uuid } = paramsSchema.parse(req.params);
   const project = await projectSerivce.isProjectExists(uuid);
 
   res
@@ -58,7 +59,7 @@ export const getAllProjects = asyncHandler(async (req, res) => {
   }
 
   const orderBy: ISortQuery = sortFields.map((field, index) => ({
-    [field]: sortOrders[index] === 'desc' ? 'desc' : 'asc',
+    [field]: sortOrders[index]?.toLocaleLowerCase() === 'desc' ? 'desc' : 'asc',
   }));
 
   const projects = await projectSerivce.findMany(
@@ -72,7 +73,7 @@ export const getAllProjects = asyncHandler(async (req, res) => {
 });
 
 export const updateProject = asyncHandler(async (req, res) => {
-  const { uuid } = req.params;
+  const { uuid } = paramsSchema.parse(req.params);
   const schema = projectUpdateSchema.parse(req.body);
 
   await projectSerivce.isProjectExists(uuid);
@@ -85,7 +86,7 @@ export const updateProject = asyncHandler(async (req, res) => {
 });
 
 export const deleteProject = asyncHandler(async (req, res) => {
-  const { uuid } = req.params;
+  const { uuid } = paramsSchema.parse(req.params);
   await projectSerivce.deleteProjectByUUID(uuid);
 
   res.sendStatus(NO_CONTENT);
