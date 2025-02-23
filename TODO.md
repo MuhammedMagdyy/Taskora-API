@@ -10,9 +10,9 @@
 - [x] Create googleId and githubId instead of providerId
 - [x] Migrate OTP table to Prisma
 - [x] Search by token instead userUUID in verify email
-- [ ] Integrate with SMTP server to send emails
+- [x] Integrate with SMTP server to send emails
 - [ ] Rename files to be more descriptive
-- [ ] Add more security
+- [x] Add more security
 - [ ] Learn how to link local account with social account
 - [x] Handle transactions correctly
 - [x] Handle SRP correctly
@@ -24,7 +24,7 @@
 
 - [x] Add logging
 - [ ] Enhance API documentation
-  - [ ] Postman
+  - [x] Postman
   - [ ] Swagger
 
 ## Testing
