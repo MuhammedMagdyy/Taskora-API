@@ -2,6 +2,7 @@ import nodemailer, { Transporter } from 'nodemailer';
 import { getVerifyEmailTemplate, getOTPTemplate, logger } from '../utils';
 import {
   frontendUrl,
+  mailService,
   mailHost,
   mailPort,
   mailAuthUser,
@@ -13,6 +14,7 @@ export class EmailService {
 
   constructor() {
     this.transporter = nodemailer.createTransport({
+      service: mailService,
       host: mailHost,
       port: Number(mailPort),
       secure: false,
@@ -32,7 +34,7 @@ export class EmailService {
   }) {
     try {
       await this.transporter.sendMail({
-        from: `Taskora support <support@taskora.live>`,
+        from: `Taskora support <${mailAuthUser}>`,
         to: args.to,
         subject: args.subject,
         text: args.text,
