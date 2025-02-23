@@ -9,6 +9,7 @@ export const cloudinaryCloudName = env('CLOUDINARY_CLOUD_NAME');
 export const cloudinaryApiKey = env('CLOUDINARY_API_KEY');
 export const cloudinaryApiSecret = env('CLOUDINARY_API_SECRET');
 export const statusUuid = env('STATUS_UUID');
+export const mailService = env('MAIL_SERVICE');
 export const mailHost = env('MAIL_HOST');
 export const mailPort = env('MAIL_PORT');
 export const mailAuthUser = env('MAIL_AUTH_USER');
