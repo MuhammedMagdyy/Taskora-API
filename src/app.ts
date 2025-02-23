@@ -34,7 +34,7 @@ app.use(morganLogger);
 app.use(helmet());
 app.use(cors(corsConfig));
 app.use(compression());
-app.use(express.json());
+app.use(express.json({ limit: '5mb' }));
 app.use(xss);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use('/api/v1', routes);
