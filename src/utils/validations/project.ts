@@ -2,11 +2,7 @@ import { z } from 'zod';
 
 export const projectSchema = z.object({
   name: z.string().min(1, 'Name must be at least 1 character').trim(),
-  description: z
-    .string()
-    .min(1, 'Description must be at least 1 character')
-    .trim()
-    .optional(),
+  description: z.string().trim().optional(),
   statusUuid: z.string().uuid({ message: 'Status is required' }),
   color: z
     .string()
@@ -20,10 +16,7 @@ export const projectSchema = z.object({
 export const projectUpdateSchema = z
   .object({
     name: z.string().min(1, 'Name must be at least 1 character').trim(),
-    description: z
-      .string()
-      .min(1, 'Description must be at least 1 character')
-      .trim(),
+    description: z.string().trim(),
     statusUuid: z.string().uuid({ message: 'Status is required' }),
     color: z
       .string()
