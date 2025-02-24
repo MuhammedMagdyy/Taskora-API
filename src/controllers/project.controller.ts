@@ -1,5 +1,5 @@
 import asyncHandler from 'express-async-handler';
-import { projectSerivce, statusSerivce, tagService } from '../services';
+import { projectService, statusService, tagService } from '../services';
 import {
   projectSchema,
   projectUpdateSchema,
@@ -16,13 +16,13 @@ export const createProject = asyncHandler(async (req, res) => {
   const schema = projectSchema.parse(req.body);
   const { statusUuid, tagUuid } = schema;
 
-  await statusSerivce.isStatusExists(statusUuid);
+  await statusService.isStatusExists(statusUuid);
 
   if (tagUuid) {
     await tagService.isTagExists(tagUuid);
   }
 
-  const project = await projectSerivce.createOne({
+  const project = await projectService.createOne({
     ...schema,
     userUuid: req.user?.uuid as string,
   });
@@ -34,7 +34,7 @@ export const createProject = asyncHandler(async (req, res) => {
 
 export const getProject = asyncHandler(async (req, res) => {
   const { uuid } = req.params;
-  const project = await projectSerivce.isProjectExists(uuid);
+  const project = await projectService.isProjectExists(uuid);
 
   res
     .status(OK)
@@ -61,7 +61,7 @@ export const getAllProjects = asyncHandler(async (req, res) => {
     [field]: sortOrders[index] === 'desc' ? 'desc' : 'asc',
   }));
 
-  const projects = await projectSerivce.findMany(
+  const projects = await projectService.findMany(
     { userUuid: req.user?.uuid as string },
     orderBy.length > 0 ? orderBy : undefined
   );
@@ -75,9 +75,9 @@ export const updateProject = asyncHandler(async (req, res) => {
   const { uuid } = req.params;
   const schema = projectUpdateSchema.parse(req.body);
 
-  await projectSerivce.isProjectExists(uuid);
+  await projectService.isProjectExists(uuid);
 
-  const updatedProject = await projectSerivce.updateOne({ uuid }, schema);
+  const updatedProject = await projectService.updateOne({ uuid }, schema);
 
   res
     .status(OK)
@@ -86,7 +86,7 @@ export const updateProject = asyncHandler(async (req, res) => {
 
 export const deleteProject = asyncHandler(async (req, res) => {
   const { uuid } = req.params;
-  await projectSerivce.deleteProjectByUUID(uuid);
+  await projectService.deleteProjectByUUID(uuid);
 
   res.sendStatus(NO_CONTENT);
 });

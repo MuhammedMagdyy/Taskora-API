@@ -1,11 +1,11 @@
 import asyncHandler from 'express-async-handler';
-import { statusSerivce } from '../services';
+import { statusService } from '../services';
 import { BAD_REQUEST, DB_COLUMNS, OK, sortSchema } from '../utils';
 import { ISortQuery } from '../types';
 
 export const getStatus = asyncHandler(async (req, res) => {
   const { uuid } = req.params;
-  const status = await statusSerivce.isStatusExists(uuid);
+  const status = await statusService.isStatusExists(uuid);
 
   res
     .status(OK)
@@ -32,7 +32,7 @@ export const getAllStatuses = asyncHandler(async (req, res) => {
     [field]: sortOrders[index] === 'desc' ? 'desc' : 'asc',
   }));
 
-  const statuses = await statusSerivce.findMany(
+  const statuses = await statusService.findMany(
     orderBy.length > 0 ? orderBy : undefined
   );
 
