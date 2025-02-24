@@ -3,7 +3,7 @@ import { statusRepository } from '../repositories';
 import { ApiError, NOT_FOUND } from '../utils';
 import { ISortQuery } from '../types';
 
-export class StatusSerivce {
+export class StatusService {
   constructor(private readonly statusDataSource = statusRepository) {}
 
   async findOne(query: Prisma.StatusWhereUniqueInput) {
@@ -23,4 +23,4 @@ export class StatusSerivce {
   }
 }
 
-export const statusSerivce = new StatusSerivce();
+export const statusService = new StatusService();
