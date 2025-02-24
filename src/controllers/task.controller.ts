@@ -1,9 +1,9 @@
 import asyncHandler from 'express-async-handler';
 import {
   taskService,
-  projectSerivce,
+  projectService,
   tagService,
-  statusSerivce,
+  statusService,
 } from '../services';
 import {
   taskSchema,
@@ -21,13 +21,13 @@ import { ISortQuery } from '../types';
 export const createTask = asyncHandler(async (req, res) => {
   const schema = taskSchema.parse(req.body);
   const { projectUuid, tagUuid, statusUuid } = schema;
-  await projectSerivce.isProjectExists(projectUuid);
+  await projectService.isProjectExists(projectUuid);
 
   if (tagUuid) {
     await tagService.isTagExists(tagUuid);
   }
 
-  await statusSerivce.isStatusExists(statusUuid);
+  await statusService.isStatusExists(statusUuid);
 
   const task = await taskService.createOne({
     ...schema,

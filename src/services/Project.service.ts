@@ -43,4 +43,4 @@ export class ProjectService {
   }
 }
 
-export const projectSerivce = new ProjectService();
+export const projectService = new ProjectService();
