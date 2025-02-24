@@ -7,6 +7,7 @@ import {
   DB_COLUMNS,
   BAD_REQUEST,
   sortSchema,
+  paramsSchema,
 } from '../utils';
 import { ISortQuery } from '../types';
 
@@ -21,7 +22,7 @@ export const createTag = asyncHandler(async (req, res) => {
 });
 
 export const getTag = asyncHandler(async (req, res) => {
-  const { uuid } = req.params;
+  const { uuid } = paramsSchema.parse(req.params);
   const tag = await tagService.isTagExists(uuid);
 
   res.status(OK).json({ message: 'Retrieved tag successfully!', data: tag });

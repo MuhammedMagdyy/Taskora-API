@@ -105,13 +105,41 @@ const handlePrismaError = (
   error: Prisma.PrismaClientKnownRequestError
 ): { status: number; message: string } => {
   switch (error.code) {
+    case 'P2000':
+      return {
+        status: BAD_REQUEST,
+        message: 'Value too long for a database column. Please shorten it.',
+      };
     case 'P2002':
       return {
         status: BAD_REQUEST,
-        message: `Duplicate field value: ${error.meta?.target as string}`,
+        message: `Duplicate value for: ${error.meta?.target}`,
       };
     case 'P2003':
-      return { status: BAD_REQUEST, message: 'Foreign key constraint failed' };
+      return {
+        status: BAD_REQUEST,
+        message: 'Foreign key constraint failed. Check related entities.',
+      };
+    case 'P2010':
+      return {
+        status: INTERNAL_SERVER_ERROR,
+        message: 'Raw query execution failed. Please check the query syntax.',
+      };
+    case 'P2014':
+      return {
+        status: BAD_REQUEST,
+        message: 'Invalid WHERE clause. Check relationships between models.',
+      };
+    case 'P2023':
+      return {
+        status: BAD_REQUEST,
+        message: 'Invalid data format. Please check your input values.',
+      };
+    case 'P2025':
+      return {
+        status: BAD_REQUEST,
+        message: 'Record not found. Please verify your input.',
+      };
     default:
       return {
         status: INTERNAL_SERVER_ERROR,

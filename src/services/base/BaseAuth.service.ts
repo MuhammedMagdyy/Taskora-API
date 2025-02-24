@@ -24,6 +24,7 @@ export abstract class BaseAuthService {
       email: user.email,
       isVerified: user.isVerified,
       picture: user.picture as string,
+      hasPassword: user.hasPassword,
       createdAt: user.createdAt,
     };
   }

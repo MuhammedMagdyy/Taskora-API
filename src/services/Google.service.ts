@@ -68,7 +68,10 @@ export class GoogleService extends BaseAuthService {
       }
 
       const tokens = await this.generateAndStoreTokens(userExists.uuid);
-      const userResponse = this.formatUserResponse(userExists as IUser);
+      const userResponse = this.formatUserResponse({
+        ...userExists,
+        hasPassword: userExists.password ? true : false,
+      } as IUser);
 
       return { userResponse, tokens };
     } catch (error) {

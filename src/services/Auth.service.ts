@@ -22,6 +22,7 @@ import {
 import { generateCode } from '../utils';
 import { Provider } from '@prisma/client';
 import { BaseAuthService } from './base';
+import { IUserInfo } from '../types';
 
 interface IAuthUserData {
   name: string;
@@ -44,7 +45,10 @@ export class AuthService extends BaseAuthService {
 
       const user = await this.createNewUser(userCredentials);
       const tokens = await this.generateAndStoreTokens(user.uuid);
-      const userResponse = this.formatUserResponse(user as IUser);
+      const userResponse = this.formatUserResponse({
+        ...user,
+        hasPassword: true,
+      } as IUser);
 
       await this.sendVerificationEmail(userResponse);
 
@@ -110,7 +114,10 @@ export class AuthService extends BaseAuthService {
       }
 
       const tokens = await this.generateAndStoreTokens(user.uuid);
-      const userResponse = this.formatUserResponse(user as IUser);
+      const userResponse = this.formatUserResponse({
+        ...user,
+        hasPassword: true,
+      } as IUser);
 
       return { data: userResponse, tokens };
     } catch (error) {
@@ -208,7 +215,11 @@ export class AuthService extends BaseAuthService {
         await redisService.delete(`verify-email:${email}`);
       }
 
-      await this.sendVerificationEmail(this.formatUserResponse(user as IUser));
+      const userResponse = this.formatUserResponse({
+        ...user,
+        hasPassword: user.password ? true : false,
+      } as IUser);
+      await this.sendVerificationEmail(userResponse);
     } catch (error) {
       logger.error('Resend verification email failed:', error);
       throw error;
@@ -221,7 +232,7 @@ export class AuthService extends BaseAuthService {
 
       if (user) {
         const otp = generateCode();
-        await this.storeAndSendOTP(user as IUser, otp);
+        await this.storeAndSendOTP(user as IUserInfo, otp);
       }
     } catch (error) {
       logger.error('OTP generation failed:', error);
@@ -229,7 +240,7 @@ export class AuthService extends BaseAuthService {
     }
   }
 
-  private async storeAndSendOTP(user: IUser, otp: string) {
+  private async storeAndSendOTP(user: IUserInfo, otp: string) {
     await Promise.all([
       otpService.createOne({
         otp,
@@ -262,20 +273,20 @@ export class AuthService extends BaseAuthService {
         throw new ApiError('Invalid or expired OTP', GONE);
       }
 
-      await this.resetPassword(user as IUser, password, otp);
+      await this.resetPassword(user.uuid, password, otp);
     } catch (error) {
       logger.error('OTP verification failed:', error);
       throw error;
     }
   }
 
-  private async resetPassword(user: IUser, password: string, otp: string) {
+  private async resetPassword(userUuid: string, password: string, otp: string) {
     const hashedPassword = await HashingService.hash(password);
 
     await Promise.all([
       redisService.delete(`otp:${otp}`),
-      userService.updateOne({ uuid: user.uuid }, { password: hashedPassword }),
-      refreshTokenService.deleteMany({ userUuid: user.uuid }),
+      userService.updateOne({ uuid: userUuid }, { password: hashedPassword }),
+      refreshTokenService.deleteMany({ userUuid }),
     ]);
   }
 }

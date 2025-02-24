@@ -14,6 +14,7 @@ import {
   sortSchema,
   BAD_REQUEST,
   DB_COLUMNS,
+  paramsSchema,
 } from '../utils';
 import { ISortQuery } from '../types';
 
@@ -39,7 +40,7 @@ export const createTask = asyncHandler(async (req, res) => {
 });
 
 export const getTask = asyncHandler(async (req, res) => {
-  const { uuid } = req.params;
+  const { uuid } = paramsSchema.parse(req.params);
   const task = await taskService.isTaskExists(uuid);
 
   res.status(OK).json({ message: 'Retrieved task successfully!', data: task });
@@ -76,7 +77,7 @@ export const getAllTasks = asyncHandler(async (req, res) => {
 });
 
 export const updateTask = asyncHandler(async (req, res) => {
-  const { uuid } = req.params;
+  const { uuid } = paramsSchema.parse(req.params);
   const schema = taskUpdateSchema.parse(req.body);
 
   await taskService.isTaskExists(uuid);
@@ -89,7 +90,7 @@ export const updateTask = asyncHandler(async (req, res) => {
 });
 
 export const deleteTask = asyncHandler(async (req, res) => {
-  const { uuid } = req.params;
+  const { uuid } = paramsSchema.parse(req.params);
   await taskService.deleteTaskByUUID(uuid);
 
   res.sendStatus(NO_CONTENT);

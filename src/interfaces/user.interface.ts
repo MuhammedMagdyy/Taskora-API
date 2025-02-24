@@ -4,5 +4,6 @@ export interface IUser {
   email: string;
   isVerified: boolean;
   picture: string;
+  hasPassword: boolean;
   createdAt: Date;
 }
