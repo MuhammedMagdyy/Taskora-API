@@ -13,7 +13,7 @@ import { IUser } from '../interfaces';
 export const getUser = asyncHandler(async (req, res, next) => {
   const uuid = req.user?.uuid as string;
 
-  const userExists = (await userService.findUserByUUID(uuid)) as IUser;
+  const userExists = await userService.findUserByUUID(uuid);
 
   if (!userExists) {
     return next(new ApiError('User not found', NOT_FOUND));
@@ -21,10 +21,11 @@ export const getUser = asyncHandler(async (req, res, next) => {
 
   const user: IUser = {
     uuid: userExists.uuid,
-    name: userExists.name,
+    name: userExists.name as string,
     email: userExists.email,
     isVerified: userExists.isVerified,
-    picture: userExists.picture,
+    picture: userExists.picture as string,
+    hasPassword: userExists.password ? true : false,
     createdAt: userExists.createdAt,
   };
 
