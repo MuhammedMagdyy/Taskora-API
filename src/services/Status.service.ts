@@ -6,6 +6,10 @@ import { ISortQuery } from '../types';
 export class StatusService {
   constructor(private readonly statusDataSource = statusRepository) {}
 
+  async createMany(data: Prisma.StatusCreateManyInput[]) {
+    return this.statusDataSource.createMany(data);
+  }
+
   async findOne(query: Prisma.StatusWhereUniqueInput) {
     return this.statusDataSource.findOne(query);
   }
@@ -20,6 +24,10 @@ export class StatusService {
       throw new ApiError('Status not found', NOT_FOUND);
     }
     return status;
+  }
+
+  async getStatusCount() {
+    return this.statusDataSource.getStatusCount();
   }
 }
 

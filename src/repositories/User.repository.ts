@@ -33,14 +33,28 @@ export class UserRepository {
     taskData: CustomTaskUncheckedCreateInput
   ) {
     return await this.dbClient.$transaction(async (dbTransaction) => {
+      const inProgressStatusUuid = await dbTransaction.status.findFirst({
+        where: { name: 'IN_PROGRESS' },
+        select: { uuid: true },
+      });
+
       const user = await dbTransaction.user.create({ data: userData });
 
       const project = await dbTransaction.project.create({
-        data: { ...projectData, userUuid: user.uuid },
+        data: {
+          ...projectData,
+          userUuid: user.uuid,
+          statusUuid: inProgressStatusUuid?.uuid as string,
+        },
       });
 
       await dbTransaction.task.create({
-        data: { ...taskData, projectUuid: project.uuid, userUuid: user.uuid },
+        data: {
+          ...taskData,
+          projectUuid: project.uuid,
+          userUuid: user.uuid,
+          statusUuid: inProgressStatusUuid?.uuid as string,
+        },
       });
 
       return user;
