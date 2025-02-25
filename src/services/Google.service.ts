@@ -5,7 +5,6 @@ import {
   googleCallbackUrl,
   googleClientId,
   googleClientSecret,
-  statusUuid,
 } from '../config';
 import {
   API_INTEGRATION,
@@ -90,8 +89,7 @@ export class GoogleService extends BaseAuthService {
       isVerified: user.verified_email,
     };
 
-    const { projectData, taskData } =
-      this.createDefaultProjectAndTaskData(statusUuid);
+    const { projectData, taskData } = this.createDefaultProjectAndTaskData();
 
     return await userService.initializeUserWithProjectAndTasks(
       googleUserProfile,

@@ -9,12 +9,20 @@ export class StatusRepository {
     this.dbClient = dbClient;
   }
 
+  async createMany(data: Prisma.StatusCreateManyInput[]) {
+    return await this.dbClient.status.createMany({ data });
+  }
+
   async findOne(query: Prisma.StatusWhereUniqueInput) {
     return await this.dbClient.status.findUnique({ where: query });
   }
 
   async findMany(orderBy?: ISortQuery) {
     return await this.dbClient.status.findMany({ orderBy });
+  }
+
+  async getStatusCount() {
+    return await this.dbClient.status.count();
   }
 }
 

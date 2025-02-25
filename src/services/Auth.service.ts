@@ -8,7 +8,6 @@ import {
   redisService,
   otpService,
 } from '../services';
-import { statusUuid } from '../config';
 import {
   ApiError,
   CONFLICT,
@@ -60,8 +59,7 @@ export class AuthService extends BaseAuthService {
   }
 
   private async createNewUser(userData: IAuthUserData) {
-    const { projectData, taskData } =
-      this.createDefaultProjectAndTaskData(statusUuid);
+    const { projectData, taskData } = this.createDefaultProjectAndTaskData();
 
     return await userService.initializeUserWithProjectAndTasks(
       userData,

@@ -2,10 +2,10 @@ import { Prisma } from '@prisma/client';
 
 export type CustomProjectUncheckedCreateInput = Omit<
   Prisma.ProjectUncheckedCreateInput,
-  'userUuid'
+  'userUuid' | 'statusUuid'
 >;
 
 export type CustomTaskUncheckedCreateInput = Omit<
   Prisma.TaskUncheckedCreateInput,
-  'projectUuid' | 'userUuid'
+  'projectUuid' | 'userUuid' | 'statusUuid'
 >;

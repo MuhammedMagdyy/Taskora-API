@@ -5,7 +5,6 @@ import {
   githubClientId,
   githubClientSecret,
   githubCallbackUrl,
-  statusUuid,
 } from '../config';
 import { Provider } from '@prisma/client';
 import {
@@ -82,8 +81,7 @@ export class GithubService extends BaseAuthService {
       isVerified: user.verified,
     };
 
-    const { projectData, taskData } =
-      this.createDefaultProjectAndTaskData(statusUuid);
+    const { projectData, taskData } = this.createDefaultProjectAndTaskData();
 
     return await userService.initializeUserWithProjectAndTasks(
       gitUserProfile,
