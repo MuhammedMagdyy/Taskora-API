@@ -10,7 +10,11 @@ import routes from './routes';
 import { errorHandler, xss } from './middlewares';
 import { nodeEnv, port, corsConfig } from './config';
 import { SERVER, INTERNAL_SERVER_ERROR, logger } from './utils';
-import { PrismaDatabaseClient, RedisDatabaseClient } from './database';
+import {
+  createStatusIfNotExists,
+  PrismaDatabaseClient,
+  RedisDatabaseClient,
+} from './database';
 import { refreshTokenService } from './services';
 
 const app = express();
@@ -42,7 +46,11 @@ app.use(errorHandler);
 
 export const up = async () => {
   try {
-    await Promise.all([prismaClient.connect(), redisClient.connect()]);
+    await Promise.all([
+      prismaClient.connect(),
+      redisClient.connect(),
+      createStatusIfNotExists(),
+    ]);
     refreshTokenService.scheduleTokenCleanupTask();
 
     const server = app.listen(Number(port), '0.0.0.0', () => {

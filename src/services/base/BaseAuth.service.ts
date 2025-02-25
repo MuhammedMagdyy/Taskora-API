@@ -29,18 +29,16 @@ export abstract class BaseAuthService {
     };
   }
 
-  protected createDefaultProjectAndTaskData(statusUuid: string) {
+  protected createDefaultProjectAndTaskData() {
     return {
       projectData: {
         name: DEFAULT_VALUES.PROJECTS.name,
         description: DEFAULT_VALUES.PROJECTS.description,
         color: DEFAULT_VALUES.PROJECTS.color,
-        statusUuid,
       },
       taskData: {
         name: DEFAULT_VALUES.TASKS.name,
         description: DEFAULT_VALUES.TASKS.description,
-        statusUuid,
       },
     };
   }
