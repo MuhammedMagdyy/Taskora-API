@@ -6,6 +6,7 @@ const router = Router();
 
 router.use(isAuth);
 router.get('/profile', users.getUser);
+router.post('/challenge', users.ramadanChallenge);
 router.patch(
   '/:uuid',
   multerMiddlewareUpload.single('image'),

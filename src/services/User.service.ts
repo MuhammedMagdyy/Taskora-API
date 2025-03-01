@@ -38,6 +38,10 @@ export class UserService {
       taskData
     );
   }
+
+  async ramadanChallenge(userUuid: string) {
+    return this.userDataSource.ramadanChallenge(userUuid);
+  }
 }
 
 export const userService = new UserService();
