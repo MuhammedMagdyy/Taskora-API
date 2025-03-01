@@ -95,7 +95,9 @@ export class UserRepository {
 
   async ramadanChallenge(userUuid: string) {
     return await this.dbClient.$transaction(async (dbTransaction) => {
-      const baseDueDate = new Date('2025-03-01');
+      const ramadanStart = new Date('2025-03-01');
+      const ramadanEnd = new Date(ramadanStart);
+      ramadanEnd.setDate(ramadanStart.getDate() + 29);
 
       const inProgressStatus = await dbTransaction.status.findFirst({
         where: { name: 'IN_PROGRESS' },
@@ -106,17 +108,17 @@ export class UserRepository {
         data: {
           name: 'ختم القرآن في رمضان',
           description: 'خطة لختم القرآن الكريم خلال شهر رمضان المبارك',
-          dueDate: new Date('2025-03-30'),
+          dueDate: ramadanEnd,
           color: '#ebbc62',
           userUuid,
-          theme: 'ramadan'.toLocaleUpperCase(),
+          theme: 'RAMADAN',
           statusUuid: inProgressStatus?.uuid as string,
         },
       });
 
       const taskPromises = this.arabicNumerals.map((num, i) => {
-        const taskDueDate = new Date(baseDueDate);
-        taskDueDate.setDate(taskDueDate.getDate() + i);
+        const taskDueDate = new Date(ramadanStart);
+        taskDueDate.setDate(ramadanStart.getDate() + i);
 
         return dbTransaction.task.create({
           data: {
