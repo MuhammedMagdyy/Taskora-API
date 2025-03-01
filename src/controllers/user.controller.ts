@@ -1,6 +1,7 @@
 import asyncHandler from 'express-async-handler';
 import {
   ApiError,
+  BAD_REQUEST,
   FORBIDDEN,
   NOT_FOUND,
   OK,
@@ -60,7 +61,22 @@ export const updateUser = asyncHandler(async (req, res, next) => {
 
   if (name) user.name = name;
   if (password) {
-    user.password = await HashingService.hash(password);
+    const hashedPassword = await HashingService.hash(password);
+    const isSamePassword = await HashingService.compare(
+      password,
+      user.password as string
+    );
+
+    if (isSamePassword) {
+      return next(
+        new ApiError(
+          'New password must be different from the current one',
+          BAD_REQUEST
+        )
+      );
+    }
+
+    user.password = hashedPassword;
   }
 
   await userService.updateOne(
