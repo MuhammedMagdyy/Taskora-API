@@ -61,7 +61,6 @@ export const updateUser = asyncHandler(async (req, res, next) => {
 
   if (name) user.name = name;
   if (password) {
-    const hashedPassword = await HashingService.hash(password);
     const isSamePassword = await HashingService.compare(
       password,
       user.password as string
@@ -76,7 +75,7 @@ export const updateUser = asyncHandler(async (req, res, next) => {
       );
     }
 
-    user.password = hashedPassword;
+    user.password = await HashingService.hash(password);
   }
 
   await userService.updateOne(
