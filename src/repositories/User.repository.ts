@@ -106,7 +106,7 @@ export class UserRepository {
         data: {
           name: 'ختم القرآن في رمضان',
           description: 'خطة لختم القرآن الكريم خلال شهر رمضان المبارك',
-          dueDate: baseDueDate,
+          dueDate: new Date('2025-03-30'),
           color: '#ebbc62',
           userUuid,
           theme: 'ramadan'.toLocaleUpperCase(),
