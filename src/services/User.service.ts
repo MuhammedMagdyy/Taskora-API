@@ -40,7 +40,7 @@ export class UserService {
   }
 
   async ramadanChallenge(userUuid: string) {
-    return this.userDataSource.ramadanQuranChallenge(userUuid);
+    return this.userDataSource.ramadanChallenge(userUuid);
   }
 }
 

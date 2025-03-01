@@ -7,7 +7,7 @@ import {
 
 export class UserRepository {
   private readonly dbClient: PrismaClient;
-  private arabicNumerals = [
+  private arabicNumerals: string[] = [
     'الأول',
     'الثاني',
     'الثالث',
@@ -93,7 +93,7 @@ export class UserRepository {
     });
   }
 
-  async ramadanQuranChallenge(userUuid: string) {
+  async ramadanChallenge(userUuid: string) {
     return await this.dbClient.$transaction(async (dbTransaction) => {
       const baseDueDate = new Date('2025-03-01');
 
