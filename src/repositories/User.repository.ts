@@ -7,6 +7,38 @@ import {
 
 export class UserRepository {
   private readonly dbClient: PrismaClient;
+  private arabicNumerals = [
+    'الأول',
+    'الثاني',
+    'الثالث',
+    'الرابع',
+    'الخامس',
+    'السادس',
+    'السابع',
+    'الثامن',
+    'التاسع',
+    'العاشر',
+    'الحادي عشر',
+    'الثاني عشر',
+    'الثالث عشر',
+    'الرابع عشر',
+    'الخامس عشر',
+    'السادس عشر',
+    'السابع عشر',
+    'الثامن عشر',
+    'التاسع عشر',
+    'العشرون',
+    'الحادي والعشرون',
+    'الثاني والعشرون',
+    'الثالث والعشرون',
+    'الرابع والعشرون',
+    'الخامس والعشرون',
+    'السادس والعشرون',
+    'السابع والعشرون',
+    'الثامن والعشرون',
+    'التاسع والعشرون',
+    'الثلاثون',
+  ];
 
   constructor(dbClient: PrismaClient) {
     this.dbClient = dbClient;
@@ -58,6 +90,49 @@ export class UserRepository {
       });
 
       return user;
+    });
+  }
+
+  async ramadanQuranChallenge(userUuid: string) {
+    return await this.dbClient.$transaction(async (dbTransaction) => {
+      const baseDueDate = new Date('2025-03-01');
+
+      const inProgressStatus = await dbTransaction.status.findFirst({
+        where: { name: 'IN_PROGRESS' },
+        select: { uuid: true },
+      });
+
+      const project = await dbTransaction.project.create({
+        data: {
+          name: 'ختم القرآن في رمضان',
+          description: 'خطة لختم القرآن الكريم خلال شهر رمضان المبارك',
+          dueDate: baseDueDate,
+          color: '#ebbc62',
+          userUuid,
+          theme: 'ramadan'.toLocaleUpperCase(),
+          statusUuid: inProgressStatus?.uuid as string,
+        },
+      });
+
+      const taskPromises = this.arabicNumerals.map((num, i) => {
+        const taskDueDate = new Date(baseDueDate);
+        taskDueDate.setDate(taskDueDate.getDate() + i);
+
+        return dbTransaction.task.create({
+          data: {
+            name: `الجزء ${num}`,
+            description: `قراءة الجزء ${num} من القرآن الكريم`,
+            dueDate: taskDueDate,
+            projectUuid: project.uuid,
+            userUuid,
+            statusUuid: inProgressStatus?.uuid as string,
+          },
+        });
+      });
+
+      const tasks = await Promise.all(taskPromises);
+
+      return { project, tasks };
     });
   }
 }
