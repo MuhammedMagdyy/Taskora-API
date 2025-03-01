@@ -70,3 +70,13 @@ export const updateUser = asyncHandler(async (req, res, next) => {
 
   res.status(OK).json({ message: 'User updated successfully!' });
 });
+
+export const ramadanChallenge = asyncHandler(async (req, res) => {
+  const userUuid = req.user?.uuid as string;
+
+  await userService.ramadanChallenge(userUuid);
+
+  res
+    .status(OK)
+    .json({ message: 'Ramadan challenge initialized successfully!' });
+});
