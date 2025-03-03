@@ -129,12 +129,8 @@ export const refreshToken = asyncHandler(async (req, res, next) => {
   res.status(OK).json({ message: 'Token refreshed successfully', tokens });
 });
 
-export const verifyEmail = asyncHandler(async (req, res, next) => {
+export const verifyEmail = asyncHandler(async (req, res) => {
   const { token } = verifyEmailSchema.parse(req.query);
-
-  if (!token) {
-    return next(new ApiError('Invalid or expired token', BAD_REQUEST));
-  }
 
   await authService.verifyEmail(token);
 
@@ -144,10 +140,6 @@ export const verifyEmail = asyncHandler(async (req, res, next) => {
 export const resendVerificationEmail = asyncHandler(async (req, res) => {
   const { email } = resendVerificationEmailSchema.parse(req.body);
 
-  if (!email) {
-    throw new ApiError('Email is required', BAD_REQUEST);
-  }
-
   await authService.resendVerificationEmail(email);
 
   res.status(OK).json({ message: 'Verification email sent successfully' });
@@ -155,10 +147,6 @@ export const resendVerificationEmail = asyncHandler(async (req, res) => {
 
 export const forgotPassword = asyncHandler(async (req, res) => {
   const { email } = forgotPasswordSchema.parse(req.body);
-
-  if (!email) {
-    throw new ApiError('Email is required', BAD_REQUEST);
-  }
 
   await authService.generateOTP(email);
 

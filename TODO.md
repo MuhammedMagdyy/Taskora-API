@@ -24,9 +24,9 @@
 ## Improvements
 
 - [x] Add logging
-- [ ] Enhance API documentation
+- [x] Enhance API documentation
   - [x] Postman
-  - [ ] Swagger
+  - [x] Swagger
 
 ## Testing
 

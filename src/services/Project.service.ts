@@ -29,16 +29,16 @@ export class ProjectService {
     return this.projectDataSource.deleteOne(query);
   }
 
-  async isProjectExists(uuid: string) {
-    const project = await this.findOne({ uuid });
+  async isProjectExists(uuid: string, userUuid: string) {
+    const project = await this.findOne({ uuid, userUuid });
     if (!project) {
       throw new ApiError('Project not found', NOT_FOUND);
     }
     return project;
   }
 
-  async deleteProjectByUUID(uuid: string) {
-    await this.isProjectExists(uuid);
+  async deleteProjectByUUID(uuid: string, userUuid: string) {
+    await this.isProjectExists(uuid, userUuid);
     await this.deleteOne({ uuid });
   }
 }

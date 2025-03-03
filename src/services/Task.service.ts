@@ -29,16 +29,16 @@ export class TaskService {
     return this.taskDataSource.deleteOne(query);
   }
 
-  async isTaskExists(uuid: string) {
-    const task = await this.findOne({ uuid });
+  async isTaskExists(uuid: string, userUuid: string) {
+    const task = await this.findOne({ uuid, userUuid });
     if (!task) {
       throw new ApiError('Task not found', NOT_FOUND);
     }
     return task;
   }
 
-  async deleteTaskByUUID(uuid: string) {
-    await this.isTaskExists(uuid);
+  async deleteTaskByUUID(uuid: string, userUuid: string) {
+    await this.isTaskExists(uuid, userUuid);
     await this.deleteOne({ uuid });
   }
 }

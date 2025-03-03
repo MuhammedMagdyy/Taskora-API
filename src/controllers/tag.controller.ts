@@ -23,7 +23,9 @@ export const createTag = asyncHandler(async (req, res) => {
 
 export const getTag = asyncHandler(async (req, res) => {
   const { uuid } = paramsSchema.parse(req.params);
-  const tag = await tagService.isTagExists(uuid);
+  const userUuid = req.user?.uuid as string;
+
+  const tag = await tagService.isTagExists(uuid, userUuid);
 
   res.status(OK).json({ message: 'Retrieved tag successfully!', data: tag });
 });

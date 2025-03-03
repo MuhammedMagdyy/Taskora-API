@@ -18,8 +18,8 @@ export class TagService {
     return this.tagDataSource.findMany(query, orderBy);
   }
 
-  async isTagExists(uuid: string) {
-    const tag = await this.findOne({ uuid });
+  async isTagExists(uuid: string, userUuid: string) {
+    const tag = await this.findOne({ uuid, userUuid });
     if (!tag) {
       throw new ApiError('Tag not found', NOT_FOUND);
     }
