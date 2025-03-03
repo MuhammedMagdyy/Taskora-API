@@ -3,10 +3,10 @@ import { ZodError } from 'zod';
 import {
   ApiError,
   BAD_REQUEST,
-  FORBIDDEN,
   INTERNAL_SERVER_ERROR,
   PAYLOAD_TOO_LARGE,
   SERVER,
+  UNAUTHORIZED,
 } from '../utils';
 import { Prisma } from '@prisma/client';
 import { JsonWebTokenError } from 'jsonwebtoken';
@@ -53,7 +53,7 @@ export const errorHandler: ErrorRequestHandler = (
   }
 
   if (error instanceof JsonWebTokenError) {
-    res.status(FORBIDDEN).json({ message: 'Invalid or expired token' });
+    res.status(UNAUTHORIZED).json({ message: 'Invalid or expired token' });
     return;
   }
 

@@ -15,12 +15,13 @@ import { ISortQuery } from '../types';
 
 export const createProject = asyncHandler(async (req, res) => {
   const schema = projectSchema.parse(req.body);
+  const userUuid = req.user?.uuid as string;
   const { statusUuid, tagUuid } = schema;
 
   await statusService.isStatusExists(statusUuid);
 
   if (tagUuid) {
-    await tagService.isTagExists(tagUuid);
+    await tagService.isTagExists(tagUuid, userUuid);
   }
 
   const project = await projectService.createOne({
@@ -35,7 +36,8 @@ export const createProject = asyncHandler(async (req, res) => {
 
 export const getProject = asyncHandler(async (req, res) => {
   const { uuid } = paramsSchema.parse(req.params);
-  const project = await projectService.isProjectExists(uuid);
+  const userUuid = req.user?.uuid as string;
+  const project = await projectService.isProjectExists(uuid, userUuid);
 
   res
     .status(OK)
@@ -74,9 +76,10 @@ export const getAllProjects = asyncHandler(async (req, res) => {
 
 export const updateProject = asyncHandler(async (req, res) => {
   const { uuid } = paramsSchema.parse(req.params);
+  const userUuid = req.user?.uuid as string;
   const schema = projectUpdateSchema.parse(req.body);
 
-  await projectService.isProjectExists(uuid);
+  await projectService.isProjectExists(uuid, userUuid);
 
   const updatedProject = await projectService.updateOne({ uuid }, schema);
 
@@ -87,7 +90,9 @@ export const updateProject = asyncHandler(async (req, res) => {
 
 export const deleteProject = asyncHandler(async (req, res) => {
   const { uuid } = paramsSchema.parse(req.params);
-  await projectService.deleteProjectByUUID(uuid);
+  const userUuid = req.user?.uuid as string;
+
+  await projectService.deleteProjectByUUID(uuid, userUuid);
 
   res.sendStatus(NO_CONTENT);
 });
