@@ -20,11 +20,13 @@ import { ISortQuery } from '../types';
 
 export const createTask = asyncHandler(async (req, res) => {
   const schema = taskSchema.parse(req.body);
+  const userUuid = req.user?.uuid as string;
   const { projectUuid, tagUuid, statusUuid } = schema;
-  await projectService.isProjectExists(projectUuid);
+
+  await projectService.isProjectExists(projectUuid, userUuid);
 
   if (tagUuid) {
-    await tagService.isTagExists(tagUuid);
+    await tagService.isTagExists(tagUuid, userUuid);
   }
 
   await statusService.isStatusExists(statusUuid);
@@ -41,7 +43,9 @@ export const createTask = asyncHandler(async (req, res) => {
 
 export const getTask = asyncHandler(async (req, res) => {
   const { uuid } = paramsSchema.parse(req.params);
-  const task = await taskService.isTaskExists(uuid);
+  const userUuid = req.user?.uuid as string;
+
+  const task = await taskService.isTaskExists(uuid, userUuid);
 
   res.status(OK).json({ message: 'Retrieved task successfully!', data: task });
 });
@@ -79,8 +83,9 @@ export const getAllTasks = asyncHandler(async (req, res) => {
 export const updateTask = asyncHandler(async (req, res) => {
   const { uuid } = paramsSchema.parse(req.params);
   const schema = taskUpdateSchema.parse(req.body);
+  const userUuid = req.user?.uuid as string;
 
-  await taskService.isTaskExists(uuid);
+  await taskService.isTaskExists(uuid, userUuid);
 
   const updatedTask = await taskService.updateOne({ uuid }, schema);
 
@@ -91,7 +96,9 @@ export const updateTask = asyncHandler(async (req, res) => {
 
 export const deleteTask = asyncHandler(async (req, res) => {
   const { uuid } = paramsSchema.parse(req.params);
-  await taskService.deleteTaskByUUID(uuid);
+  const userUuid = req.user?.uuid as string;
+
+  await taskService.deleteTaskByUUID(uuid, userUuid);
 
   res.sendStatus(NO_CONTENT);
 });

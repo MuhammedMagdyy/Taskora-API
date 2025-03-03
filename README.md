@@ -22,6 +22,7 @@ Taskora API built using **Node.js**, **Express.js**, **TypeScript**, **Prisma OR
 - [🌟 Features](#-features)
 - [📖 API Documentation](#-api-documentation)
   - [🚀 Postman](#-postman)
+  - [📚 Swagger](#-swagger)
 - [🗄️ Database Schema](#️-database-schema)
 - [🛠️ Getting Started](#️-getting-started)
   - [⚡ Prerequisites](#-prerequisites)
@@ -55,9 +56,22 @@ Easily test and interact with the API documentation using Postman
 
 ---
 
+### 📚 Swagger
+
+[Swagger](https://swagger.io/) UI is available at `/api-docs` to explore the API endpoints
+
+```
+Server URL could be:
+  - http://localhost:3000/api-docs (development)
+  - https://backend.taskora.live/api-docs (staging)
+  - https://taskora.live/api-docs (production)
+```
+
+---
+
 ## 🗄️ Database Schema
 
-![Schema](https://github.com/user-attachments/assets/8a01c4be-3c6e-47e4-8a6a-52ded2f661f5)
+![Schema](https://github.com/user-attachments/assets/1ba1fd47-79b9-4f63-af2b-c7b938d6a938)
 
 ---
 

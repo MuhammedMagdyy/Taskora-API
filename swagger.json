@@ -1,9 +1,14 @@
 {
-  "openapi": "3.0.3",
+  "openapi": "3.0.0",
   "info": {
-    "version": "1.0.0",
     "title": "Taskora API",
+    "version": "1.0.0",
     "description": "Taskora - A REST API for modern task and project management that helps you organize work efficiently. Create projects, manage tasks, set deadlines, and track progress with an intuitive interface.",
+    "contact": {
+      "name": "Mohamed Magdy",
+      "url": "https://github.com/MuhammedMagdyy",
+      "email": "Mohamedmagdy7410@gmail.com"
+    },
     "license": {
       "name": "MIT",
       "url": "https://opensource.org/licenses/MIT"
@@ -11,45 +16,674 @@
   },
   "servers": [
     {
-      "url": "http://localhost:3000/api/v1",
-      "description": "Local server"
+      "url": "http://localhost:3000",
+      "description": "Development server"
     },
     {
-      "url": "https://api.taskora.live/api/v1",
+      "url": "https://backend.taskora.live",
+      "description": "Staging server"
+    },
+    {
+      "url": "https://api.taskora.live",
       "description": "Production server"
     }
   ],
-  "tags": [
-    {
-      "name": "default",
-      "description": "General endpoints"
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
     },
-    {
-      "name": "statuses",
-      "description": "Endpoints to manage statuses"
-    },
-    {
-      "name": "tags",
-      "description": "Endpoints to manage tags"
-    },
-    {
-      "name": "tasks",
-      "description": "Endpoints to manage tasks"
-    },
-    {
-      "name": "projects",
-      "description": "Endpoints to manage projects"
+    "schemas": {
+      "RegisterRequest": {
+        "type": "object",
+        "required": [
+          "name",
+          "email",
+          "password"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 3,
+            "example": "John doe"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "john@gmail.com"
+          },
+          "password": {
+            "type": "string",
+            "pattern": "^(?=.*\\d)(?=.*[!@#$%^&*()\\-_=+{};:,<.>])(?=.*[A-Za-z]).{8,}$",
+            "example": "X#6I)RLIQ)TQ*@Pa^"
+          }
+        }
+      },
+      "RegisterResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "Registered successfully"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "uuid": {
+                "type": "string",
+                "format": "uuid",
+                "example": "d993bc1e-167c-43b1-a89c-723886dce3b6"
+              },
+              "name": {
+                "type": "string",
+                "example": "John doe"
+              },
+              "email": {
+                "type": "string",
+                "format": "email",
+                "example": "john@gmail.com"
+              },
+              "isVerified": {
+                "type": "boolean",
+                "example": false
+              },
+              "picture": {
+                "type": "string",
+                "nullable": true,
+                "example": null
+              },
+              "hasPassword": {
+                "type": "boolean",
+                "example": true
+              },
+              "createdAt": {
+                "type": "string",
+                "format": "date-time",
+                "example": "2025-03-03T18:24:56.265Z"
+              }
+            }
+          },
+          "tokens": {
+            "type": "object",
+            "properties": {
+              "accessToken": {
+                "type": "string",
+                "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1dWlkIjoiZDk5M2JjMWUtMTY3Yy00M2IxLWE4OWMtNzIzODg2ZGNlM2I2IiwiaWF0IjoxNzQxMDI2Mjk2LCJleHAiOjE3NDEwMjcxOTZ9.iaVIsCkVJxh7pSIfHQ1tH659i-zGcOlR1OFKgm3qqyU"
+              },
+              "refreshToken": {
+                "type": "string",
+                "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1dWlkIjoiZDk5M2JjMWUtMTY3Yy00M2IxLWE4OWMtNzIzODg2ZGNlM2I2IiwiaWF0IjoxNzQxMDI2Mjk2LCJleHAiOjE3NDE2MzEwOTZ9.0C5Nc_z9JV06q2FvNnCJ6A5Zq1wlNL0EQP0nY_2Rcbc"
+              }
+            }
+          }
+        }
+      },
+      "LoginRequest": {
+        "type": "object",
+        "required": [
+          "email",
+          "password"
+        ],
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "john@gmail.com"
+          },
+          "password": {
+            "type": "string",
+            "example": "X#6I)RLIQ)TQ*@Pa^"
+          }
+        }
+      },
+      "LoginResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "Logged in successfully"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "uuid": {
+                "type": "string",
+                "format": "uuid",
+                "example": "d993bc1e-167c-43b1-a89c-723886dce3b6"
+              },
+              "name": {
+                "type": "string",
+                "example": "John doe"
+              },
+              "email": {
+                "type": "string",
+                "format": "email",
+                "example": "john@gmail.com"
+              },
+              "isVerified": {
+                "type": "boolean",
+                "example": false
+              },
+              "picture": {
+                "type": "string",
+                "nullable": true,
+                "example": null
+              },
+              "hasPassword": {
+                "type": "boolean",
+                "example": true
+              },
+              "createdAt": {
+                "type": "string",
+                "format": "date-time",
+                "example": "2025-03-03T18:24:56.265Z"
+              }
+            }
+          },
+          "tokens": {
+            "type": "object",
+            "properties": {
+              "accessToken": {
+                "type": "string",
+                "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1dWlkIjoiZDk5M2JjMWUtMTY3Yy00M2IxLWE4OWMtNzIzODg2ZGNlM2I2IiwiaWF0IjoxNzQxMDI2Mjk2LCJleHAiOjE3NDEwMjcxOTZ9.iaVIsCkVJxh7pSIfHQ1tH659i-zGcOlR1OFKgm3qqyU"
+              },
+              "refreshToken": {
+                "type": "string",
+                "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1dWlkIjoiZDk5M2JjMWUtMTY3Yy00M2IxLWE4OWMtNzIzODg2ZGNlM2I2IiwiaWF0IjoxNzQxMDI2Mjk2LCJleHAiOjE3NDE2MzEwOTZ9.0C5Nc_z9JV06q2FvNnCJ6A5Zq1wlNL0EQP0nY_2Rcbc"
+              }
+            }
+          }
+        }
+      },
+      "LogoutRequest": {
+        "type": "object",
+        "required": [
+          "refreshToken"
+        ],
+        "properties": {
+          "refreshToken": {
+            "type": "string",
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+          }
+        }
+      },
+      "RefreshTokenResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "Token refreshed successfully"
+          },
+          "tokens": {
+            "type": "object",
+            "properties": {
+              "accessToken": {
+                "type": "string",
+                "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1dWlkIjoiZDk5M2JjMWUtMTY3Yy00M2IxLWE4OWMtNzIzODg2ZGNlM2I2IiwiaWF0IjoxNzQxMDI3MjQyLCJleHAiOjE3NDEwMjgxNDJ9.yFzg9KTnSgeuTqmM0VhGrZ-xOntUw_h5JEQd4QFP-OI"
+              },
+              "refreshToken": {
+                "type": "string",
+                "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1dWlkIjoiZDk5M2JjMWUtMTY3Yy00M2IxLWE4OWMtNzIzODg2ZGNlM2I2IiwiaWF0IjoxNzQxMDI3MjQyLCJleHAiOjE3NDE2MzIwNDJ9.7LEHala1Zgro4NQcemQgQGpBTw5N1vn5SB3jwQpq8_s"
+              }
+            }
+          }
+        }
+      },
+      "EmailRequest": {
+        "type": "object",
+        "required": [
+          "email"
+        ],
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "john@gmail.com"
+          }
+        }
+      },
+      "VerifyOTPRequest": {
+        "type": "object",
+        "required": [
+          "email",
+          "otp",
+          "password"
+        ],
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "john@gmail.com"
+          },
+          "otp": {
+            "type": "string",
+            "minLength": 6,
+            "maxLength": 6,
+            "example": "991419"
+          },
+          "password": {
+            "type": "string",
+            "pattern": "^(?=.*\\d)(?=.*[!@#$%^&*()\\-_=+{};:,<.>])(?=.*[A-Za-z]).{8,}$",
+            "example": "12345678"
+          }
+        }
+      },
+      "ProjectRequest": {
+        "type": "object",
+        "required": [
+          "name",
+          "statusUuid",
+          "color"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "example": "First project"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true,
+            "example": "First description"
+          },
+          "statusUuid": {
+            "type": "string",
+            "format": "uuid",
+            "example": "f5cd8a09-e4f5-11ef-ae92-0242ac110002"
+          },
+          "color": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 20,
+            "example": "#FF0000"
+          },
+          "dueDate": {
+            "type": "string",
+            "format": "date",
+            "nullable": true,
+            "example": "2023-12-31"
+          },
+          "tagUuid": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true,
+            "example": "6330c64a-c195-11ef-b309-0242ac110002"
+          },
+          "theme": {
+            "type": "string",
+            "nullable": true,
+            "example": "RAMADAN"
+          }
+        }
+      },
+      "ProjectResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "Project created successfully!"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "uuid": {
+                "type": "string",
+                "format": "uuid",
+                "example": "77be4a2e-d167-4781-97f7-f86c372abf06"
+              },
+              "name": {
+                "type": "string",
+                "example": "Post 1"
+              },
+              "description": {
+                "type": "string",
+                "example": "First description"
+              },
+              "dueDate": {
+                "type": "string",
+                "format": "date-time",
+                "example": "2023-12-31T00:00:00.000Z"
+              },
+              "color": {
+                "type": "string",
+                "example": "#FF0000"
+              },
+              "theme": {
+                "type": "string",
+                "nullable": true,
+                "example": null
+              },
+              "createdAt": {
+                "type": "string",
+                "format": "date-time",
+                "example": "2025-03-03T19:29:23.926Z"
+              },
+              "updatedAt": {
+                "type": "string",
+                "format": "date-time",
+                "example": "2025-03-03T19:29:23.926Z"
+              },
+              "statusUuid": {
+                "type": "string",
+                "format": "uuid",
+                "example": "1dc270b2-e4ba-474a-84d6-4d198165b6a3"
+              },
+              "tagUuid": {
+                "type": "string",
+                "format": "uuid",
+                "example": "52216805-6d88-4e8e-a64b-031ed9f4e800"
+              },
+              "userUuid": {
+                "type": "string",
+                "format": "uuid",
+                "example": "d993bc1e-167c-43b1-a89c-723886dce3b6"
+              }
+            }
+          }
+        }
+      },
+      "TaskRequest": {
+        "type": "object",
+        "required": [
+          "name",
+          "projectUuid",
+          "statusUuid"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "example": "First task"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true,
+            "example": "First description"
+          },
+          "dueDate": {
+            "type": "string",
+            "format": "date",
+            "nullable": true,
+            "example": "2023-12-31"
+          },
+          "projectUuid": {
+            "type": "string",
+            "format": "uuid",
+            "example": "f039d886-4858-4e5a-8f43-2140031ffc5a"
+          },
+          "tagUuid": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true,
+            "example": "6330c64a-c195-11ef-b309-0242ac110002"
+          },
+          "statusUuid": {
+            "type": "string",
+            "format": "uuid",
+            "example": "5eee6a04-c195-11ef-b309-0242ac110002"
+          }
+        }
+      },
+      "TaskResponse": {
+        "type": "object",
+        "properties": {
+          "uuid": {
+            "type": "string",
+            "format": "uuid",
+            "example": "66c44a3f-c195-11ef-b309-0242ac110002"
+          },
+          "name": {
+            "type": "string",
+            "example": "First task"
+          },
+          "description": {
+            "type": "string",
+            "example": "First description"
+          },
+          "projectUuid": {
+            "type": "string",
+            "format": "uuid",
+            "example": "f039d886-4858-4e5a-8f43-2140031ffc5a"
+          },
+          "tagUuid": {
+            "type": "string",
+            "format": "uuid",
+            "example": "6330c64a-c195-11ef-b309-0242ac110002"
+          },
+          "statusUuid": {
+            "type": "string",
+            "format": "uuid",
+            "example": "5eee6a04-c195-11ef-b309-0242ac110002"
+          },
+          "dueDate": {
+            "type": "string",
+            "format": "date",
+            "example": "2023-12-31"
+          },
+          "userUuid": {
+            "type": "string",
+            "format": "uuid",
+            "example": "d993bc1e-167c-43b1-a89c-723886dce3b6"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2024-01-15T10:30:00Z"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2024-01-15T10:30:00Z"
+          }
+        }
+      },
+      "TagRequest": {
+        "type": "object",
+        "required": [
+          "name",
+          "color"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 30,
+            "example": "Purple tags"
+          },
+          "color": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 20,
+            "example": "#800089"
+          }
+        }
+      },
+      "TagResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "Tag created successfully!"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "uuid": {
+                "type": "string",
+                "format": "uuid",
+                "example": "284f917b-c006-11ef-832b-0242ac110002"
+              },
+              "name": {
+                "type": "string",
+                "example": "Purple tags"
+              },
+              "color": {
+                "type": "string",
+                "example": "#800089"
+              },
+              "userUuid": {
+                "type": "string",
+                "format": "uuid",
+                "example": "d993bc1e-167c-43b1-a89c-723886dce3b6"
+              },
+              "createdAt": {
+                "type": "string",
+                "format": "date-time",
+                "example": "2024-01-15T10:30:00Z"
+              },
+              "updatedAt": {
+                "type": "string",
+                "format": "date-time",
+                "example": "2024-01-15T10:30:00Z"
+              }
+            }
+          }
+        }
+      },
+      "StatusResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "Statuses retrieved successfully"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "uuid": {
+                  "type": "string",
+                  "format": "uuid",
+                  "example": "5eee6a04-c195-11ef-b309-0242ac110002"
+                },
+                "name": {
+                  "type": "string",
+                  "example": "In Progress"
+                },
+                "createdAt": {
+                  "type": "string",
+                  "format": "date-time",
+                  "example": "2024-01-15T10:30:00Z"
+                },
+                "updatedAt": {
+                  "type": "string",
+                  "format": "date-time",
+                  "example": "2024-01-15T10:30:00Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "UserProfileResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "User profile retrieved successfully"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "uuid": {
+                "type": "string",
+                "format": "uuid",
+                "example": "25a14aa5-56e1-424e-904e-b073eef3fdf3"
+              },
+              "name": {
+                "type": "string",
+                "example": "John doe"
+              },
+              "email": {
+                "type": "string",
+                "format": "email",
+                "example": "john@gmail.com"
+              },
+              "isVerified": {
+                "type": "boolean",
+                "example": true
+              },
+              "picture": {
+                "type": "string",
+                "nullable": true,
+                "example": "https://example.com/images/profile.jpg"
+              },
+              "hasPassword": {
+                "type": "boolean",
+                "example": true
+              },
+              "createdAt": {
+                "type": "string",
+                "format": "date-time",
+                "example": "2024-01-15T10:30:00Z"
+              },
+              "updatedAt": {
+                "type": "string",
+                "format": "date-time",
+                "example": "2024-01-15T10:30:00Z"
+              }
+            }
+          }
+        }
+      },
+      "UserUpdateRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "example": "John Smith"
+          },
+          "password": {
+            "type": "string",
+            "pattern": "^(?=.*\\d)(?=.*[!@#$%^&*()\\-_=+{};:,<.>])(?=.*[A-Za-z]).{8,}$",
+            "example": "New@Password123"
+          },
+          "image": {
+            "type": "string",
+            "format": "binary"
+          }
+        }
+      }
     }
-  ],
+  },
   "paths": {
-    "/health": {
+    "/": {
       "get": {
-        "tags": ["default"],
-        "summary": "Health Check",
-        "description": "Check the health status of the server.",
+        "tags": [
+          "General"
+        ],
+        "summary": "Welcome Endpoint",
+        "description": "Returns a welcome HTML page to confirm that the API is up and running",
         "responses": {
           "200": {
-            "description": "The server is healthy.",
+            "description": "Welcome HTML page",
+            "content": {
+              "text/html": {
+                "schema": {
+                  "type": "string",
+                  "example": "<div style=\"text-align: center; margin-top: 20px;\"><h1>Welcome to Taskora API 🚀</h1></div>"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/health": {
+      "get": {
+        "tags": [
+          "General"
+        ],
+        "summary": "Check Server Health",
+        "description": "Checks the server's health status",
+        "responses": {
+          "200": {
+            "description": "Server health status",
             "content": {
               "application/json": {
                 "schema": {
@@ -57,7 +691,16 @@
                   "properties": {
                     "message": {
                       "type": "string",
-                      "example": "I'm healthy 🤸‍♂️"
+                      "example": "I'm healthy 🏋️‍♂️"
+                    },
+                    "uptime": {
+                      "type": "string",
+                      "example": "1 minutes"
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2024-01-15T10:30:00Z"
                     }
                   }
                 }
@@ -67,80 +710,69 @@
         }
       }
     },
-    "/statuses": {
-      "get": {
-        "tags": ["statuses"],
-        "summary": "Get statuses",
-        "description": "Return a list of statuses.",
-        "responses": {
-          "200": {
-            "description": "A list of statuses.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "data": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/statuses"
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/statuses/{uuid}": {
-      "get": {
-        "tags": ["statuses"],
-        "summary": "Get a specific status",
-        "description": "Return details of a specific status based on statusUUID.",
-        "parameters": [
-          {
-            "name": "uuid",
-            "in": "path",
-            "required": true,
-            "description": "The statusUUID of the status.",
-            "schema": {
-              "type": "string"
-            }
-          }
+    "/api/v1/auth/register": {
+      "post": {
+        "tags": [
+          "Authentication"
         ],
+        "summary": "Register a new user",
+        "description": "Registers a new user and triggers email verification",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterRequest"
+              }
+            }
+          }
+        },
         "responses": {
-          "200": {
-            "description": "A specific status.",
+          "201": {
+            "description": "User registered successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RegisterResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "data": {
-                      "type": "object",
-                      "properties": {
-                        "uuid": {
-                          "type": "string",
-                          "format": "uuid"
+                    "message": {
+                      "type": "string",
+                      "example": "Validation failed"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "example": [
+                        {
+                          "field": "name",
+                          "message": "Name must be at least 3 characters"
                         },
-                        "name": {
-                          "type": "string"
+                        {
+                          "field": "email",
+                          "message": "Invalid email format"
                         },
-                        "color": {
-                          "type": "string"
+                        {
+                          "field": "password",
+                          "message": "Password: 8+ chars, 1 number, 1 special, 1 lowercase or uppercase"
                         }
-                      },
-                      "required": ["name", "color"]
+                      ]
                     }
                   }
                 }
               }
             }
           },
-          "404": {
-            "description": "Status not found",
+          "409": {
+            "description": "User already exists",
             "content": {
               "application/json": {
                 "schema": {
@@ -148,7 +780,7 @@
                   "properties": {
                     "message": {
                       "type": "string",
-                      "example": "Status not found"
+                      "example": "User already exists"
                     }
                   }
                 }
@@ -158,65 +790,196 @@
         }
       }
     },
-    "/tags": {
+    "/api/v1/auth/login": {
       "post": {
-        "tags": ["tags"],
-        "summary": "Create a new tag",
-        "description": "Create a new tag",
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Login user",
+        "description": "Authenticates a user using their email and password",
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "type": "object",
-                "properties": {
-                  "name": {
-                    "type": "string",
-                    "minLength": 3,
-                    "description": "The name of the tag. Must be at least 3 characters."
-                  },
-                  "color": {
-                    "type": "string",
-                    "minLength": 3,
-                    "description": "The color of the tag. Must be at least 3 characters."
-                  }
-                },
-                "required": ["name", "color"]
+                "$ref": "#/components/schemas/LoginRequest"
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "Tag created successfully.",
+            "description": "Logged in successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid email or password",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "data": {
-                      "type": "object",
-                      "properties": {
-                        "uuid": {
-                          "type": "string",
-                          "format": "uuid"
-                        },
-                        "name": {
-                          "type": "string"
-                        },
-                        "color": {
-                          "type": "string"
-                        },
-                        "createdAt": {
-                          "type": "string",
-                          "format": "date-time"
-                        },
-                        "updatedAt": {
-                          "type": "string",
-                          "format": "date-time"
-                        }
-                      },
-                      "required": ["uuid", "name", "color"]
+                    "message": {
+                      "type": "string",
+                      "example": "Invalid email or password"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Account not verified. Please check your email.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Account not verified. Please check your email."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/logout": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Logout user",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LogoutRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Logged out successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Logged out successfully"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid or expired token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Invalid or expired token"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/refresh-token": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Refresh Access Token",
+        "description": "Generates a new access token and invalidate current refresh token using refresh token",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "New access token generated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RefreshTokenResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid or expired token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Invalid or expired token"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/resend-verify-email": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Resend Verification Email",
+        "description": "Resends the account verification email",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmailRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Verification email sent successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Verification email sent successfully"
                     }
                   }
                 }
@@ -224,7 +987,7 @@
             }
           },
           "400": {
-            "description": "Validation Error",
+            "description": "Validation failed",
             "content": {
               "application/json": {
                 "schema": {
@@ -240,39 +1003,71 @@
                         "type": "object",
                         "properties": {
                           "field": {
-                            "type": "string"
+                            "type": "string",
+                            "example": "email"
                           },
                           "message": {
-                            "type": "string"
+                            "type": "string",
+                            "example": "Invalid email format"
                           }
                         }
                       }
                     }
-                  },
-                  "required": ["message", "errors"]
+                  }
                 }
               }
             }
-          }
-        }
-      },
-      "get": {
-        "tags": ["tags"],
-        "summary": "Get tags",
-        "description": "Return a list of tags.",
-        "responses": {
-          "200": {
-            "description": "A list of tags.",
+          },
+          "404": {
+            "description": "User not found",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "data": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/tags"
-                      }
+                    "message": {
+                      "type": "string",
+                      "example": "User not found"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Email already verified",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Email already verified"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "Rate limit exceeded"
+                    },
+                    "details": {
+                      "type": "string",
+                      "example": "Too many requests, please try again after a minute"
+                    },
+                    "retryAfter": {
+                      "type": "string",
+                      "example": "60 seconds"
                     }
                   }
                 }
@@ -282,53 +1077,1182 @@
         }
       }
     },
-    "/tags/{uuid}": {
-      "get": {
-        "tags": ["tags"],
-        "summary": "Get a specific tag",
-        "description": "Return details of a specific tag based on tagUUID.",
-        "parameters": [
-          {
-            "name": "uuid",
-            "in": "path",
-            "required": true,
-            "description": "The tagUUID of the tag.",
-            "schema": {
-              "type": "string"
+    "/api/v1/auth/forgot-password": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Forgot Password",
+        "description": "Initiates the password reset process by sending an OTP",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmailRequest"
+              }
             }
           }
-        ],
+        },
         "responses": {
           "200": {
-            "description": "A specific tag.",
+            "description": "Password reset email sent successfully",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "data": {
-                      "type": "object",
-                      "properties": {
-                        "uuid": {
-                          "type": "string",
-                          "format": "uuid"
+                    "message": {
+                      "type": "string",
+                      "example": "Password reset email sent successfully"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/verify-otp": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Verify OTP & Change Password",
+        "description": "Verifies the OTP and sets new password",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyOTPRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OTP verified successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "OTP verified successfully"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Validation failed"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "example": [
+                        {
+                          "field": "email",
+                          "message": "Invalid email format"
                         },
-                        "name": {
-                          "type": "string"
+                        {
+                          "field": "password",
+                          "message": "Password: 8+ chars, 1 number, 1 special, 1 lowercase or uppercase"
                         },
-                        "color": {
-                          "type": "string"
-                        },
-                        "createdAt": {
-                          "type": "string",
-                          "format": "date-time"
-                        },
-                        "updatedAt": {
-                          "type": "string",
-                          "format": "date-time"
+                        {
+                          "field": "otp",
+                          "message": "Invalid OTP"
                         }
-                      },
-                      "required": ["name", "color"]
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/projects": {
+      "post": {
+        "tags": [
+          "Projects"
+        ],
+        "summary": "Create new project",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProjectRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Project created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Validation failed"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "example": [
+                        {
+                          "field": "name",
+                          "message": "Name must be at least 1 character"
+                        },
+                        {
+                          "field": "statusUuid",
+                          "message": "Status is required"
+                        },
+                        {
+                          "field": "color",
+                          "message": "Color must be at least 3 characters"
+                        },
+                        {
+                          "field": "dueDate",
+                          "message": "Invalid date"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Unauthorized"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Invalid or expired token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Invalid or expired token"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Projects"
+        ],
+        "summary": "Get all projects",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of projects",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProjectResponse"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid or expired token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Invalid or expired token"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/projects/{uuid}": {
+      "get": {
+        "tags": [
+          "Projects"
+        ],
+        "summary": "Get project by UUID",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "uuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Project details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid or expired token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Invalid or expired token"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "You are not allowed to access this resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "You are not allowed to access this resource"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Project not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Project not found"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Projects"
+        ],
+        "summary": "Update project partially",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "uuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProjectRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Project updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid or expired token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Invalid or expired token"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "You are not allowed to access this resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "You are not allowed to access this resource"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Project not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Project not found"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Projects"
+        ],
+        "summary": "Delete project",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "uuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Project deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Project deleted successfully"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid or expired token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Invalid or expired token"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "You are not allowed to access this resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "You are not allowed to access this resource"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Project not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Project not found"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/tasks": {
+      "post": {
+        "tags": [
+          "Tasks"
+        ],
+        "summary": "Create new task",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TaskRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Task created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Validation failed"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "example": [
+                        {
+                          "field": "name",
+                          "message": "Name must be at least 1 character"
+                        },
+                        {
+                          "field": "statusUuid",
+                          "message": "Status is required"
+                        },
+                        {
+                          "field": "projectUuid",
+                          "message": "Project is required"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Unauthorized"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Invalid or expired token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Invalid or expired token"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Tasks"
+        ],
+        "summary": "Get all tasks",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "projectUuid",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Filter tasks by project UUID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of tasks",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TaskResponse"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid or expired token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Invalid or expired token"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "You are not allowed to access this resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "You are not allowed to access this resource"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/tasks/{uuid}": {
+      "get": {
+        "tags": [
+          "Tasks"
+        ],
+        "summary": "Get Task by UUID",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "uuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Task details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid or expired token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Invalid or expired token"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "You are not allowed to access this resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "You are not allowed to access this resource"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Task not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Task not found"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Tasks"
+        ],
+        "summary": "Update Task by UUID",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "uuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TaskRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Task updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Validation failed"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "example": [
+                        {
+                          "field": "name",
+                          "message": "Name must be at least 1 character"
+                        },
+                        {
+                          "field": "dueDate",
+                          "message": "Due date must be a valid date"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid or expired token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Invalid or expired token"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "You are not allowed to modify this task",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "You are not allowed to modify this task"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Task not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Task not found"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Tasks"
+        ],
+        "summary": "Delete Task by UUID",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "uuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Task deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Task deleted successfully"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid or expired token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Invalid or expired token"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "You are not allowed to delete this task",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "You are not allowed to delete this task"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Task not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Task not found"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/tags": {
+      "post": {
+        "tags": [
+          "Tags"
+        ],
+        "summary": "Create new tag",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TagRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Tag created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TagResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Validation failed"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "example": [
+                        {
+                          "field": "name",
+                          "message": "Name must be at least 1 character and at most 30 characters"
+                        },
+                        {
+                          "field": "color",
+                          "message": "Color must be at least 3 characters and at most 20 characters"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid or expired token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Invalid or expired token"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Tags"
+        ],
+        "summary": "Get all tags",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Tags retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Tags retrieved successfully"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/TagResponse/properties/data"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid or expired token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Invalid or expired token"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/tags/{uuid}": {
+      "get": {
+        "tags": [
+          "Tags"
+        ],
+        "summary": "Get Tag by UUID",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "uuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Tag details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Tag retrieved successfully"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/TagResponse/properties/data"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid or expired token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Invalid or expired token"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "You are not allowed to access this tag",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "You are not allowed to access this tag"
                     }
                   }
                 }
@@ -354,108 +2278,30 @@
         }
       }
     },
-    "/tasks": {
-      "post": {
-        "tags": ["tasks"],
-        "summary": "Create a new task",
-        "description": "Create a new task",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "name": {
-                    "type": "string",
-                    "minLength": 3,
-                    "description": "The name of the task. Must be at least 3 characters."
-                  },
-                  "description": {
-                    "type": "string",
-                    "nullable": true,
-                    "description": "The description of the task."
-                  },
-                  "dueDate": {
-                    "type": "string",
-                    "format": "date-time",
-                    "description": "The due date of the task."
-                  },
-                  "projectUuid": {
-                    "type": "string",
-                    "format": "uuid",
-                    "description": "The projectUUID of the project."
-                  },
-                  "tagUuid": {
-                    "type": "string",
-                    "format": "uuid",
-                    "description": "The tagUUID of the tag (optional)."
-                  },
-                  "statusUuid": {
-                    "type": "string",
-                    "format": "uuid",
-                    "description": "The statusUUID of the status."
-                  }
-                },
-                "required": ["name", "dueDate", "projectUuid", "statusUuid"]
-              }
-            }
+    "/api/v1/users/profile": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Get user profile",
+        "security": [
+          {
+            "bearerAuth": []
           }
-        },
+        ],
         "responses": {
           "200": {
-            "description": "Task created successfully.",
+            "description": "User profile details",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "data": {
-                      "type": "object",
-                      "properties": {
-                        "uuid": {
-                          "type": "string",
-                          "format": "uuid"
-                        },
-                        "name": {
-                          "type": "string"
-                        },
-                        "description": {
-                          "type": "string",
-                          "nullable": true
-                        },
-                        "dueDate": {
-                          "type": "string",
-                          "format": "date-time"
-                        },
-                        "projectUuid": {
-                          "type": "string",
-                          "format": "uuid"
-                        },
-                        "tagUuid": {
-                          "type": "string",
-                          "nullable": true,
-                          "format": "uuid"
-                        },
-                        "statusUuid": {
-                          "type": "string"
-                        }
-                      },
-                      "required": [
-                        "uuid",
-                        "name",
-                        "dueDate",
-                        "projectUuid",
-                        "statusUuid"
-                      ]
-                    }
-                  }
+                  "$ref": "#/components/schemas/UserProfileResponse"
                 }
               }
             }
           },
-          "400": {
-            "description": "Validation Error",
+          "401": {
+            "description": "Unauthorized",
             "content": {
               "application/json": {
                 "schema": {
@@ -463,47 +2309,23 @@
                   "properties": {
                     "message": {
                       "type": "string",
-                      "example": "Validation failed"
-                    },
-                    "errors": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "properties": {
-                          "field": {
-                            "type": "string"
-                          },
-                          "message": {
-                            "type": "string"
-                          }
-                        }
-                      }
+                      "example": "Unauthorized"
                     }
-                  },
-                  "required": ["message", "errors"]
+                  }
                 }
               }
             }
-          }
-        }
-      },
-      "get": {
-        "tags": ["tasks"],
-        "summary": "Get tasks",
-        "description": "Return a list of tasks.",
-        "responses": {
-          "200": {
-            "description": "A list of tasks.",
+          },
+          "403": {
+            "description": "Invalid or expired token",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "data": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/tasks"
-                      }
+                    "message": {
+                      "type": "string",
+                      "example": "Invalid or expired token"
                     }
                   }
                 }
@@ -513,205 +2335,59 @@
         }
       }
     },
-    "/tasks/{uuid}": {
-      "get": {
-        "tags": ["tasks"],
-        "summary": "Get a specific task",
-        "description": "Return details of a specific task based on taskUUID.",
-        "parameters": [
+    "/api/v1/users/{uuid}": {
+      "patch": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Update User Profile",
+        "security": [
           {
-            "name": "uuid",
-            "in": "path",
-            "required": true,
-            "description": "The taskUUID of the task.",
-            "schema": {
-              "type": "string"
-            }
+            "bearerAuth": []
           }
         ],
-        "responses": {
-          "200": {
-            "description": "A specific task.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "data": {
-                      "type": "object",
-                      "properties": {
-                        "uuid": {
-                          "type": "string",
-                          "format": "uuid"
-                        },
-                        "name": {
-                          "type": "string"
-                        },
-                        "description": {
-                          "type": "string",
-                          "nullable": true
-                        },
-                        "dueDate": {
-                          "type": "string",
-                          "format": "date-time"
-                        },
-                        "projectUuid": {
-                          "type": "string",
-                          "format": "uuid"
-                        },
-                        "tagUuid": {
-                          "type": "string",
-                          "nullable": true,
-                          "format": "uuid"
-                        },
-                        "statusUuid": {
-                          "type": "string",
-                          "format": "uuid"
-                        }
-                      },
-                      "required": [
-                        "name",
-                        "dueDate",
-                        "projectUuid",
-                        "statusUuid"
-                      ]
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Task not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "message": {
-                      "type": "string",
-                      "example": "Task not found"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "put": {
-        "tags": ["tasks"],
-        "summary": "Update a specific task",
-        "description": "Update a specific task based on taskUUID.",
         "parameters": [
           {
             "name": "uuid",
             "in": "path",
             "required": true,
-            "description": "The taskUUID of the task.",
             "schema": {
-              "type": "string"
+              "type": "string",
+              "format": "uuid"
             }
           }
         ],
         "requestBody": {
-          "required": true,
           "content": {
-            "application/json": {
+            "multipart/form-data": {
               "schema": {
-                "type": "object",
-                "properties": {
-                  "name": {
-                    "type": "string",
-                    "minLength": 3,
-                    "description": "The name of the task. Must be at least 3 characters."
-                  },
-                  "description": {
-                    "type": "string",
-                    "nullable": true,
-                    "description": "The description of the task."
-                  },
-                  "dueDate": {
-                    "type": "string",
-                    "format": "date-time",
-                    "description": "The due date of the task."
-                  },
-                  "projectUuid": {
-                    "type": "string",
-                    "format": "uuid",
-                    "description": "The projectUUID of the project."
-                  },
-                  "tagUuid": {
-                    "type": "string",
-                    "format": "uuid",
-                    "nullable": true,
-                    "description": "The tagUUID of the tag (optional)."
-                  },
-                  "statusUuid": {
-                    "type": "string",
-                    "format": "uuid",
-                    "description": "The statusUUID of the status."
-                  }
-                },
-                "required": ["name", "dueDate", "projectUuid", "statusUuid"]
+                "$ref": "#/components/schemas/UserUpdateRequest"
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "Task updated successfully.",
+            "description": "Profile updated successfully",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
                   "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Profile updated successfully"
+                    },
                     "data": {
-                      "type": "object",
-                      "properties": {
-                        "uuid": {
-                          "type": "string",
-                          "format": "uuid"
-                        },
-                        "name": {
-                          "type": "string"
-                        },
-                        "description": {
-                          "type": "string",
-                          "nullable": true
-                        },
-                        "dueDate": {
-                          "type": "string",
-                          "format": "date-time"
-                        },
-                        "projectUuid": {
-                          "type": "string",
-                          "format": "uuid"
-                        },
-                        "tagUuid": {
-                          "type": "string",
-                          "nullable": true,
-                          "format": "uuid"
-                        },
-                        "statusUuid": {
-                          "type": "string",
-                          "format": "uuid"
-                        }
-                      },
-                      "required": [
-                        "name",
-                        "dueDate",
-                        "projectUuid",
-                        "statusUuid"
-                      ]
+                      "$ref": "#/components/schemas/UserProfileResponse/properties/data"
                     }
                   }
                 }
               }
             }
           },
-          "400": {
-            "description": "Validation Error",
+          "401": {
+            "description": "Unauthorized",
             "content": {
               "application/json": {
                 "schema": {
@@ -719,30 +2395,31 @@
                   "properties": {
                     "message": {
                       "type": "string",
-                      "example": "Validation failed"
-                    },
-                    "errors": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "properties": {
-                          "field": {
-                            "type": "string"
-                          },
-                          "message": {
-                            "type": "string"
-                          }
-                        }
-                      }
+                      "example": "Unauthorized"
                     }
-                  },
-                  "required": ["message", "errors"]
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Invalid or expired token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Invalid or expired token"
+                    }
+                  }
                 }
               }
             }
           },
           "404": {
-            "description": "Task not found",
+            "description": "User not found",
             "content": {
               "application/json": {
                 "schema": {
@@ -750,7 +2427,7 @@
                   "properties": {
                     "message": {
                       "type": "string",
-                      "example": "Task not found"
+                      "example": "User not found"
                     }
                   }
                 }
@@ -760,185 +2437,149 @@
         }
       }
     },
-    "/projects": {
+    "/api/v1/users/challenge": {
       "post": {
-        "tags": ["projects"],
-        "summary": "Create a new project",
-        "description": "Create a new project",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "name": {
-                    "type": "string",
-                    "minLength": 3,
-                    "description": "The name of the project. Must be at least 3 characters."
-                  },
-                  "description": {
-                    "type": "string",
-                    "nullable": true,
-                    "description": "The description of the project."
-                  },
-                  "dueDate": {
-                    "type": "string",
-                    "format": "date-time",
-                    "description": "The due date of the project."
-                  },
-                  "statusUuid": {
-                    "type": "string",
-                    "format": "uuid",
-                    "description": "The statusUUID of the status."
-                  },
-                  "color": {
-                    "type": "string",
-                    "minLength": 3,
-                    "description": "The color of the project. Must be at least 3 characters."
-                  }
-                },
-                "required": ["name", "statusUuid", "color", "dueDate"]
-              }
-            }
+        "tags": [
+          "Users"
+        ],
+        "summary": "Ramadan Challenge",
+        "description": "Start the Ramadan Challenge - creates a project with 30 tasks for Quran reading",
+        "security": [
+          {
+            "bearerAuth": []
           }
-        },
+        ],
         "responses": {
           "200": {
-            "description": "Project created successfully.",
+            "description": "Challenge started successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
                   "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Unauthorized"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Invalid or expired token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Invalid or expired token"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/statuses": {
+      "get": {
+        "tags": [
+          "Statuses"
+        ],
+        "summary": "Get all statuses",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of statuses",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StatusResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/api/v1/statuses/{uuid}": {
+      "get": {
+        "tags": [
+          "Statuses"
+        ],
+        "summary": "Get Status by UUID",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "uuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Status details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Status retrieved successfully"
+                    },
                     "data": {
                       "type": "object",
                       "properties": {
                         "uuid": {
                           "type": "string",
-                          "format": "uuid"
+                          "format": "uuid",
+                          "example": "5eee6a04-c195-11ef-b309-0242ac110002"
                         },
                         "name": {
-                          "type": "string"
-                        },
-                        "description": {
                           "type": "string",
-                          "nullable": true
-                        },
-                        "dueDate": {
-                          "type": "string",
-                          "format": "date-time"
-                        },
-                        "statusUuid": {
-                          "type": "string",
-                          "format": "uuid"
-                        },
-                        "color": {
-                          "type": "string"
+                          "example": "In Progress"
                         },
                         "createdAt": {
                           "type": "string",
-                          "format": "date-time"
+                          "format": "date-time",
+                          "example": "2024-01-15T10:30:00Z"
                         },
                         "updatedAt": {
                           "type": "string",
-                          "format": "date-time"
+                          "format": "date-time",
+                          "example": "2024-01-15T10:30:00Z"
                         }
-                      },
-                      "required": ["uuid", "name", "statusUuid", "color"]
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "get": {
-        "tags": ["projects"],
-        "summary": "Get projects",
-        "description": "Return a list of projects.",
-        "responses": {
-          "200": {
-            "description": "A list of projects.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "data": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/projects"
                       }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/projects/{uuid}": {
-      "get": {
-        "tags": ["projects"],
-        "summary": "Get a specific project",
-        "description": "Return details of a specific project based on projectUUID.",
-        "parameters": [
-          {
-            "name": "uuid",
-            "in": "path",
-            "required": true,
-            "description": "The projectUUID of the project.",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "A specific project.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "data": {
-                      "type": "object",
-                      "properties": {
-                        "uuid": {
-                          "type": "string",
-                          "format": "uuid"
-                        },
-                        "name": {
-                          "type": "string"
-                        },
-                        "description": {
-                          "type": "string",
-                          "nullable": true
-                        },
-                        "dueDate": {
-                          "type": "string",
-                          "format": "date-time"
-                        },
-                        "statusUuid": {
-                          "type": "string",
-                          "format": "uuid"
-                        },
-                        "color": {
-                          "type": "string"
-                        },
-                        "createdAt": {
-                          "type": "string",
-                          "format": "date-time"
-                        },
-                        "updatedAt": {
-                          "type": "string",
-                          "format": "date-time"
-                        }
-                      },
-                      "required": ["name", "statusUuid", "color", "dueDate"]
                     }
                   }
                 }
@@ -946,7 +2587,7 @@
             }
           },
           "404": {
-            "description": "Project not found",
+            "description": "Status not found",
             "content": {
               "application/json": {
                 "schema": {
@@ -954,237 +2595,12 @@
                   "properties": {
                     "message": {
                       "type": "string",
-                      "example": "Project not found"
+                      "example": "Status not found"
                     }
                   }
                 }
               }
             }
-          }
-        }
-      },
-      "put": {
-        "tags": ["projects"],
-        "summary": "Update a specific project",
-        "description": "Update a specific project based on projectUUID.",
-        "parameters": [
-          {
-            "name": "uuid",
-            "in": "path",
-            "required": true,
-            "description": "The projectUUID of the project.",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "name": {
-                    "type": "string",
-                    "minLength": 3,
-                    "description": "The name of the project. Must be at least 3 characters."
-                  },
-                  "description": {
-                    "type": "string",
-                    "nullable": true,
-                    "description": "The description of the project."
-                  },
-                  "dueDate": {
-                    "type": "string",
-                    "format": "date-time",
-                    "description": "The due date of the project."
-                  },
-                  "statusUuid": {
-                    "type": "string",
-                    "format": "uuid",
-                    "description": "The statusUUID of the status."
-                  },
-                  "color": {
-                    "type": "string",
-                    "minLength": 3,
-                    "description": "The color of the project. Must be at least 3 characters."
-                  }
-                },
-                "required": ["name", "statusUuid", "color", "dueDate"]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Project updated successfully.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "data": {
-                      "type": "object",
-                      "properties": {
-                        "uuid": {
-                          "type": "string",
-                          "format": "uuid"
-                        },
-                        "name": {
-                          "type": "string"
-                        },
-                        "description": {
-                          "type": "string",
-                          "nullable": true
-                        },
-                        "dueDate": {
-                          "type": "string",
-                          "format": "date-time"
-                        },
-                        "statusUuid": {
-                          "type": "string",
-                          "format": "uuid"
-                        },
-                        "color": {
-                          "type": "string"
-                        }
-                      },
-                      "required": ["name", "statusUuid", "color", "dueDate"]
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "message": {
-                      "type": "string",
-                      "example": "Validation failed"
-                    },
-                    "errors": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "properties": {
-                          "field": {
-                            "type": "string"
-                          },
-                          "message": {
-                            "type": "string"
-                          }
-                        }
-                      }
-                    }
-                  },
-                  "required": ["message", "errors"]
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  },
-  "components": {
-    "schemas": {
-      "statuses": {
-        "type": "object",
-        "required": ["name", "color"],
-        "properties": {
-          "uuid": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "name": {
-            "type": "string"
-          },
-          "color": {
-            "type": "string"
-          }
-        }
-      },
-      "tags": {
-        "type": "object",
-        "required": ["name", "color"],
-        "properties": {
-          "uuid": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "name": {
-            "type": "string"
-          },
-          "color": {
-            "type": "string"
-          }
-        }
-      },
-      "tasks": {
-        "type": "object",
-        "required": ["name", "dueDate", "projectUuid", "statusUuid"],
-        "properties": {
-          "uuid": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "name": {
-            "type": "string"
-          },
-          "description": {
-            "type": "string",
-            "nullable": true
-          },
-          "dueDate": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "projectUuid": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "tagUuid": {
-            "type": "string",
-            "nullable": true,
-            "format": "uuid"
-          },
-          "statusUuid": {
-            "type": "string",
-            "format": "uuid"
-          }
-        }
-      },
-      "projects": {
-        "type": "object",
-        "required": ["name", "statusUuid", "color", "dueDate"],
-        "properties": {
-          "uuid": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "name": {
-            "type": "string"
-          },
-          "description": {
-            "type": "string",
-            "nullable": true
-          },
-          "dueDate": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "statusUuid": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "color": {
-            "type": "string"
           }
         }
       }
