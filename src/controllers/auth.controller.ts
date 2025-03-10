@@ -54,8 +54,8 @@ export const logout = asyncHandler(async (req, res) => {
   res.status(OK).json({ message: 'Logged out successfully' });
 });
 
-export const generateAuthUrl = asyncHandler(async (req, res) => {
-  const authorizeUrl = await googleService.getGoogleAuthUrl();
+export const generateAuthUrl = asyncHandler((_req, res) => {
+  const authorizeUrl = googleService.getGoogleAuthUrl();
 
   if (!authorizeUrl) {
     throw new ApiError('Failed to generate Google auth URL', BAD_REQUEST);
@@ -75,7 +75,7 @@ export const handleGoogleCallback = asyncHandler(async (req, res, next) => {
 
   if (!token) {
     return next(
-      new ApiError('Failed to fetch Google access token', UNAUTHORIZED)
+      new ApiError('Failed to fetch Google access token', UNAUTHORIZED),
     );
   }
 
@@ -99,7 +99,7 @@ export const handleGitHubCallback = asyncHandler(async (req, res, next) => {
   }
 
   const accessToken = await githubService.getGitHubAccessToken(code);
-  const userInfo = await githubService.getGitHubUserInfo(accessToken);
+  const userInfo = await githubService.getGitHubUserInfo(accessToken as string);
 
   res.json({
     message: 'Logged in successfully!',

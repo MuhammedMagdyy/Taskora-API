@@ -1,4 +1,4 @@
-import { IPaginationQuery, IPagination } from '../interfaces';
+import { IPagination, IPaginationQuery } from '../interfaces';
 
 export class PaginationService {
   static getPagination({

@@ -1,13 +1,13 @@
 import nodemailer, { Transporter } from 'nodemailer';
-import { getVerifyEmailTemplate, getOTPTemplate, logger } from '../utils';
 import {
   frontendUrl,
-  mailService,
+  mailAuthPassword,
+  mailAuthUser,
   mailHost,
   mailPort,
-  mailAuthUser,
-  mailAuthPassword,
+  mailService,
 } from '../config';
+import { getOTPTemplate, getVerifyEmailTemplate, logger } from '../utils';
 
 export class EmailService {
   private transporter: Transporter;

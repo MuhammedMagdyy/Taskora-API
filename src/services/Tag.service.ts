@@ -1,7 +1,7 @@
 import { Prisma } from '@prisma/client';
 import { tagRepository } from '../repositories';
-import { ApiError, NOT_FOUND } from '../utils';
 import { ISortQuery } from '../types';
+import { ApiError, NOT_FOUND } from '../utils';
 
 export class TagService {
   constructor(private readonly tagDataSource = tagRepository) {}

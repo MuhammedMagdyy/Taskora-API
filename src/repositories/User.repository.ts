@@ -54,7 +54,7 @@ export class UserRepository {
 
   async updateOne(
     query: Prisma.UserWhereUniqueInput,
-    data: Prisma.UserUncheckedUpdateInput
+    data: Prisma.UserUncheckedUpdateInput,
   ) {
     return await this.dbClient.user.update({ where: query, data });
   }
@@ -62,7 +62,7 @@ export class UserRepository {
   async initializeUserWithProjectAndTasks(
     userData: Prisma.UserUncheckedCreateInput,
     projectData: CustomProjectUncheckedCreateInput,
-    taskData: CustomTaskUncheckedCreateInput
+    taskData: CustomTaskUncheckedCreateInput,
   ) {
     return await this.dbClient.$transaction(async (dbTransaction) => {
       const inProgressStatusUuid = await dbTransaction.status.findFirst({

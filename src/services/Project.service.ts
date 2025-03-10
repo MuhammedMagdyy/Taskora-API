@@ -1,7 +1,7 @@
 import { Prisma } from '@prisma/client';
 import { projectRepository } from '../repositories';
-import { ApiError, NOT_FOUND } from '../utils';
 import { ISortQuery } from '../types';
+import { ApiError, NOT_FOUND } from '../utils';
 
 export class ProjectService {
   constructor(private readonly projectDataSource = projectRepository) {}
@@ -20,7 +20,7 @@ export class ProjectService {
 
   async updateOne(
     query: Prisma.ProjectWhereUniqueInput,
-    data: Prisma.ProjectUncheckedUpdateInput
+    data: Prisma.ProjectUncheckedUpdateInput,
   ) {
     return this.projectDataSource.updateOne(query, data);
   }

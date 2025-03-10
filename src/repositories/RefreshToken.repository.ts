@@ -18,14 +18,14 @@ export class RefreshTokenRepository {
 
   async updateOne(
     query: Prisma.RefreshTokenWhereUniqueInput,
-    data: Prisma.RefreshTokenUncheckedUpdateInput
+    data: Prisma.RefreshTokenUncheckedUpdateInput,
   ) {
     return this.dbClient.refreshToken.update({ where: query, data });
   }
 
   async updateMany(
     query: Prisma.RefreshTokenWhereInput,
-    data: Prisma.RefreshTokenUncheckedUpdateManyInput
+    data: Prisma.RefreshTokenUncheckedUpdateManyInput,
   ) {
     return this.dbClient.refreshToken.updateMany({ where: query, data });
   }

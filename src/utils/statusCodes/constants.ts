@@ -1,4 +1,4 @@
-import { HttpSuccessStatusCodes, HttpExceptionStatusCodes } from '../../types';
+import { HttpExceptionStatusCodes, HttpSuccessStatusCodes } from '../../types';
 
 // HTTP status codes (Success codes)
 export const OK: HttpSuccessStatusCodes = 200;

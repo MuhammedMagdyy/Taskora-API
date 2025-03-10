@@ -1,5 +1,6 @@
 import asyncHandler from 'express-async-handler';
 import { statusService } from '../services';
+import { ISortQuery } from '../types';
 import {
   BAD_REQUEST,
   DB_COLUMNS,
@@ -7,7 +8,6 @@ import {
   paramsSchema,
   sortSchema,
 } from '../utils';
-import { ISortQuery } from '../types';
 
 export const getStatus = asyncHandler(async (req, res) => {
   const { uuid } = paramsSchema.parse(req.params);
@@ -25,7 +25,7 @@ export const getAllStatuses = asyncHandler(async (req, res) => {
   const sortOrders = order?.split(',') || [];
 
   const invalidFields = sortFields.filter(
-    (field) => !validColumns.includes(field)
+    (field) => !validColumns.includes(field),
   );
   if (invalidFields.length > 0) {
     res.status(BAD_REQUEST).json({
@@ -39,7 +39,7 @@ export const getAllStatuses = asyncHandler(async (req, res) => {
   }));
 
   const statuses = await statusService.findMany(
-    orderBy.length > 0 ? orderBy : undefined
+    orderBy.length > 0 ? orderBy : undefined,
   );
 
   res

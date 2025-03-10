@@ -1,17 +1,17 @@
 import asyncHandler from 'express-async-handler';
 import { projectService, statusService, tagService } from '../services';
+import { ISortQuery } from '../types';
 import {
-  projectSchema,
-  projectUpdateSchema,
+  BAD_REQUEST,
   CREATED,
+  DB_COLUMNS,
   NO_CONTENT,
   OK,
-  sortSchema,
-  DB_COLUMNS,
-  BAD_REQUEST,
   paramsSchema,
+  projectSchema,
+  projectUpdateSchema,
+  sortSchema,
 } from '../utils';
-import { ISortQuery } from '../types';
 
 export const createProject = asyncHandler(async (req, res) => {
   const schema = projectSchema.parse(req.body);
@@ -51,7 +51,7 @@ export const getAllProjects = asyncHandler(async (req, res) => {
   const sortOrders = order?.split(',') || [];
 
   const invalidFields = sortFields.filter(
-    (field) => !validColumns.includes(field)
+    (field) => !validColumns.includes(field),
   );
   if (invalidFields.length > 0) {
     res.status(BAD_REQUEST).json({
@@ -66,7 +66,7 @@ export const getAllProjects = asyncHandler(async (req, res) => {
 
   const projects = await projectService.findMany(
     { userUuid: req.user?.uuid as string },
-    orderBy.length > 0 ? orderBy : undefined
+    orderBy.length > 0 ? orderBy : undefined,
   );
 
   res

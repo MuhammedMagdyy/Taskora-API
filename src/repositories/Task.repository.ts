@@ -23,7 +23,7 @@ export class TaskRepository {
 
   async updateOne(
     query: Prisma.TaskWhereUniqueInput,
-    data: Prisma.TaskUncheckedUpdateInput
+    data: Prisma.TaskUncheckedUpdateInput,
   ) {
     return await this.dbClient.task.update({ where: query, data });
   }

@@ -1,15 +1,15 @@
 import asyncHandler from 'express-async-handler';
 import { tagService } from '../services';
-import {
-  tagSchema,
-  CREATED,
-  OK,
-  DB_COLUMNS,
-  BAD_REQUEST,
-  sortSchema,
-  paramsSchema,
-} from '../utils';
 import { ISortQuery } from '../types';
+import {
+  BAD_REQUEST,
+  CREATED,
+  DB_COLUMNS,
+  OK,
+  paramsSchema,
+  sortSchema,
+  tagSchema,
+} from '../utils';
 
 export const createTag = asyncHandler(async (req, res) => {
   const schema = tagSchema.parse(req.body);
@@ -37,7 +37,7 @@ export const getAllTags = asyncHandler(async (req, res) => {
   const sortOrders = order?.split(',') || [];
 
   const invalidFields = sortFields.filter(
-    (field) => !validColumns.includes(field)
+    (field) => !validColumns.includes(field),
   );
   if (invalidFields.length > 0) {
     res.status(BAD_REQUEST).json({
@@ -52,7 +52,7 @@ export const getAllTags = asyncHandler(async (req, res) => {
 
   const tags = await tagService.findMany(
     { userUuid: req.user?.uuid as string },
-    orderBy.length > 0 ? orderBy : undefined
+    orderBy.length > 0 ? orderBy : undefined,
   );
 
   res.status(OK).json({ message: 'Retrieved tags successfully!', data: tags });
