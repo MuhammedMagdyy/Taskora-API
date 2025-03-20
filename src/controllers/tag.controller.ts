@@ -5,10 +5,12 @@ import {
   BAD_REQUEST,
   CREATED,
   DB_COLUMNS,
+  NO_CONTENT,
   OK,
   paramsSchema,
   sortSchema,
   tagSchema,
+  updateTagSchema,
 } from '../utils';
 
 export const createTag = asyncHandler(async (req, res) => {
@@ -56,4 +58,23 @@ export const getAllTags = asyncHandler(async (req, res) => {
   );
 
   res.status(OK).json({ message: 'Retrieved tags successfully!', data: tags });
+});
+
+export const updateTag = asyncHandler(async (req, res) => {
+  const { uuid } = paramsSchema.parse(req.params);
+  const schema = updateTagSchema.parse(req.body);
+  const userUuid = req.user?.uuid as string;
+
+  const tag = await tagService.updateTagByUuid(uuid, schema, userUuid);
+
+  res.status(OK).json({ message: 'Tag updated successfully!', data: tag });
+});
+
+export const deleteTag = asyncHandler(async (req, res) => {
+  const { uuid } = paramsSchema.parse(req.params);
+  const userUuid = req.user?.uuid as string;
+
+  await tagService.deleteTagByUuid(uuid, userUuid);
+
+  res.sendStatus(NO_CONTENT);
 });
