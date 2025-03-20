@@ -23,7 +23,7 @@ export class ProjectRepository {
 
   async updateOne(
     query: Prisma.ProjectWhereUniqueInput,
-    data: Prisma.ProjectUncheckedUpdateInput
+    data: Prisma.ProjectUncheckedUpdateInput,
   ) {
     return this.dbClient.project.update({ where: query, data });
   }

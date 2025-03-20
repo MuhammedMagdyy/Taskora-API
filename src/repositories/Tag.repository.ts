@@ -20,6 +20,17 @@ export class TagRepository {
   async findMany(query: Prisma.TagWhereInput, orderBy?: ISortQuery) {
     return await this.dbClient.tag.findMany({ where: query, orderBy });
   }
+
+  async updateOne(
+    query: Prisma.TagWhereUniqueInput,
+    data: Prisma.TagUpdateInput,
+  ) {
+    return await this.dbClient.tag.update({ where: query, data });
+  }
+
+  async deleteOne(query: Prisma.TagWhereUniqueInput) {
+    return await this.dbClient.tag.delete({ where: query });
+  }
 }
 
 export const tagRepository = new TagRepository(prismaClient);

@@ -1,17 +1,16 @@
 import { Router } from 'express';
-import { ApiError } from '../utils';
-import { NOT_FOUND, OK } from '../utils';
+import { isVerified } from '../middlewares';
+import { ApiError, NOT_FOUND, OK } from '../utils';
+import { authRouter } from './auth.routes';
 import { projectRouter } from './project.routes';
+import { statusRouter } from './status.routes';
 import { tagRouter } from './tag.routes';
 import { taskRouter } from './task.routes';
-import { statusRouter } from './status.routes';
-import { authRouter } from './auth.routes';
 import { userRouter } from './user.routes';
-import { isVerified } from '../middlewares';
 
 const router = Router();
 
-router.get('/health', (req, res) => {
+router.get('/health', (_req, res) => {
   const uptime = process.uptime();
 
   res.status(OK).json({
@@ -30,7 +29,7 @@ router.use('/users', isVerified, userRouter);
 
 router.all('*', (request, _res, next) => {
   return next(
-    new ApiError(`The route ${request.originalUrl} can't be found`, NOT_FOUND)
+    new ApiError(`The route ${request.originalUrl} can't be found`, NOT_FOUND),
   );
 });
 

@@ -27,7 +27,7 @@ export class RedisService {
     } catch {
       throw new ApiError(
         'Failed to get value from Redis',
-        INTERNAL_SERVER_ERROR
+        INTERNAL_SERVER_ERROR,
       );
     }
   }
@@ -38,7 +38,7 @@ export class RedisService {
     } catch {
       throw new ApiError(
         'Failed to delete value from Redis',
-        INTERNAL_SERVER_ERROR
+        INTERNAL_SERVER_ERROR,
       );
     }
   }
@@ -51,7 +51,7 @@ export class RedisService {
     } catch {
       throw new ApiError(
         'Failed to check if value exists in Redis',
-        INTERNAL_SERVER_ERROR
+        INTERNAL_SERVER_ERROR,
       );
     }
   }

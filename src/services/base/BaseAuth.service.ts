@@ -1,6 +1,6 @@
 import { Provider } from '@prisma/client';
-import { IUser } from '../../interfaces';
 import { JwtService, refreshTokenService } from '..';
+import { IUser } from '../../interfaces';
 import { DEFAULT_VALUES, MAGIC_NUMBERS } from '../../utils';
 
 export abstract class BaseAuthService {
@@ -20,10 +20,10 @@ export abstract class BaseAuthService {
   protected formatUserResponse(user: IUser): IUser {
     return {
       uuid: user.uuid,
-      name: user.name as string,
+      name: user.name,
       email: user.email,
       isVerified: user.isVerified,
-      picture: user.picture as string,
+      picture: user.picture,
       hasPassword: user.hasPassword,
       createdAt: user.createdAt,
     };

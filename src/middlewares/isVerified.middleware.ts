@@ -1,11 +1,10 @@
-import { Request, Response, NextFunction } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import asyncHandler from 'express-async-handler';
 import { JwtService, userService } from '../services';
 import { ApiError, FORBIDDEN, UNAUTHORIZED } from '../utils';
-import { IJwtPayload } from '../interfaces';
 
 export const isVerified = asyncHandler(
-  async (req: Request, res: Response, next: NextFunction) => {
+  async (req: Request, _res: Response, next: NextFunction) => {
     const authHeader = req.headers.authorization;
 
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -18,15 +17,15 @@ export const isVerified = asyncHandler(
       return next(new ApiError('Unauthorized', UNAUTHORIZED));
     }
 
-    const decoded = JwtService.verify(token, 'access') as IJwtPayload;
+    const decoded = JwtService.verify(token, 'access');
     const userInfo = await userService.findUserByUUID(decoded.uuid as string);
 
     if (!userInfo) {
       return next(
         new ApiError(
           `You don't have permission to access this route`,
-          FORBIDDEN
-        )
+          FORBIDDEN,
+        ),
       );
     }
 
@@ -35,5 +34,5 @@ export const isVerified = asyncHandler(
     }
 
     next();
-  }
+  },
 );

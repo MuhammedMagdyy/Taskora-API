@@ -1,12 +1,12 @@
 import { Router } from 'express';
-import { googleRouter } from './google.routes';
-import { githubRouter } from './github.routes';
 import { auth } from '../controllers';
 import {
   isAuth,
   oneMinuteLimiter,
   twentyFourHourLimiter,
 } from '../middlewares';
+import { githubRouter } from './github.routes';
+import { googleRouter } from './google.routes';
 
 const router = Router();
 
@@ -21,13 +21,13 @@ router.post(
   '/resend-verify-email',
   oneMinuteLimiter,
   twentyFourHourLimiter,
-  auth.resendVerificationEmail
+  auth.resendVerificationEmail,
 );
 router.post(
   '/forgot-password',
   oneMinuteLimiter,
   twentyFourHourLimiter,
-  auth.forgotPassword
+  auth.forgotPassword,
 );
 router.post('/verify-otp', auth.verifyOtp);
 

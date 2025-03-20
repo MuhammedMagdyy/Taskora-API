@@ -24,14 +24,14 @@ const consoleFormat = winston.format.combine(
   winston.format.colorize({ all: true }),
   winston.format.printf(
     (info) =>
-      `${info.timestamp} [${info.level}]: ${info.message}${info.meta ? ` ${JSON.stringify(info.meta)}` : ''}`
-  )
+      `${info.timestamp} [${info.level}]: ${info.message}${info.meta ? ` ${JSON.stringify(info.meta)}` : ''}`,
+  ),
 );
 
 const fileFormat = winston.format.combine(
   winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
   winston.format.errors({ stack: true }),
-  winston.format.json()
+  winston.format.json(),
 );
 
 const transports = [

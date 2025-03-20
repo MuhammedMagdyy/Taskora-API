@@ -1,6 +1,6 @@
 import { createClient, RedisClientType } from 'redis';
-import { IDatabaseClient } from '../interfaces';
 import { redisUrl } from '../config';
+import { IDatabaseClient } from '../interfaces';
 import { logger } from '../utils';
 
 export class RedisDatabaseClient implements IDatabaseClient {

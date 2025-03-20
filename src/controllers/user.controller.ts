@@ -1,4 +1,6 @@
 import asyncHandler from 'express-async-handler';
+import { IUser } from '../interfaces';
+import { cloudinaryService, HashingService, userService } from '../services';
 import {
   ApiError,
   BAD_REQUEST,
@@ -8,8 +10,6 @@ import {
   paramsSchema,
   updateUserSchema,
 } from '../utils';
-import { HashingService, userService, cloudinaryService } from '../services';
-import { IUser } from '../interfaces';
 
 export const getUser = asyncHandler(async (req, res, next) => {
   const uuid = req.user?.uuid as string;
@@ -39,7 +39,7 @@ export const updateUser = asyncHandler(async (req, res, next) => {
 
   if (userUUID !== uuid) {
     return next(
-      new ApiError(`You are not allowed to access this resource`, FORBIDDEN)
+      new ApiError(`You are not allowed to access this resource`, FORBIDDEN),
     );
   }
 
@@ -63,15 +63,15 @@ export const updateUser = asyncHandler(async (req, res, next) => {
   if (password) {
     const isSamePassword = await HashingService.compare(
       password,
-      user.password as string
+      user.password as string,
     );
 
     if (isSamePassword) {
       return next(
         new ApiError(
           'New password must be different from the current one',
-          BAD_REQUEST
-        )
+          BAD_REQUEST,
+        ),
       );
     }
 
@@ -80,7 +80,7 @@ export const updateUser = asyncHandler(async (req, res, next) => {
 
   await userService.updateOne(
     { uuid: userUUID },
-    { name: user.name, password: user.password, picture }
+    { name: user.name, password: user.password, picture },
   );
 
   res.status(OK).json({ message: 'User updated successfully!' });

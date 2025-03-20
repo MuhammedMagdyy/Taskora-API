@@ -14,7 +14,7 @@ export class UserService {
 
   async updateOne(
     query: Prisma.UserWhereUniqueInput,
-    data: Prisma.UserUncheckedUpdateInput
+    data: Prisma.UserUncheckedUpdateInput,
   ) {
     return this.userDataSource.updateOne(query, data);
   }
@@ -30,12 +30,12 @@ export class UserService {
   async initializeUserWithProjectAndTasks(
     userData: Prisma.UserUncheckedCreateInput,
     projectData: CustomProjectUncheckedCreateInput,
-    taskData: CustomTaskUncheckedCreateInput
+    taskData: CustomTaskUncheckedCreateInput,
   ) {
     return this.userDataSource.initializeUserWithProjectAndTasks(
       userData,
       projectData,
-      taskData
+      taskData,
     );
   }
 

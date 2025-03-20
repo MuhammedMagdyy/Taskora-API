@@ -1,11 +1,11 @@
 import { Prisma } from '@prisma/client';
+import cron from 'node-cron';
 import { refreshTokenRepository } from '../repositories';
 import { ApiError, logger, UNAUTHORIZED } from '../utils';
-import cron from 'node-cron';
 
 export class RefreshTokenService {
   constructor(
-    private readonly refreshTokenDataSource = refreshTokenRepository
+    private readonly refreshTokenDataSource = refreshTokenRepository,
   ) {}
 
   async createOne(data: Prisma.RefreshTokenUncheckedCreateInput) {
@@ -18,7 +18,7 @@ export class RefreshTokenService {
 
   async updateOne(
     query: Prisma.RefreshTokenWhereUniqueInput,
-    data: Prisma.RefreshTokenUncheckedUpdateInput
+    data: Prisma.RefreshTokenUncheckedUpdateInput,
   ) {
     return this.refreshTokenDataSource.updateOne(query, data);
   }
@@ -61,10 +61,15 @@ export class RefreshTokenService {
   }
 
   scheduleTokenCleanupTask() {
-    cron.schedule('0 0 * * *', async () => {
+    cron.schedule('0 0 * * *', () => {
       logger.info('Cleanup tokens cron job started 🕛');
-      await this.deleteExpiredTokens();
-      logger.info('Cleanup tokens cron job completed ✅');
+      this.deleteExpiredTokens()
+        .then(() => {
+          logger.info('Cleanup tokens cron job completed ✅');
+        })
+        .catch((error) => {
+          logger.error('Cleanup tokens cron job failed ❌', error);
+        });
     });
   }
 }

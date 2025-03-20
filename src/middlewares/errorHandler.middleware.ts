@@ -1,4 +1,9 @@
+import { Prisma } from '@prisma/client';
+import { AxiosError } from 'axios';
+import { UploadApiErrorResponse } from 'cloudinary';
 import { ErrorRequestHandler, NextFunction, Request, Response } from 'express';
+import { JsonWebTokenError } from 'jsonwebtoken';
+import { MulterError } from 'multer';
 import { ZodError } from 'zod';
 import {
   ApiError,
@@ -8,11 +13,6 @@ import {
   SERVER,
   UNAUTHORIZED,
 } from '../utils';
-import { Prisma } from '@prisma/client';
-import { JsonWebTokenError } from 'jsonwebtoken';
-import { UploadApiErrorResponse } from 'cloudinary';
-import { MulterError } from 'multer';
-import { AxiosError } from 'axios';
 
 type ErrorType =
   | ApiError
@@ -28,7 +28,7 @@ export const errorHandler: ErrorRequestHandler = (
   error: ErrorType,
   _req: Request,
   res: Response,
-  _next: NextFunction
+  _next: NextFunction,
 ): void => {
   if (error instanceof ApiError) {
     res.status(error.status).json({ message: error.message });
@@ -102,7 +102,7 @@ const sendErrorToProd = (res: Response): void => {
 };
 
 const handlePrismaError = (
-  error: Prisma.PrismaClientKnownRequestError
+  error: Prisma.PrismaClientKnownRequestError,
 ): { status: number; message: string } => {
   switch (error.code) {
     case 'P2000':
@@ -158,7 +158,7 @@ const isCloudinaryError = (error: unknown): error is UploadApiErrorResponse => {
 };
 
 const handleMulterError = (
-  error: MulterError
+  error: MulterError,
 ): { status: number; message: string } => {
   const errorMap: Record<string, { status: number; message: string }> = {
     LIMIT_FILE_SIZE: {

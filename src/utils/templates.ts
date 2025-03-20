@@ -5,7 +5,7 @@ export const getVerifyEmailTemplate = () => {
   const verifyEmailHtmlTemplate = '../templates/verify-email.html';
   const verificationEmailTemplatePath = path.join(
     __dirname,
-    verifyEmailHtmlTemplate
+    verifyEmailHtmlTemplate,
   );
 
   return fs.readFileSync(verificationEmailTemplatePath, 'utf-8');

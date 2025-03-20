@@ -14,5 +14,5 @@ export const sortSchema = z
     (data) =>
       (!data.sortBy && !data.order) ||
       data.sortBy?.split(',').length === data.order?.split(',').length,
-    { message: "'sortBy' and 'order' must have the same number of fields" }
+    { message: "'sortBy' and 'order' must have the same number of fields" },
   );

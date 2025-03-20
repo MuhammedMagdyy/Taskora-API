@@ -7,7 +7,7 @@ export const updateUserSchema = z
       .string()
       .regex(
         /^(?=.*\d)(?=.*[!@#$%^&*()\-_=+{};:,<.>])(?=.*[A-Za-z]).{8,}$/,
-        'Password: 8+ chars, 1 number, 1 special, 1 lowercase or uppercase'
+        'Password: 8+ chars, 1 number, 1 special, 1 lowercase or uppercase',
       )
       .trim(),
     picture: z.string().trim(),
