@@ -15,7 +15,13 @@ import {
 import { errorHandler, xss } from './middlewares';
 import routes from './routes';
 import { refreshTokenService } from './services';
-import { INTERNAL_SERVER_ERROR, logger, SERVER } from './utils';
+import {
+  ApiError,
+  INTERNAL_SERVER_ERROR,
+  logger,
+  NOT_FOUND,
+  SERVER,
+} from './utils';
 
 const app = express();
 const prismaClient = PrismaDatabaseClient.getInstance();
@@ -42,6 +48,15 @@ app.use(express.json({ limit: '5mb' }));
 app.use(xss);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use('/api/v1', routes);
+app.all('*', (req, _res, next) => {
+  logger.error(`${req.method} ${req.originalUrl} not found`);
+  return next(
+    new ApiError(
+      `Seems like you're lost 🧐 - ${req.method} ${req.originalUrl} not found ❌`,
+      NOT_FOUND,
+    ),
+  );
+});
 app.use(errorHandler);
 
 export const up = async () => {
