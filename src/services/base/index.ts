@@ -1,1 +1,1 @@
-export * from './BaseAuth.service';
+export * from './baseAuth.service';

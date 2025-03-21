@@ -1,58 +1,37 @@
 import winston from 'winston';
-import { nodeEnv } from '../config';
+import { SERVER } from './constants';
 
-const levels = {
-  error: 0,
-  warn: 1,
-  info: 2,
-  http: 3,
-  debug: 4,
-};
-
-const colors = {
+winston.addColors({
   error: 'red',
   warn: 'yellow',
   info: 'green',
   http: 'magenta',
   debug: 'white',
-};
+});
 
-winston.addColors(colors);
-
-const consoleFormat = winston.format.combine(
+const format = winston.format.combine(
   winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
   winston.format.colorize({ all: true }),
   winston.format.printf(
-    (info) =>
-      `${info.timestamp} [${info.level}]: ${info.message}${info.meta ? ` ${JSON.stringify(info.meta)}` : ''}`,
+    ({ timestamp, level, message, meta }) =>
+      `${timestamp} [${level}]: ${message}${meta ? ` ${JSON.stringify(meta)}` : ''}`,
   ),
 );
 
-const fileFormat = winston.format.combine(
-  winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
-  winston.format.errors({ stack: true }),
-  winston.format.json(),
-);
-
-const transports = [
-  new winston.transports.Console({
-    format: consoleFormat,
-  }),
-  new winston.transports.File({
-    filename: 'logs/error.log',
-    level: 'error',
-    format: fileFormat,
-  }),
-  new winston.transports.File({
-    filename: 'logs/all.log',
-    format: fileFormat,
-  }),
-];
-
 const logger = winston.createLogger({
-  level: process.env.NODE_ENV === nodeEnv ? 'debug' : 'info',
-  levels,
-  transports,
+  level: process.env.NODE_ENV === SERVER.PRODUCTION ? 'info' : 'debug',
+  transports: [
+    new winston.transports.Console({ format }),
+    new winston.transports.File({
+      filename: 'logs/error.log',
+      level: 'error',
+      format: winston.format.json(),
+    }),
+    new winston.transports.File({
+      filename: 'logs/all.log',
+      format: winston.format.json(),
+    }),
+  ],
 });
 
 export { logger };

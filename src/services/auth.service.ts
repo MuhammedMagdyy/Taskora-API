@@ -1,5 +1,4 @@
 import { Provider } from '@prisma/client';
-import { IUser } from '../interfaces';
 import {
   emailService,
   HashingService,
@@ -8,7 +7,8 @@ import {
   redisService,
   refreshTokenService,
   userService,
-} from '../services';
+} from '.';
+import { IUser } from '../interfaces';
 import { IUserInfo } from '../types';
 import {
   ApiError,

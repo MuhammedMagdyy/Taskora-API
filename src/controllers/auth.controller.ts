@@ -64,22 +64,10 @@ export const generateAuthUrl = asyncHandler((_req, res) => {
   res.redirect(authorizeUrl);
 });
 
-export const handleGoogleCallback = asyncHandler(async (req, res, next) => {
+export const handleGoogleCallback = asyncHandler(async (req, res) => {
   const code = req.query.code as string;
-
-  if (!code) {
-    return next(new ApiError('No code found in query parameters', BAD_REQUEST));
-  }
-
   const token = await googleService.getGoogleAccessToken(code);
-
-  if (!token) {
-    return next(
-      new ApiError('Failed to fetch Google access token', UNAUTHORIZED),
-    );
-  }
-
-  const userInfo = await googleService.getGoogleUserInfo(token);
+  const userInfo = await googleService.getGoogleUserInfo(token as string);
 
   res.json({
     message: 'Logged in successfully!',
@@ -91,13 +79,8 @@ export const handleGoogleCallback = asyncHandler(async (req, res, next) => {
   });
 });
 
-export const handleGitHubCallback = asyncHandler(async (req, res, next) => {
+export const handleGitHubCallback = asyncHandler(async (req, res) => {
   const code = req.query.code as string;
-
-  if (!code) {
-    return next(new ApiError('No code found in query parameters', BAD_REQUEST));
-  }
-
   const accessToken = await githubService.getGitHubAccessToken(code);
   const userInfo = await githubService.getGitHubUserInfo(accessToken as string);
 
