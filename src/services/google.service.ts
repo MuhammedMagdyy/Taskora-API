@@ -1,13 +1,13 @@
 import { Provider } from '@prisma/client';
 import { AxiosError } from 'axios';
 import { OAuth2Client } from 'google-auth-library';
+import { userService } from '.';
 import {
   googleCallbackUrl,
   googleClientId,
   googleClientSecret,
 } from '../config';
 import { IGoogleOAuthClient, IGoogleStrategy, IUser } from '../interfaces';
-import { userService } from '../services';
 import { HttpExceptionStatusCodes } from '../types';
 import {
   API_INTEGRATION,
