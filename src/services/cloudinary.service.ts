@@ -1,11 +1,11 @@
 import { v2 as cloudinary } from 'cloudinary';
+import { unlinkSync } from 'fs';
 import {
   cloudinaryApiKey,
   cloudinaryApiSecret,
   cloudinaryCloudName,
 } from '../config';
 import { ApiError, BAD_REQUEST, INTERNAL_SERVER_ERROR } from '../utils';
-import { unlinkSync } from 'fs';
 
 export class CloudinaryService {
   constructor() {
@@ -31,7 +31,7 @@ export class CloudinaryService {
     } catch {
       throw new ApiError(
         'Something wen wrong while uploading image',
-        INTERNAL_SERVER_ERROR
+        INTERNAL_SERVER_ERROR,
       );
     } finally {
       unlinkSync(image);

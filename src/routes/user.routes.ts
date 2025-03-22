@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { isAuth, multerMiddlewareUpload } from '../middlewares';
 import { users } from '../controllers';
+import { isAuth, multerMiddlewareUpload } from '../middlewares';
 
 const router = Router();
 
@@ -10,7 +10,7 @@ router.post('/challenge', users.ramadanChallenge);
 router.patch(
   '/:uuid',
   multerMiddlewareUpload.single('image'),
-  users.updateUser
+  users.updateUser,
 );
 
 export { router as userRouter };

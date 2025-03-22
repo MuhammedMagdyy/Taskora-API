@@ -1,12 +1,13 @@
-import { IGitHubOAuthClient, IGitHubStrategy, IUser } from '../interfaces';
-import { userService } from '../services';
-import { BaseAuthService } from './base';
+import { Provider } from '@prisma/client';
+import axios, { AxiosError } from 'axios';
 import {
+  githubCallbackUrl,
   githubClientId,
   githubClientSecret,
-  githubCallbackUrl,
 } from '../config';
-import { Provider } from '@prisma/client';
+import { IGitHubOAuthClient, IGitHubStrategy, IUser } from '../interfaces';
+import { userService } from '../services';
+import { HttpExceptionStatusCodes } from '../types';
 import {
   API_INTEGRATION,
   ApiError,
@@ -16,8 +17,7 @@ import {
   NOT_FOUND,
   UNAUTHORIZED,
 } from '../utils';
-import axios, { AxiosError } from 'axios';
-import { HttpExceptionStatusCodes } from '../types';
+import { BaseAuthService } from './base';
 
 export class GithubService extends BaseAuthService {
   private readonly githubConfig: IGitHubOAuthClient;
@@ -50,7 +50,7 @@ export class GithubService extends BaseAuthService {
       if (userExists?.email && !userExists?.githubId) {
         throw new ApiError(
           'Account exists. Please link your GitHub account',
-          CONFLICT
+          CONFLICT,
         );
       }
 
@@ -86,7 +86,7 @@ export class GithubService extends BaseAuthService {
     return await userService.initializeUserWithProjectAndTasks(
       gitUserProfile,
       projectData,
-      taskData
+      taskData,
     );
   }
 
@@ -102,7 +102,9 @@ export class GithubService extends BaseAuthService {
       ]);
 
       const primaryEmail = userEmails.data.find(
-        (email: { primary: boolean }) => email.primary || userEmails.data[0]
+        (email: { primary: boolean; email: string; verified: boolean }) =>
+          email.primary ||
+          (userEmails.data[0] as { email: string; verified: boolean }),
       );
 
       if (!primaryEmail) {
@@ -156,14 +158,14 @@ export class GithubService extends BaseAuthService {
           code,
           redirect_uri: this.githubConfig.callbackUrl,
         },
-        { headers: { Accept: 'application/json' } }
+        { headers: { Accept: 'application/json' } },
       );
 
       if (!response.data.access_token) {
         throw new ApiError('GitHub token exchange failed', UNAUTHORIZED);
       }
 
-      return response.data.access_token;
+      return response.data.access_token as string;
     } catch (error) {
       this.handleGitHubApiError(error);
     }
@@ -174,7 +176,7 @@ export class GithubService extends BaseAuthService {
       logger.error('GitHub API Error:', error.response?.data);
       throw new ApiError(
         `GitHub API Error: ${error.response?.data?.message || error.message}`,
-        (error.response?.status as HttpExceptionStatusCodes) || UNAUTHORIZED
+        (error.response?.status as HttpExceptionStatusCodes) || UNAUTHORIZED,
       );
     }
   }

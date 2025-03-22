@@ -1,6 +1,6 @@
-import { frontendUrl } from './frontend.env';
-import { SERVER } from '../utils';
 import { CorsOptions } from 'cors';
+import { SERVER } from '../utils';
+import { frontendUrl } from './frontend.env';
 import { nodeEnv } from './server.env';
 
 export const corsConfig: CorsOptions = {

@@ -1,22 +1,22 @@
 import asyncHandler from 'express-async-handler';
 import {
-  taskService,
   projectService,
-  tagService,
   statusService,
+  tagService,
+  taskService,
 } from '../services';
+import { ISortQuery } from '../types';
 import {
-  taskSchema,
-  taskUpdateSchema,
+  BAD_REQUEST,
   CREATED,
+  DB_COLUMNS,
   NO_CONTENT,
   OK,
-  sortSchema,
-  BAD_REQUEST,
-  DB_COLUMNS,
   paramsSchema,
+  sortSchema,
+  taskSchema,
+  taskUpdateSchema,
 } from '../utils';
-import { ISortQuery } from '../types';
 
 export const createTask = asyncHandler(async (req, res) => {
   const schema = taskSchema.parse(req.body);
@@ -57,7 +57,7 @@ export const getAllTasks = asyncHandler(async (req, res) => {
   const sortOrders = order?.split(',') || [];
 
   const invalidFields = sortFields.filter(
-    (field) => !validColumns.includes(field)
+    (field) => !validColumns.includes(field),
   );
   if (invalidFields.length > 0) {
     res.status(BAD_REQUEST).json({
@@ -72,7 +72,7 @@ export const getAllTasks = asyncHandler(async (req, res) => {
 
   const tasks = await taskService.findMany(
     { userUuid: req.user?.uuid as string },
-    orderBy.length > 0 ? orderBy : undefined
+    orderBy.length > 0 ? orderBy : undefined,
   );
 
   res

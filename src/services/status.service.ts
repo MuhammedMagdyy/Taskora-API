@@ -1,7 +1,7 @@
 import { Prisma } from '@prisma/client';
 import { statusRepository } from '../repositories';
-import { ApiError, NOT_FOUND } from '../utils';
 import { ISortQuery } from '../types';
+import { ApiError, NOT_FOUND } from '../utils';
 
 export class StatusService {
   constructor(private readonly statusDataSource = statusRepository) {}

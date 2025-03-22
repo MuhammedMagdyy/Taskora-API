@@ -1,27 +1,27 @@
-import { IJwtPayload, IUser } from '../interfaces';
+import { Provider } from '@prisma/client';
 import {
-  userService,
-  JwtService,
-  HashingService,
-  refreshTokenService,
   emailService,
-  redisService,
+  HashingService,
+  JwtService,
   otpService,
-} from '../services';
+  redisService,
+  refreshTokenService,
+  userService,
+} from '.';
+import { IUser } from '../interfaces';
+import { IUserInfo } from '../types';
 import {
   ApiError,
   CONFLICT,
   FORBIDDEN,
+  generateCode,
   GONE,
   logger,
   MAGIC_NUMBERS,
   NOT_FOUND,
   UNAUTHORIZED,
 } from '../utils';
-import { generateCode } from '../utils';
-import { Provider } from '@prisma/client';
 import { BaseAuthService } from './base';
-import { IUserInfo } from '../types';
 
 interface IAuthUserData {
   name: string;
@@ -64,26 +64,26 @@ export class AuthService extends BaseAuthService {
     return await userService.initializeUserWithProjectAndTasks(
       userData,
       projectData,
-      taskData
+      taskData,
     );
   }
 
   private async sendVerificationEmail(user: IUser) {
     const verificationToken = JwtService.generateAccessToken(
       { uuid: user.uuid },
-      '24h'
+      '24h',
     );
 
     await redisService.set(
       `verify-email:${user.email}`,
       verificationToken,
-      MAGIC_NUMBERS.ONE_DAY_IN_SECONDS
+      MAGIC_NUMBERS.ONE_DAY_IN_SECONDS,
     );
 
     emailService.sendVerificationEmail(
       user.email,
       user.name,
-      verificationToken
+      verificationToken,
     );
   }
 
@@ -97,7 +97,7 @@ export class AuthService extends BaseAuthService {
 
       const passwordMatches = await HashingService.compare(
         password,
-        user.password
+        user.password,
       );
 
       if (!passwordMatches) {
@@ -107,7 +107,7 @@ export class AuthService extends BaseAuthService {
       if (!user.isVerified) {
         throw new ApiError(
           'Account not verified. Please check your email.',
-          FORBIDDEN
+          FORBIDDEN,
         );
       }
 
@@ -166,7 +166,7 @@ export class AuthService extends BaseAuthService {
 
   async verifyEmail(token: string) {
     try {
-      const decoded = JwtService.verify(token, 'access') as IJwtPayload;
+      const decoded = JwtService.verify(token, 'access');
 
       if (!decoded) {
         throw new ApiError('Invalid token', UNAUTHORIZED);
@@ -179,7 +179,7 @@ export class AuthService extends BaseAuthService {
       }
 
       const storedToken = await redisService.get<string>(
-        `verify-email:${user.email}`
+        `verify-email:${user.email}`,
       );
 
       if (!storedToken || storedToken !== token) {
@@ -244,13 +244,13 @@ export class AuthService extends BaseAuthService {
         otp,
         userUuid: user.uuid,
         expiresAt: new Date(
-          Date.now() + MAGIC_NUMBERS.FIFTEEN_MINUTES_IN_MILLISECONDS
+          Date.now() + MAGIC_NUMBERS.FIFTEEN_MINUTES_IN_MILLISECONDS,
         ),
       }),
       redisService.set(
         `otp:${otp}`,
         otp,
-        MAGIC_NUMBERS.FIFTEEN_MINUTES_IN_SECONDS
+        MAGIC_NUMBERS.FIFTEEN_MINUTES_IN_SECONDS,
       ),
     ]);
 

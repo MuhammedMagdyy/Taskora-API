@@ -20,6 +20,7 @@
 - [ ] Create a decorator for less use of try-catch blocks
 - [ ] Handle AxiosErrors in OAuth2 Clients
 - [ ] Migrate to a Docker container with Nginx
+- [ ] Enhance parameters to be as interfaces or types
 
 ## Improvements
 

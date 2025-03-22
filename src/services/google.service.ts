@@ -1,11 +1,14 @@
-import { IUser, IGoogleStrategy, IGoogleOAuthClient } from '../interfaces';
-import { userService } from '../services';
+import { Provider } from '@prisma/client';
+import { AxiosError } from 'axios';
 import { OAuth2Client } from 'google-auth-library';
+import { userService } from '.';
 import {
   googleCallbackUrl,
   googleClientId,
   googleClientSecret,
 } from '../config';
+import { IGoogleOAuthClient, IGoogleStrategy, IUser } from '../interfaces';
+import { HttpExceptionStatusCodes } from '../types';
 import {
   API_INTEGRATION,
   ApiError,
@@ -15,10 +18,7 @@ import {
   OK,
   UNAUTHORIZED,
 } from '../utils';
-import { Provider } from '@prisma/client';
 import { BaseAuthService } from './base';
-import { HttpExceptionStatusCodes } from '../types';
-import { AxiosError } from 'axios';
 
 export class GoogleService extends BaseAuthService {
   private readonly googleConfig: IGoogleOAuthClient;
@@ -37,7 +37,7 @@ export class GoogleService extends BaseAuthService {
     this.googleOAuth2Client = new OAuth2Client(
       this.googleConfig.clientId,
       this.googleConfig.clientSecret,
-      this.googleConfig.callbackUrl
+      this.googleConfig.callbackUrl,
     );
   }
 
@@ -58,7 +58,7 @@ export class GoogleService extends BaseAuthService {
       if (userExists?.email && !userExists?.googleId) {
         throw new ApiError(
           'Account exists. Please link your Google account',
-          CONFLICT
+          CONFLICT,
         );
       }
 
@@ -94,7 +94,7 @@ export class GoogleService extends BaseAuthService {
     return await userService.initializeUserWithProjectAndTasks(
       googleUserProfile,
       projectData,
-      taskData
+      taskData,
     );
   }
 
@@ -113,7 +113,7 @@ export class GoogleService extends BaseAuthService {
       if (response.status !== OK) {
         throw new ApiError(
           'Failed to fetch user info',
-          response.status as HttpExceptionStatusCodes
+          response.status as HttpExceptionStatusCodes,
         );
       }
 
@@ -123,7 +123,7 @@ export class GoogleService extends BaseAuthService {
     }
   }
 
-  async getGoogleAuthUrl() {
+  getGoogleAuthUrl() {
     try {
       this.validateGoogleConfig();
 
@@ -163,7 +163,7 @@ export class GoogleService extends BaseAuthService {
       logger.error('Google API Error:', error.response?.data);
       throw new ApiError(
         `Google API Error: ${error.response?.data?.message || error.message}`,
-        (error.response?.status as HttpExceptionStatusCodes) || UNAUTHORIZED
+        (error.response?.status as HttpExceptionStatusCodes) || UNAUTHORIZED,
       );
     }
     if (error instanceof Error) {

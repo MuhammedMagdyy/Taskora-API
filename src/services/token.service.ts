@@ -1,17 +1,17 @@
-import { sign, verify, Secret } from 'jsonwebtoken';
+import { Secret, sign, verify } from 'jsonwebtoken';
 import {
-  accessTokenSecret,
-  refreshTokenSecret,
   accessTokenExpiry,
+  accessTokenSecret,
   refreshTokenExpiry,
+  refreshTokenSecret,
 } from '../config';
-import { JwtType } from '../types';
 import { IJwtPayload } from '../interfaces';
+import { JwtType } from '../types';
 
 export class JwtService {
   static generateAccessToken(
     { exp: _exp, iat: _iat, ...payload }: IJwtPayload,
-    expiresIn = accessTokenExpiry
+    expiresIn = accessTokenExpiry,
   ) {
     return sign(payload, accessTokenSecret as Secret, {
       expiresIn,

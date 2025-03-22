@@ -1,4 +1,4 @@
-import { hash, compare } from 'bcryptjs';
+import { compare, hash } from 'bcryptjs';
 import { bcryptSaltRounds } from '../config';
 import { ApiError, BAD_REQUEST } from '../utils';
 

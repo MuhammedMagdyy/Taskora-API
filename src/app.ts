@@ -1,21 +1,27 @@
+import compression from 'compression';
+import cors from 'cors';
 import 'dotenv/config';
 import express from 'express';
-import cors from 'cors';
-import morgan from 'morgan';
 import helmet from 'helmet';
+import morgan from 'morgan';
 import swaggerUi from 'swagger-ui-express';
-import compression from 'compression';
 import swaggerDocument from '../swagger.json';
-import routes from './routes';
-import { errorHandler, xss } from './middlewares';
-import { nodeEnv, port, corsConfig } from './config';
-import { SERVER, INTERNAL_SERVER_ERROR, logger } from './utils';
+import { corsConfig, nodeEnv, port } from './config';
 import {
   createStatusIfNotExists,
   PrismaDatabaseClient,
   RedisDatabaseClient,
 } from './database';
+import { errorHandler, xss } from './middlewares';
+import routes from './routes';
 import { refreshTokenService } from './services';
+import {
+  ApiError,
+  INTERNAL_SERVER_ERROR,
+  logger,
+  NOT_FOUND,
+  SERVER,
+} from './utils';
 
 const app = express();
 const prismaClient = PrismaDatabaseClient.getInstance();
@@ -29,7 +35,7 @@ const morganLogger =
 
 app.get('/', (_, res) => {
   res.send(
-    '<div style="text-align: center; margin-top: 20px;"><h1>Welcome to Taskora API 🚀</h1></div>'
+    '<div style="text-align: center; margin-top: 20px;"><h1>Welcome to Taskora API 🚀</h1></div>',
   );
 });
 
@@ -42,6 +48,15 @@ app.use(express.json({ limit: '5mb' }));
 app.use(xss);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use('/api/v1', routes);
+app.all('*', (req, _res, next) => {
+  logger.error(`${req.method} ${req.originalUrl} not found`);
+  return next(
+    new ApiError(
+      `Seems like you're lost 🧐 - ${req.method} ${req.originalUrl} not found ❌`,
+      NOT_FOUND,
+    ),
+  );
+});
 app.use(errorHandler);
 
 export const up = async () => {
@@ -55,19 +70,24 @@ export const up = async () => {
 
     const server = app.listen(Number(port), '0.0.0.0', () => {
       logger.info(
-        `Server is running on ${port || SERVER.DEFAULT_PORT_NUMBER} 🚀`
+        `Server is running on ${port || SERVER.DEFAULT_PORT_NUMBER} 🚀`,
       );
     });
 
-    process.on('SIGINT', async () => {
+    process.on('SIGINT', () => {
       logger.warn('Shutting down gracefully...');
 
-      await Promise.all([prismaClient.disconnect(), redisClient.disconnect()]);
-
-      server.close(() => {
-        logger.info('Server closed successfully! 👋');
-        process.exit(0);
-      });
+      Promise.all([prismaClient.disconnect(), redisClient.disconnect()])
+        .then(() => {
+          server.close(() => {
+            logger.info('Server closed successfully! 👋');
+            process.exit(0);
+          });
+        })
+        .catch((error) => {
+          logger.error(`Error occurred during shutdown - ${error} ❌`);
+          process.exit(1);
+        });
     });
   } catch (error) {
     logger.error(`Error occurred while starting the server - ${error} ❌`);

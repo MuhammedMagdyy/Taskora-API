@@ -1,7 +1,7 @@
 import { Prisma } from '@prisma/client';
 import { taskRepository } from '../repositories';
-import { ApiError, NOT_FOUND } from '../utils';
 import { ISortQuery } from '../types';
+import { ApiError, NOT_FOUND } from '../utils';
 
 export class TaskService {
   constructor(private readonly taskDataSource = taskRepository) {}
@@ -20,7 +20,7 @@ export class TaskService {
 
   async updateOne(
     query: Prisma.TaskWhereUniqueInput,
-    data: Prisma.TaskUncheckedUpdateInput
+    data: Prisma.TaskUncheckedUpdateInput,
   ) {
     return this.taskDataSource.updateOne(query, data);
   }
