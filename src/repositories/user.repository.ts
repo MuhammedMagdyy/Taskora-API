@@ -137,6 +137,19 @@ export class UserRepository {
       return { project, tasks };
     });
   }
+
+  async softDeleteInactiveUsers() {
+    const now = new Date();
+    const oneWeekAgo = new Date(now);
+    oneWeekAgo.setDate(now.getDate() - 7);
+
+    const softDeleteUsers = await this.dbClient.user.updateMany({
+      where: { createdAt: { lt: oneWeekAgo }, isVerified: false },
+      data: { deletedAt: now },
+    });
+
+    return { totalUsers: softDeleteUsers.count };
+  }
 }
 
 export const userRepository = new UserRepository(prismaClient);

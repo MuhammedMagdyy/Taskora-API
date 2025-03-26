@@ -14,7 +14,7 @@ import {
 } from './database';
 import { errorHandler, xss } from './middlewares';
 import routes from './routes';
-import { refreshTokenService } from './services';
+import { refreshTokenService, userService } from './services';
 import {
   ApiError,
   INTERNAL_SERVER_ERROR,
@@ -67,6 +67,7 @@ export const up = async () => {
       createStatusIfNotExists(),
     ]);
     refreshTokenService.scheduleTokenCleanupTask();
+    userService.scheduleUserCleanupTask();
 
     const server = app.listen(Number(port), '0.0.0.0', () => {
       logger.info(
