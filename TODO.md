@@ -11,7 +11,7 @@
 - [x] Migrate OTP table to Prisma
 - [x] Search by token instead userUUID in verify email
 - [x] Integrate with SMTP server to send emails
-- [ ] Rename files to be more descriptive
+- [x] Rename files to be more descriptive
 - [x] Add more security
 - [ ] Learn how to link local account with social account
 - [x] Handle transactions correctly
@@ -21,6 +21,7 @@
 - [ ] Handle AxiosErrors in OAuth2 Clients
 - [ ] Migrate to a Docker container with Nginx
 - [ ] Enhance parameters to be as interfaces or types
+- [x] Fix deployment issues
 
 ## Improvements
 

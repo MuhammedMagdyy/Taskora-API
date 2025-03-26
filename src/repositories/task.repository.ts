@@ -3,11 +3,7 @@ import { prismaClient } from '../database';
 import { ISortQuery } from '../types';
 
 export class TaskRepository {
-  private readonly dbClient: PrismaClient;
-
-  constructor(dbClient: PrismaClient) {
-    this.dbClient = dbClient;
-  }
+  constructor(private readonly dbClient: PrismaClient) {}
 
   async createOne(data: Prisma.TaskUncheckedCreateInput) {
     return await this.dbClient.task.create({ data });

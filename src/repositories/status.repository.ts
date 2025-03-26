@@ -3,11 +3,7 @@ import { prismaClient } from '../database';
 import { ISortQuery } from '../types';
 
 export class StatusRepository {
-  private readonly dbClient: PrismaClient;
-
-  constructor(dbClient: PrismaClient) {
-    this.dbClient = dbClient;
-  }
+  constructor(private readonly dbClient: PrismaClient) {}
 
   async createMany(data: Prisma.StatusCreateManyInput[]) {
     return await this.dbClient.status.createMany({ data });

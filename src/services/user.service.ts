@@ -1,9 +1,11 @@
 import { Prisma } from '@prisma/client';
+import cron from 'node-cron';
 import { userRepository } from '../repositories';
 import {
   CustomProjectUncheckedCreateInput,
   CustomTaskUncheckedCreateInput,
 } from '../types/prisma';
+import { logger } from '../utils';
 
 export class UserService {
   constructor(private readonly userDataSource = userRepository) {}
@@ -41,6 +43,20 @@ export class UserService {
 
   async ramadanChallenge(userUuid: string) {
     return this.userDataSource.ramadanChallenge(userUuid);
+  }
+
+  scheduleUserCleanupTask() {
+    cron.schedule('0 0 * * *', () => {
+      logger.info(`Running user cleanup task... 🧹`);
+      this.userDataSource
+        .softDeleteInactiveUsers()
+        .then(({ totalUsers }) => {
+          logger.info(`Soft deleted ${totalUsers} inactive users ✅`);
+        })
+        .catch((error) => {
+          logger.error(`Error deleting inactive users ❌: ${error}`);
+        });
+    });
   }
 }
 
