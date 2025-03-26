@@ -4,7 +4,7 @@ echo "🔄 Pulling latest code..."
 git pull origin main
 
 echo "📦 Installing production dependencies..."
-npm ci --only=production
+npm ci
 
 echo "🔨 Applying database migrations..."
 npx prisma migrate deploy --schema=src/database/prisma/schema.prisma
