@@ -2,11 +2,7 @@ import { Prisma, PrismaClient } from '@prisma/client';
 import { prismaClient } from '../database';
 
 export class RefreshTokenRepository {
-  private readonly dbClient: PrismaClient;
-
-  constructor(dbClient: PrismaClient) {
-    this.dbClient = dbClient;
-  }
+  constructor(private readonly dbClient: PrismaClient) {}
 
   async createOne(data: Prisma.RefreshTokenUncheckedCreateInput) {
     return this.dbClient.refreshToken.create({ data });
