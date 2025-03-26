@@ -11,7 +11,7 @@
 - [x] Migrate OTP table to Prisma
 - [x] Search by token instead userUUID in verify email
 - [x] Integrate with SMTP server to send emails
-- [ ] Rename files to be more descriptive
+- [x] Rename files to be more descriptive
 - [x] Add more security
 - [ ] Learn how to link local account with social account
 - [x] Handle transactions correctly
