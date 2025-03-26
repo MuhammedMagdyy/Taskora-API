@@ -7,10 +7,10 @@ echo "📦 Installing production dependencies..."
 npm ci --only=production
 
 echo "🔨 Applying database migrations..."
-npx prisma migrate deploy
+npx prisma migrate deploy --schema=src/database/prisma/schema.prisma
 
 echo "⚙️ Generating Prisma Client..."
-npx prisma generate
+npx prisma generate --schema=src/database/prisma/schema.prisma
 
 echo "🏗 Building the app..."
 npm run build
