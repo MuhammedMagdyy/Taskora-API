@@ -3,7 +3,7 @@
 echo "🔄 Pulling latest code..."
 git pull origin main
 
-echo "📦 Installing production dependencies..."
+echo "📦 Installing dependencies..."
 npm ci
 
 echo "🔨 Applying database migrations..."
