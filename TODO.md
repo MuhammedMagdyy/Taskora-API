@@ -21,7 +21,7 @@
 - [ ] Handle AxiosErrors in OAuth2 Clients
 - [ ] Migrate to a Docker container with Nginx
 - [ ] Enhance parameters to be as interfaces or types
-- [ ] Fix deployment issues
+- [x] Fix deployment issues
 
 ## Improvements
 
