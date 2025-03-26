@@ -6,7 +6,6 @@ import {
 } from '../types/prisma';
 
 export class UserRepository {
-  private readonly dbClient: PrismaClient;
   private arabicNumerals: string[] = [
     'الأول',
     'الثاني',
@@ -40,9 +39,7 @@ export class UserRepository {
     'الثلاثون',
   ];
 
-  constructor(dbClient: PrismaClient) {
-    this.dbClient = dbClient;
-  }
+  constructor(private readonly dbClient: PrismaClient) {}
 
   async createOne(data: Prisma.UserUncheckedCreateInput) {
     return await this.dbClient.user.create({ data });
