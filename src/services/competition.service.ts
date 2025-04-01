@@ -45,15 +45,14 @@ export class CompetitionService {
       NX: true,
       PX: 5000,
     });
-    if (!lock) return { status: 'error', message: 'Try again later.' };
+    if (!lock) {
+      return { status: 'error', message: 'Try again later.' };
+    }
 
     try {
       const winners = await redisClient.lRange(this.WINNERS_KEY, 0, -1);
       if (winners.length >= 3) {
-        return {
-          status: 'not_winner',
-          message: 'You answered too late.',
-        };
+        return { status: 'not_winner', message: 'You answered too late.' };
       }
 
       if (!winners.includes(userId)) {
@@ -62,10 +61,7 @@ export class CompetitionService {
         await redisClient.set(userAttemptKey, 'true', { EX: 60 * 60 * 24 });
       }
 
-      return {
-        status: 'winner',
-        message: 'Congratulations! You won!',
-      };
+      return { status: 'winner', message: 'Congratulations! You won!' };
     } finally {
       await redisClient.del(this.LOCK_KEY);
     }
