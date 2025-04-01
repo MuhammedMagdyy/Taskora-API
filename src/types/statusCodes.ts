@@ -1,4 +1,4 @@
-export type HttpSuccessStatusCodes = 200 | 201 | 204;
+export type HttpSuccessStatusCodes = 200 | 202 | 201 | 204;
 export type HttpExceptionStatusCodes =
   | 400
   | 401

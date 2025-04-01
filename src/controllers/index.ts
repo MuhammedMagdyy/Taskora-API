@@ -1,4 +1,5 @@
 export * as auth from './auth.controller';
+export * as competition from './competition.controller';
 export * as projects from './project.controller';
 export * as statuses from './status.controller';
 export * as tags from './tag.controller';

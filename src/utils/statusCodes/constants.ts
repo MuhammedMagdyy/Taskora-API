@@ -3,6 +3,7 @@ import { HttpExceptionStatusCodes, HttpSuccessStatusCodes } from '../../types';
 // HTTP status codes (Success codes)
 export const OK: HttpSuccessStatusCodes = 200;
 export const CREATED: HttpSuccessStatusCodes = 201;
+export const ACCEPTED: HttpSuccessStatusCodes = 202;
 export const NO_CONTENT: HttpSuccessStatusCodes = 204;
 
 // HTTP status codes (Error codes)
