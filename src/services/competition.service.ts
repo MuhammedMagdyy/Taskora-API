@@ -1,5 +1,6 @@
 import { correctAnswer } from '../config';
 import { redisClient } from '../database';
+import { emailService, userService } from '../services';
 
 export class CompetitionService {
   private static WINNERS_KEY = 'winners';
@@ -37,6 +38,8 @@ export class CompetitionService {
       };
     }
 
+    await redisClient.set(userAttemptKey, 'true', { EX: 60 * 60 * 24 });
+
     if (parseInt(correctAnswer) !== answerId) {
       return { status: 'not_winner', message: 'Incorrect answer.' };
     }
@@ -45,27 +48,29 @@ export class CompetitionService {
       NX: true,
       PX: 5000,
     });
-    if (!lock) return { status: 'error', message: 'Try again later.' };
+    if (!lock) {
+      return { status: 'error', message: 'Try again later.' };
+    }
 
     try {
       const winners = await redisClient.lRange(this.WINNERS_KEY, 0, -1);
-      if (winners.length >= 3) {
-        return {
-          status: 'not_winner',
-          message: 'You answered too late.',
-        };
+      if (winners.length >= 5) {
+        return { status: 'not_winner', message: 'You answered too late.' };
       }
 
       if (!winners.includes(userId)) {
         await redisClient.rPush(this.WINNERS_KEY, userId);
         await redisClient.expire(this.WINNERS_KEY, 60 * 60 * 24);
-        await redisClient.set(userAttemptKey, 'true', { EX: 60 * 60 * 24 });
       }
 
-      return {
-        status: 'winner',
-        message: 'Congratulations! You won!',
-      };
+      const userInfo = await userService.getUserInfo(userId);
+
+      emailService.sendNotifyWinnerEmail(
+        userInfo.email,
+        userInfo.name as string,
+      );
+
+      return { status: 'winner', message: 'Congratulations! You won!' };
     } finally {
       await redisClient.del(this.LOCK_KEY);
     }

@@ -5,7 +5,7 @@ import {
   CustomProjectUncheckedCreateInput,
   CustomTaskUncheckedCreateInput,
 } from '../types/prisma';
-import { logger } from '../utils';
+import { ApiError, logger, NOT_FOUND } from '../utils';
 
 export class UserService {
   constructor(private readonly userDataSource = userRepository) {}
@@ -57,6 +57,14 @@ export class UserService {
           logger.error(`Error deleting inactive users ❌: ${error}`);
         });
     });
+  }
+
+  async getUserInfo(userUuid: string) {
+    const user = await this.userDataSource.findOne({ uuid: userUuid });
+    if (!user) {
+      throw new ApiError('User not found', NOT_FOUND);
+    }
+    return { name: user.name, email: user.email };
   }
 }
 

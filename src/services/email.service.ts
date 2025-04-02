@@ -7,7 +7,12 @@ import {
   mailPort,
   mailService,
 } from '../config';
-import { getOTPTemplate, getVerifyEmailTemplate, logger } from '../utils';
+import {
+  getOTPTemplate,
+  getVerifyEmailTemplate,
+  getWinnersTemplate,
+  logger,
+} from '../utils';
 
 export class EmailService {
   private transporter: Transporter;
@@ -71,6 +76,17 @@ export class EmailService {
       to: email,
       subject: 'Reset your password',
       text: 'Reset your password',
+      html,
+    });
+  }
+
+  async sendNotifyWinnerEmail(email: string, name: string) {
+    const html = getWinnersTemplate().replace(/{{name}}/g, name);
+
+    await this.sendEmail({
+      to: email,
+      subject: 'Congratulations! You are a winner',
+      text: 'Congratulations! You are a winner',
       html,
     });
   }
