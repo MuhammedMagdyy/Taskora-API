@@ -65,7 +65,7 @@ export class CompetitionService {
 
       const userInfo = await userService.getUserInfo(userId);
 
-      emailService.sendNotifyWinnerEmail(
+      await emailService.sendNotifyWinnerEmail(
         userInfo.email,
         userInfo.name as string,
       );
