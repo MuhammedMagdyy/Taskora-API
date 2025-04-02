@@ -54,7 +54,7 @@ export class CompetitionService {
 
     try {
       const winners = await redisClient.lRange(this.WINNERS_KEY, 0, -1);
-      if (winners.length >= 3) {
+      if (winners.length >= 5) {
         return { status: 'not_winner', message: 'You answered too late.' };
       }
 
