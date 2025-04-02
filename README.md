@@ -17,6 +17,10 @@ Taskora API built using **Node.js**, **Express.js**, **TypeScript**, **Prisma OR
 
 ---
 
+**[Alert ⚠️]** I have created a [Node.js script](https://github.com/MuhammedMagdyy/taskora-user-tracker) to monitor new user registrations passionately and celebrate every new member of the Taskora community.
+
+---
+
 ## 📚 Table of Contents
 
 - [🌟 Features](#-features)
@@ -34,7 +38,7 @@ Taskora API built using **Node.js**, **Express.js**, **TypeScript**, **Prisma OR
 ## 🌟Features
 
 - 🔒 **Authentication & Authorization** (JWT & OAuth2 with Google & GitHub).
-- ✅ **CRUD** Operations for Projects, Tasks, and Tags.
+- ✅ **CRUD Operations** for Projects, Tasks, and Tags.
 - 📅 **Task Management** with Tags & Status.
 - 📊 **User Profile** Handling.
 - 🔄 **Token Refresh** & Password Reset via Email.
@@ -42,6 +46,8 @@ Taskora API built using **Node.js**, **Express.js**, **TypeScript**, **Prisma OR
 - 📧 **Email Notifications** for Verification & Password Reset.
 - 🌐 **Deployed on Azure** with **Nginx** as Reverse Proxy.
 - 🔄️ **CI/CD** using GitHub Actions.
+- 🌙 **Ramadan Challenge** A special feature for Ramadan, allowing users to set daily goals and track their progress.
+- 🥳 **Eid Competition** A fun competition feature for Eid, where users can participate in challenges and win prizes.
 - 📝 **[Todo](https://github.com/MuhammedMagdyy/Taskora-API/blob/main/TODO.md)** – 🚀 Explore finished & upcoming features, enhancements, and what's next for Taskora!
 
 ---
