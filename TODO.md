@@ -24,6 +24,7 @@
 - [x] Fix deployment issues
 - [x] Created Eid competition
 - [ ] Remove Ramadan challenge
+- [x] Notify winner of Eid competition
 
 ## Improvements
 
