@@ -17,3 +17,10 @@ export const getOTPTemplate = () => {
 
   return fs.readFileSync(otpTemplatePath, 'utf-8');
 };
+
+export const getWinnersTemplate = () => {
+  const winnersHtmlTemplate = '../templates/winners.html';
+  const winnersTemplatePath = path.join(__dirname, winnersHtmlTemplate);
+
+  return fs.readFileSync(winnersTemplatePath, 'utf-8');
+};

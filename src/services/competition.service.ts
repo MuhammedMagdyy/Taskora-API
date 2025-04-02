@@ -1,5 +1,6 @@
 import { correctAnswer } from '../config';
 import { redisClient } from '../database';
+import { emailService, userService } from '../services';
 
 export class CompetitionService {
   private static WINNERS_KEY = 'winners';
@@ -37,6 +38,8 @@ export class CompetitionService {
       };
     }
 
+    await redisClient.set(userAttemptKey, 'true', { EX: 60 * 60 * 24 });
+
     if (parseInt(correctAnswer) !== answerId) {
       return { status: 'not_winner', message: 'Incorrect answer.' };
     }
@@ -58,8 +61,14 @@ export class CompetitionService {
       if (!winners.includes(userId)) {
         await redisClient.rPush(this.WINNERS_KEY, userId);
         await redisClient.expire(this.WINNERS_KEY, 60 * 60 * 24);
-        await redisClient.set(userAttemptKey, 'true', { EX: 60 * 60 * 24 });
       }
+
+      const userInfo = await userService.getUserInfo(userId);
+
+      emailService.sendNotifyWinnerEmail(
+        userInfo.email,
+        userInfo.name as string,
+      );
 
       return { status: 'winner', message: 'Congratulations! You won!' };
     } finally {

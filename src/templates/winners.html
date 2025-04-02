@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>🎉 You're a Winner! 🎉</title>
+    <style>
+      body {
+        font-family: 'Chillax', Arial, sans-serif;
+        background-color: #202225 !important;
+        margin: 0;
+        padding: 0;
+        color: #ffffff !important;
+      }
+      .container {
+        min-height: fit-content;
+        max-width: 600px;
+        margin: 20px auto;
+        background: #2c2f33 !important;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        text-align: center;
+      }
+      .header {
+        background: #306bff;
+        color: white;
+        font-size: 24px;
+        font-weight: bold;
+        padding: 20px;
+        border-radius: 15px 15px 0 0;
+        margin-bottom: 20px;
+      }
+      .content {
+        padding: 20px;
+        font-size: 18px;
+        color: #ffffff;
+      }
+      .footer {
+        margin-top: 20px;
+        font-size: 14px;
+        color: #ffffff;
+        text-align: center;
+      }
+      .logo {
+        margin-top: 20px;
+        max-width: 50px;
+        margin-bottom: 5px;
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">🎉 Congratulations! 🎉</div>
+      <img
+        src="https://res.cloudinary.com/de9jdl1lm/image/upload/v1738898452/taskora-api/xfujhxusx4ymtdlclcp3.png"
+        alt="Taskora Logo"
+      />
+      <div class="content">
+        <p>Dear <strong>{{name}}</strong>,</p>
+        <p>
+          We are thrilled to announce that you are the winner of our
+          competition! 🎆
+        </p>
+        <p>Your prize: <strong>50 EGP 🚀</strong></p>
+        <p>
+          To claim your prize, please send a screenshot of this email to us for
+          verification.
+        </p>
+      </div>
+      <div class="footer">
+        <p>
+          Best regards,
+          <br /><strong>Taskora Team</strong>
+        </p>
+        <div class="footer">&copy; 2025 Taskora. All rights reserved.</div>
+      </div>
+    </div>
+  </body>
+</html>
