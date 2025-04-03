@@ -148,22 +148,21 @@ export class AuthService extends BaseAuthService {
         throw new ApiError('Unauthorized', UNAUTHORIZED);
       }
 
-      const refreshToken = authHeader.split(' ')[1];
-      const payload = JwtService.verify(refreshToken, 'refresh');
+      const token = authHeader.split(' ')[1];
+      const payload = JwtService.verify(token, 'refresh');
 
       if (!payload) {
         throw new ApiError('Unauthorized', UNAUTHORIZED);
       }
 
       const user = await userService.findUserByUUID(payload.uuid as string);
-      const storedToken =
-        await refreshTokenService.refreshTokenExists(refreshToken);
+      const storedToken = await refreshTokenService.refreshTokenExists(token);
 
       if (!user || !storedToken) {
         throw new ApiError('Unauthorized', UNAUTHORIZED);
       }
 
-      await refreshTokenService.deleteOne({ token: refreshToken });
+      await refreshTokenService.deleteOne({ token });
       return await this.generateAndStoreTokens(payload.uuid as string);
     } catch (error) {
       logger.error('Token refresh failed:', error);
