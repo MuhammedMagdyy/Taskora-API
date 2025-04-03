@@ -142,8 +142,14 @@ export class AuthService extends BaseAuthService {
     }
   }
 
-  async refreshAccessToken(refreshToken: string) {
+  async refreshAccessToken(authHeader: string) {
     try {
+      const refreshToken = authHeader.split(' ')[1];
+
+      if (!authHeader || !authHeader.startsWith('Bearer ') || !refreshToken) {
+        throw new ApiError('Unauthorized', UNAUTHORIZED);
+      }
+
       const payload = JwtService.verify(refreshToken, 'refresh');
 
       if (!payload) {

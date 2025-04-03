@@ -9,7 +9,6 @@ import {
   OK,
   registerSchema,
   resendVerificationEmailSchema,
-  UNAUTHORIZED,
   verifyEmailSchema,
   verifyOtpSchema,
 } from '../utils';
@@ -37,18 +36,7 @@ export const localLogin = asyncHandler(async (req, res) => {
 });
 
 export const logout = asyncHandler(async (req, res) => {
-  const uuid = req.user?.uuid as string;
-
-  if (!uuid) {
-    throw new ApiError('Unauthorized', UNAUTHORIZED);
-  }
-
   const refreshToken = req.body.refreshToken as string;
-
-  if (!refreshToken) {
-    throw new ApiError('Unauthorized', UNAUTHORIZED);
-  }
-
   await authService.logout(refreshToken);
 
   res.status(OK).json({ message: 'Logged out successfully' });
@@ -94,20 +82,9 @@ export const handleGitHubCallback = asyncHandler(async (req, res) => {
   });
 });
 
-export const refreshToken = asyncHandler(async (req, res, next) => {
-  const authHeader = req.headers.authorization;
-
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return next(new ApiError('Unauthorized', UNAUTHORIZED));
-  }
-
-  const token = authHeader.split(' ')[1];
-
-  if (!token) {
-    return next(new ApiError('Unauthorized', UNAUTHORIZED));
-  }
-
-  const tokens = await authService.refreshAccessToken(token);
+export const refreshToken = asyncHandler(async (req, res) => {
+  const authHeader = req.headers.authorization as string;
+  const tokens = await authService.refreshAccessToken(authHeader);
 
   res.status(OK).json({ message: 'Token refreshed successfully', tokens });
 });
