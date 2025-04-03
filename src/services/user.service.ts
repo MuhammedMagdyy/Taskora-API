@@ -78,12 +78,12 @@ export class UserService {
   }
 
   async updateUserInfo(
-    loggedInUserUUid: string,
+    currentUserUuid: string,
     userUuid: string,
     data: Prisma.UserUncheckedUpdateInput,
     file?: Express.Multer.File,
   ) {
-    if (loggedInUserUUid !== userUuid) {
+    if (currentUserUuid !== userUuid) {
       throw new ApiError(
         'You are not allowed to access this resource',
         FORBIDDEN,

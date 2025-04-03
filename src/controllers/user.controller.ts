@@ -12,12 +12,9 @@ export const getUserInfo = asyncHandler(async (req, res) => {
 export const updateUser = asyncHandler(async (req, res) => {
   const { uuid } = paramsSchema.parse(req.params);
   const userUUID = req.user?.uuid as string;
-  const validatedData = updateUserSchema.parse({
-    ...req.body,
-    picture: req.file ? req.file.path : undefined,
-  });
+  const userUpdateData = updateUserSchema.parse(req.body);
 
-  await userService.updateUserInfo(userUUID, uuid, validatedData, req.file);
+  await userService.updateUserInfo(userUUID, uuid, userUpdateData, req.file);
 
   res.status(OK).json({ message: 'User updated successfully!' });
 });
