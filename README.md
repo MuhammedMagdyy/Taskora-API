@@ -70,14 +70,14 @@ Easily test and interact with the API documentation using Postman
 Server URL could be:
   - http://localhost:3000/api-docs (development)
   - https://backend.taskora.live/api-docs (staging)
-  - https://taskora.live/api-docs (production)
+  - https://api.taskora.live/api-docs (production)
 ```
 
 ---
 
 ## 🗄️ Database Schema
 
-![Schema](https://github.com/user-attachments/assets/1ba1fd47-79b9-4f63-af2b-c7b938d6a938)
+![Schema](https://github.com/user-attachments/assets/d48b49fb-5066-4f64-a655-635a4019539b)
 
 ---
 
