@@ -5,7 +5,7 @@ import { isAuth, multerMiddlewareUpload } from '../middlewares';
 const router = Router();
 
 router.use(isAuth);
-router.get('/profile', users.getUser);
+router.get('/profile', users.getUserInfo);
 router.post('/challenge', users.ramadanChallenge);
 router.patch(
   '/:uuid',

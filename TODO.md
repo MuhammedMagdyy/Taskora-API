@@ -20,10 +20,10 @@
 - [ ] Create a decorator for less use of try-catch blocks
 - [ ] Handle AxiosErrors in OAuth2 Clients
 - [ ] Migrate to a Docker container with Nginx
-- [ ] Enhance parameters to be as interfaces or types
+- [x] Enhance parameters to be as interfaces or types
 - [x] Fix deployment issues
 - [x] Created Eid competition
-- [ ] Remove Ramadan challenge
+- [x] Remove Ramadan challenge
 - [x] Notify winner of Eid competition
 
 ## Improvements

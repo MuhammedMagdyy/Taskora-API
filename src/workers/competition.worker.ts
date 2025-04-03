@@ -6,7 +6,7 @@ export const answerWorker = new Worker(
   'answerQueue',
   async (job) => {
     return await CompetitionService.processAnswer(
-      job.data.userId,
+      job.data.userUuid,
       job.data.answerId,
     );
   },

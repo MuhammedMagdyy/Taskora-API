@@ -8,7 +8,7 @@ import {
   refreshTokenService,
   userService,
 } from '.';
-import { IUser } from '../interfaces';
+import { IAuth, IResetPassword, IUser, IVerifyOtp } from '../interfaces';
 import { IUserInfo } from '../types';
 import {
   ApiError,
@@ -23,24 +23,26 @@ import {
 } from '../utils';
 import { BaseAuthService } from './base';
 
-interface IAuthUserData {
-  name: string;
-  email: string;
-  password?: string;
-}
 export class AuthService extends BaseAuthService {
   protected readonly provider = Provider.LOCAL;
 
-  async register(name: string, email: string, password: string) {
+  async register(userRegistrationInfo: IAuth) {
     try {
-      const userExists = await userService.findUserByEmail(email);
+      const userExists = await userService.findUserByEmail(
+        userRegistrationInfo.email,
+      );
 
       if (userExists) {
         throw new ApiError('User already exists', CONFLICT);
       }
 
-      const hashedPassword = await HashingService.hash(password);
-      const userCredentials = { name, email, password: hashedPassword };
+      const hashedPassword = await HashingService.hash(
+        userRegistrationInfo.password,
+      );
+      const userCredentials = {
+        ...userRegistrationInfo,
+        password: hashedPassword,
+      };
 
       const user = await this.createNewUser(userCredentials);
       const tokens = await this.generateAndStoreTokens(user.uuid);
@@ -58,7 +60,7 @@ export class AuthService extends BaseAuthService {
     }
   }
 
-  private async createNewUser(userData: IAuthUserData) {
+  private async createNewUser(userData: IAuth) {
     const { projectData, taskData } = this.createDefaultProjectAndTaskData();
 
     return await userService.initializeUserWithProjectAndTasks(
@@ -87,16 +89,16 @@ export class AuthService extends BaseAuthService {
     );
   }
 
-  async login(email: string, password: string) {
+  async login(userLoginInfo: IAuth) {
     try {
-      const user = await userService.findUserByEmail(email);
+      const user = await userService.findUserByEmail(userLoginInfo.email);
 
       if (!user || !user.password) {
         throw new ApiError('Invalid email or password', UNAUTHORIZED);
       }
 
       const passwordMatches = await HashingService.compare(
-        password,
+        userLoginInfo.password,
         user.password,
       );
 
@@ -140,23 +142,27 @@ export class AuthService extends BaseAuthService {
     }
   }
 
-  async refreshAccessToken(refreshToken: string) {
+  async refreshAccessToken(authHeader: string) {
     try {
-      const payload = JwtService.verify(refreshToken, 'refresh');
+      if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        throw new ApiError('Unauthorized', UNAUTHORIZED);
+      }
+
+      const token = authHeader.split(' ')[1];
+      const payload = JwtService.verify(token, 'refresh');
 
       if (!payload) {
         throw new ApiError('Unauthorized', UNAUTHORIZED);
       }
 
       const user = await userService.findUserByUUID(payload.uuid as string);
-      const storedToken =
-        await refreshTokenService.refreshTokenExists(refreshToken);
+      const storedToken = await refreshTokenService.refreshTokenExists(token);
 
       if (!user || !storedToken) {
         throw new ApiError('Unauthorized', UNAUTHORIZED);
       }
 
-      await refreshTokenService.deleteOne({ token: refreshToken });
+      await refreshTokenService.deleteOne({ token });
       return await this.generateAndStoreTokens(payload.uuid as string);
     } catch (error) {
       logger.error('Token refresh failed:', error);
@@ -257,34 +263,46 @@ export class AuthService extends BaseAuthService {
     emailService.sendForgetPasswordEmail(user.email, user.name, otp);
   }
 
-  async verifyOTP(email: string, password: string, otp: string) {
+  async verifyOTP(otpInfo: IVerifyOtp) {
     try {
-      const user = await userService.findUserByEmail(email);
+      const user = await userService.findUserByEmail(otpInfo.email);
 
       if (!user) {
         throw new ApiError('User not found', NOT_FOUND);
       }
 
-      const storedOTP = await redisService.get<string>(`otp:${otp}`);
+      const storedOTP = await redisService.get<string>(`otp:${otpInfo.otp}`);
 
-      if (!storedOTP || String(storedOTP).trim() !== String(otp).trim()) {
+      if (
+        !storedOTP ||
+        String(storedOTP).trim() !== String(otpInfo.otp).trim()
+      ) {
         throw new ApiError('Invalid or expired OTP', GONE);
       }
 
-      await this.resetPassword(user.uuid, password, otp);
+      await this.resetPassword({
+        userUuid: user.uuid,
+        password: otpInfo.password,
+        otp: otpInfo.otp,
+      });
     } catch (error) {
       logger.error('OTP verification failed:', error);
       throw error;
     }
   }
 
-  private async resetPassword(userUuid: string, password: string, otp: string) {
-    const hashedPassword = await HashingService.hash(password);
+  private async resetPassword(resetPasswordInfo: IResetPassword) {
+    const hashedPassword = await HashingService.hash(
+      resetPasswordInfo.password,
+    );
 
     await Promise.all([
-      redisService.delete(`otp:${otp}`),
-      userService.updateOne({ uuid: userUuid }, { password: hashedPassword }),
-      refreshTokenService.deleteMany({ userUuid }),
+      redisService.delete(`otp:${resetPasswordInfo.otp}`),
+      userService.updateOne(
+        { uuid: resetPasswordInfo.userUuid },
+        { password: hashedPassword },
+      ),
+      refreshTokenService.deleteMany({ userUuid: resetPasswordInfo.userUuid }),
     ]);
   }
 }

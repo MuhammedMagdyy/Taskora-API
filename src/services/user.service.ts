@@ -1,11 +1,12 @@
 import { Prisma } from '@prisma/client';
 import cron from 'node-cron';
 import { userRepository } from '../repositories';
+import { cloudinaryService, HashingService } from '../services';
 import {
   CustomProjectUncheckedCreateInput,
   CustomTaskUncheckedCreateInput,
 } from '../types/prisma';
-import { ApiError, logger, NOT_FOUND } from '../utils';
+import { ApiError, BAD_REQUEST, FORBIDDEN, logger, NOT_FOUND } from '../utils';
 
 export class UserService {
   constructor(private readonly userDataSource = userRepository) {}
@@ -60,11 +61,63 @@ export class UserService {
   }
 
   async getUserInfo(userUuid: string) {
-    const user = await this.userDataSource.findOne({ uuid: userUuid });
+    const user = await this.findUserByUUID(userUuid);
     if (!user) {
       throw new ApiError('User not found', NOT_FOUND);
     }
-    return { name: user.name, email: user.email };
+
+    return {
+      uuid: user.uuid,
+      name: user.name,
+      email: user.email,
+      isVerified: user.isVerified,
+      picture: user.picture,
+      hasPassword: user.password ? true : false,
+      createdAt: user.createdAt,
+    };
+  }
+
+  async updateUserInfo(
+    currentUserUuid: string,
+    userUuid: string,
+    data: Prisma.UserUncheckedUpdateInput,
+    file?: Express.Multer.File,
+  ) {
+    if (currentUserUuid !== userUuid) {
+      throw new ApiError(
+        'You are not allowed to access this resource',
+        FORBIDDEN,
+      );
+    }
+
+    const user = await this.findUserByUUID(userUuid);
+    if (!user) {
+      throw new ApiError('User not found', NOT_FOUND);
+    }
+
+    let picture = user.picture;
+    if (file) {
+      const { image } = await cloudinaryService.uploadImage(file.path);
+      picture = image;
+    }
+
+    if (data.password) {
+      const isSamePassword = await HashingService.compare(
+        data.password as string,
+        user.password as string,
+      );
+
+      if (isSamePassword) {
+        throw new ApiError(
+          'New password must be different from the current one',
+          BAD_REQUEST,
+        );
+      }
+
+      data.password = await HashingService.hash(data.password as string);
+    }
+
+    await this.updateOne({ uuid: userUuid }, { ...data, picture });
   }
 }
 
