@@ -15,8 +15,8 @@ import {
 } from '../utils';
 
 export const localRegister = asyncHandler(async (req, res) => {
-  const { name, email, password } = registerSchema.parse(req.body);
-  const userInfo = await authService.register(name, email, password);
+  const userRegistrationInfo = registerSchema.parse(req.body);
+  const userInfo = await authService.register(userRegistrationInfo);
 
   res.status(CREATED).json({
     message: 'Registered successfully',
@@ -26,8 +26,8 @@ export const localRegister = asyncHandler(async (req, res) => {
 });
 
 export const localLogin = asyncHandler(async (req, res) => {
-  const { email, password } = loginSchema.parse(req.body);
-  const userInfo = await authService.login(email, password);
+  const userLoginInfo = loginSchema.parse(req.body);
+  const userInfo = await authService.login(userLoginInfo);
 
   res.status(OK).json({
     message: 'Logged in successfully',
@@ -137,9 +137,9 @@ export const forgotPassword = asyncHandler(async (req, res) => {
 });
 
 export const verifyOtp = asyncHandler(async (req, res) => {
-  const { email, password, otp } = verifyOtpSchema.parse(req.body);
+  const verifyOtpInfo = verifyOtpSchema.parse(req.body);
 
-  const token = await authService.verifyOTP(email, password, otp);
+  const token = await authService.verifyOTP(verifyOtpInfo);
 
   res.status(OK).json({ message: 'OTP verified successfully', token });
 });

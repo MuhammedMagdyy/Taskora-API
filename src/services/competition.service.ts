@@ -14,11 +14,8 @@ export class CompetitionService {
     return { message: 'Challenge has started.' };
   }
 
-  static async processAnswer(
-    userId: string,
-    answerId: number,
-  ): Promise<{ status: string; message: string }> {
-    const userAttemptKey = `user:${userId}:attempted`;
+  static async processAnswer(userUuid: string, answerId: number) {
+    const userAttemptKey = `user:${userUuid}:attempted`;
 
     const correctAnswer = await redisClient.get('correctAnswer');
     if (!correctAnswer) {
@@ -58,12 +55,12 @@ export class CompetitionService {
         return { status: 'not_winner', message: 'You answered too late.' };
       }
 
-      if (!winners.includes(userId)) {
-        await redisClient.rPush(this.WINNERS_KEY, userId);
+      if (!winners.includes(userUuid)) {
+        await redisClient.rPush(this.WINNERS_KEY, userUuid);
         await redisClient.expire(this.WINNERS_KEY, 60 * 60 * 24);
       }
 
-      const userInfo = await userService.getUserInfo(userId);
+      const userInfo = await userService.getUserInfo(userUuid);
 
       await emailService.sendNotifyWinnerEmail(
         userInfo.email,
