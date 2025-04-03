@@ -23,7 +23,7 @@
 - [ ] Enhance parameters to be as interfaces or types
 - [x] Fix deployment issues
 - [x] Created Eid competition
-- [ ] Remove Ramadan challenge
+- [x] Remove Ramadan challenge
 - [x] Notify winner of Eid competition
 
 ## Improvements
