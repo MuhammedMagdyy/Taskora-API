@@ -15,10 +15,15 @@ jobs:
 
       - name: Debug secret values
         run: |
-          echo "VM_USER: ${{ secrets.VM_USER }}"
-          echo "VM_HOST: ${{ secrets.VM_HOST }}"
-          echo "SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}"
-          echo "VM_PORT: ${{ secrets.VM_PORT }}"
+          echo "VM_USER: $VM_USER"
+          echo "VM_HOST: $VM_HOST"
+          echo "SSH_PRIVATE_KEY: $SSH_PRIVATE_KEY"
+          echo "VM_PORT: $VM_PORT"
+        env:
+          VM_USER: ${{ secrets.VM_USER }}
+          VM_HOST: ${{ secrets.VM_HOST }}
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          VM_PORT: ${{ secrets.VM_PORT }}
 
       - name: Execute commands on remote server
         uses: appleboy/ssh-action@v1.2.1
