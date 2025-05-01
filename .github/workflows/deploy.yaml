@@ -21,6 +21,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.VM_PORT }}
           script: |
+            whoami
             cd ~/Taskora-API
             chmod +x deploy.sh
             ./deploy.sh
