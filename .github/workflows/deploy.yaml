@@ -16,12 +16,11 @@ jobs:
       - name: Execute commands on remote server
         uses: appleboy/ssh-action@v1.2.1
         with:
-          host: ${{ secrets.VM_HOST }}
           username: ${{ secrets.VM_USER }}
+          host: ${{ secrets.VM_HOST }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.VM_PORT }}
           script: |
-            whoami
             cd ~/Taskora-API
             chmod +x deploy.sh
             ./deploy.sh
