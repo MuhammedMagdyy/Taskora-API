@@ -13,24 +13,11 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-
-      - name: Debug secret values
-        run: |
-          echo "VM_USER: $VM_USER"
-          echo "VM_HOST: $VM_HOST"
-          echo "SSH_PRIVATE_KEY: $SSH_PRIVATE_KEY"
-          echo "VM_PORT: $VM_PORT"
-        env:
-          VM_USER: ${{ secrets.VM_USER }}
-          VM_HOST: ${{ secrets.VM_HOST }}
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-          VM_PORT: ${{ secrets.VM_PORT }}
-
       - name: Execute commands on remote server
         uses: appleboy/ssh-action@v1.2.1
         with:
-          username: ${{ secrets.VM_USER }}
           host: ${{ secrets.VM_HOST }}
+          username: ${{ secrets.VM_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.VM_PORT }}
           script: |
