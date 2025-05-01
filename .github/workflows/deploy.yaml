@@ -8,11 +8,11 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    environment: production
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-
       - name: Execute commands on remote server
         uses: appleboy/ssh-action@v1.2.1
         with:
