@@ -250,13 +250,13 @@ export class AuthService extends BaseAuthService {
         otp,
         userUuid: user.uuid,
         expiresAt: new Date(
-          Date.now() + MAGIC_NUMBERS.FIFTEEN_MINUTES_IN_MILLISECONDS,
+          Date.now() + MAGIC_NUMBERS.FIVE_MINUTES_IN_MILLISECONDS,
         ),
       }),
       redisService.set(
         `otp:${otp}`,
         otp,
-        MAGIC_NUMBERS.FIFTEEN_MINUTES_IN_SECONDS,
+        MAGIC_NUMBERS.FIVE_MINUTES_IN_MILLISECONDS,
       ),
     ]);
 
@@ -265,20 +265,32 @@ export class AuthService extends BaseAuthService {
 
   async verifyOTP(otpInfo: IVerifyOtp) {
     try {
-      const user = await userService.findUserByEmail(otpInfo.email);
+      const otpRecord = await otpService.findOneByOtp(otpInfo.otp);
+      const otpFromRedis = await redisService.get<string>(`otp:${otpInfo.otp}`);
+      const now = new Date();
+
+      if (!otpFromRedis || otpFromRedis !== otpRecord?.otp) {
+        throw new ApiError('Invalid OTP', GONE);
+      }
+
+      if (!otpRecord || otpRecord.expiresAt < now) {
+        throw new ApiError('Invalid or expired OTP', GONE);
+      }
+
+      const user = await userService.findUserByUUID(otpRecord.userUuid);
 
       if (!user) {
         throw new ApiError('User not found', NOT_FOUND);
       }
 
-      const storedOTP = await redisService.get<string>(`otp:${otpInfo.otp}`);
-
-      if (
-        !storedOTP ||
-        String(storedOTP).trim() !== String(otpInfo.otp).trim()
-      ) {
-        throw new ApiError('Invalid or expired OTP', GONE);
+      if (user.email !== otpInfo.email) {
+        throw new ApiError(
+          'You are not authorized to reset this password',
+          FORBIDDEN,
+        );
       }
+
+      await redisService.delete(`otp:${otpInfo.otp}`);
 
       await this.resetPassword({
         userUuid: user.uuid,
