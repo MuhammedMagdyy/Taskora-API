@@ -7,6 +7,10 @@ export class OtpService {
   async createOne(data: Prisma.GeneratedOtpUncheckedCreateInput) {
     return this.otpDataSource.createOne(data);
   }
+
+  async findOneByOtp(otp: string) {
+    return this.otpDataSource.findOne({ otp });
+  }
 }
 
 export const otpService = new OtpService();
