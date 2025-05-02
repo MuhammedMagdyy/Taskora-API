@@ -7,6 +7,10 @@ export class OtpRepository {
   async createOne(data: Prisma.GeneratedOtpUncheckedCreateInput) {
     return this.dbClient.generatedOtp.create({ data });
   }
+
+  async findOne(where: Prisma.GeneratedOtpWhereUniqueInput) {
+    return this.dbClient.generatedOtp.findUnique({ where });
+  }
 }
 
 export const otpRepository = new OtpRepository(prismaClient);
