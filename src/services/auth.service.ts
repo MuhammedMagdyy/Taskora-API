@@ -269,12 +269,12 @@ export class AuthService extends BaseAuthService {
       const otpFromRedis = await redisService.get<string>(`otp:${otpInfo.otp}`);
       const now = new Date();
 
-      if (!otpFromRedis || otpFromRedis !== otpRecord?.otp) {
-        throw new ApiError('Invalid OTP', GONE);
-      }
-
       if (!otpRecord || otpRecord.expiresAt < now) {
         throw new ApiError('Invalid or expired OTP', GONE);
+      }
+
+      if (!otpFromRedis || otpFromRedis !== otpRecord?.otp) {
+        throw new ApiError('Invalid OTP', GONE);
       }
 
       const user = await userService.findUserByUUID(otpRecord.userUuid);
