@@ -256,7 +256,7 @@ export class AuthService extends BaseAuthService {
       redisService.set(
         `otp:${otp}`,
         otp,
-        MAGIC_NUMBERS.FIVE_MINUTES_IN_MILLISECONDS,
+        MAGIC_NUMBERS.FIVE_MINUTES_IN_SECONDS,
       ),
     ]);
 
