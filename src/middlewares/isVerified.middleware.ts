@@ -29,8 +29,22 @@ export const isVerified = asyncHandler(
       );
     }
 
+    if (userInfo.deletedAt) {
+      return next(
+        new ApiError(
+          'This account has been deleted, please contact support',
+          FORBIDDEN,
+        ),
+      );
+    }
+
     if (!userInfo.isVerified) {
-      return next(new ApiError('You need to verify your email', FORBIDDEN));
+      return next(
+        new ApiError(
+          'This account is not verified. Please check your email.',
+          FORBIDDEN,
+        ),
+      );
     }
 
     next();
