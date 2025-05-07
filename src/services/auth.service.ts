@@ -106,6 +106,13 @@ export class AuthService extends BaseAuthService {
         throw new ApiError('Invalid email or password', UNAUTHORIZED);
       }
 
+      if (user.deletedAt) {
+        throw new ApiError(
+          'This account has been deleted, please contact support',
+          FORBIDDEN,
+        );
+      }
+
       if (!user.isVerified) {
         throw new ApiError(
           'Account not verified. Please check your email.',

@@ -26,7 +26,9 @@
 - [x] Remove Ramadan challenge
 - [x] Notify winner of Eid competition
 - [ ] Hash OTP in redis
-- [ ] OTP expiration must be less than 15m. Decide on the exact duration (e.g., 5m).
+- [x] OTP expiration must be less than 15m. Decide on the exact duration (e.g., 5m)
+- [ ] Add middleware to check if user is deleted
+- [ ] Centralize error messages
 
 ## Improvements
 

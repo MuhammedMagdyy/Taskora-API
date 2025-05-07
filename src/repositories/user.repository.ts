@@ -141,7 +141,11 @@ export class UserRepository {
     oneWeekAgo.setDate(now.getDate() - 7);
 
     const softDeleteUsers = await this.dbClient.user.updateMany({
-      where: { createdAt: { lt: oneWeekAgo }, isVerified: false },
+      where: {
+        createdAt: { lt: oneWeekAgo },
+        isVerified: false,
+        deletedAt: null,
+      },
       data: { deletedAt: now },
     });
 
