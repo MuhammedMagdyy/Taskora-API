@@ -280,7 +280,10 @@ export class AuthService extends BaseAuthService {
         throw new ApiError('Invalid or expired OTP', GONE);
       }
 
-      if (!otpFromRedis || otpFromRedis !== otpRecord?.otp) {
+      if (
+        !otpFromRedis ||
+        otpFromRedis.toString() !== otpRecord?.otp?.toString()
+      ) {
         throw new ApiError('Invalid OTP', GONE);
       }
 
