@@ -8,7 +8,9 @@ export class RedisDatabaseClient implements IDatabaseClient {
   private client: RedisClientType;
 
   private constructor() {
-    this.client = createClient({ url: `redis://${redisHost}:${redisPort}` });
+    this.client = createClient({
+      socket: { host: redisHost, port: Number(redisPort) },
+    });
   }
 
   static getInstance(): RedisDatabaseClient {
