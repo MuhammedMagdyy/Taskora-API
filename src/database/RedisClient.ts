@@ -1,5 +1,5 @@
 import { createClient, RedisClientType } from 'redis';
-import { redisUrl } from '../config';
+import { redisHost, redisPort } from '../config';
 import { IDatabaseClient } from '../interfaces';
 import { logger } from '../utils';
 
@@ -8,7 +8,7 @@ export class RedisDatabaseClient implements IDatabaseClient {
   private client: RedisClientType;
 
   private constructor() {
-    this.client = createClient({ url: redisUrl });
+    this.client = createClient({ url: `redis://${redisHost}:${redisPort}` });
   }
 
   static getInstance(): RedisDatabaseClient {
