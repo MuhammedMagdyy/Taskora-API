@@ -4,9 +4,10 @@ import { ApiError, INTERNAL_SERVER_ERROR } from '../utils';
 export class RedisService {
   async set(key: string, value: string, expiryInSeconds: number) {
     try {
-      const stringValue =
+      const serializedValue =
         typeof value === 'string' ? value : JSON.stringify(value);
-      await redisClient.set(key, stringValue, { EX: expiryInSeconds });
+
+      await redisClient.setEx(key, expiryInSeconds, serializedValue);
     } catch {
       throw new ApiError('Failed to set value in Redis', INTERNAL_SERVER_ERROR);
     }
