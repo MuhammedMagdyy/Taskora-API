@@ -69,7 +69,7 @@ export const up = async () => {
     refreshTokenService.scheduleTokenCleanupTask();
     userService.scheduleUserCleanupTask();
 
-    const server = app.listen(Number(port), '0.0.0.0', () => {
+    const server = app.listen(Number(port), '127.0.0.1', () => {
       logger.info(
         `Server is running on ${port || SERVER.DEFAULT_PORT_NUMBER} 🚀`,
       );
