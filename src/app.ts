@@ -6,7 +6,7 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import swaggerUi from 'swagger-ui-express';
 import swaggerDocument from '../swagger.json';
-import { corsConfig, nodeEnv, port } from './config';
+import { corsConfig, host, nodeEnv, port } from './config';
 import {
   createStatusIfNotExists,
   PrismaDatabaseClient,
@@ -69,7 +69,7 @@ export const up = async () => {
     refreshTokenService.scheduleTokenCleanupTask();
     userService.scheduleUserCleanupTask();
 
-    const server = app.listen(Number(port), '127.0.0.1', () => {
+    const server = app.listen(Number(port), host || '127.0.0.1', () => {
       logger.info(
         `Server is running on ${port || SERVER.DEFAULT_PORT_NUMBER} 🚀`,
       );
