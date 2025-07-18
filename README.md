@@ -65,13 +65,7 @@ Easily test and interact with the API documentation using Postman
 ### 📚 Swagger
 
 [Swagger](https://swagger.io/) UI is available at `/api-docs` to explore the API endpoints
-
-```
-Server URL could be:
-  - http://localhost:3000/api-docs (development)
-  - https://backend.taskora.live/api-docs (staging)
-  - https://api.taskora.live/api-docs (production)
-```
+and their details.
 
 ---
 
