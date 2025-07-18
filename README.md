@@ -64,8 +64,7 @@ Easily test and interact with the API documentation using Postman
 
 ### 📚 Swagger
 
-[Swagger](https://swagger.io/) UI is available at `/api-docs` to explore the API endpoints
-and their details.
+[Swagger](https://swagger.io/) UI is available at `/api-docs` to explore the API endpoints and their details.
 
 ---
 
