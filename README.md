@@ -9,6 +9,10 @@ Taskora API built using **Node.js**, **Express.js**, **TypeScript**, **Prisma OR
 
 ---
 
+**[Alert ⚠️]** Taskora now has `+200` active users! 🎉
+
+---
+
 **[Alert ⚠️]** I have created a [Node.js script](https://github.com/MuhammedMagdyy/taskora-user-tracker) to monitor new user registrations passionately and celebrate every new member of the Taskora community.
 
 ---
