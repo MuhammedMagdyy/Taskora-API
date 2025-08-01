@@ -73,6 +73,8 @@ export const MAGIC_NUMBERS = {
   NUMBER_OF_BYTES: 32,
   MAX_NUMBER_OF_ALLOWED_REQUESTS: {
     ONE: 1,
+    THREE: 3,
+    FIVE: 5,
     TEN: 10,
   },
 };

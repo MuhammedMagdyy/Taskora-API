@@ -3,7 +3,7 @@
 ## Features to Implement
 
 - [x] Soft delete refresh tokens
-- [ ] Add rate limiting to endpoints
+- [x] Add rate limiting to authentication endpoints
 - [x] Make OTP table to track generated OTPs
 - [x] Make OTP valid for 15m instead of 5m
 - [ ] Enhance constants to be interfaces or types
