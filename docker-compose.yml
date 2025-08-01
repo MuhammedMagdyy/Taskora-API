@@ -10,11 +10,13 @@ services:
     ports:
       - '3000:3000'
     depends_on:
-      - mysql
-      - redis
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     networks:
       - taskora-api-network
-    command: sh -c "sleep 10 && npx prisma db push --schema=src/database/prisma/schema.prisma && npm start"
+    command: sh -c "npx prisma db push --schema=src/database/prisma/schema.prisma && npm start"
 
   mysql:
     image: mysql:8.0
@@ -24,6 +26,11 @@ services:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
     command: --default-authentication-plugin=mysql_native_password
+    healthcheck:
+      test: ['CMD', 'mysqladmin', 'ping', '-h', 'localhost']
+      interval: 15s
+      timeout: 10s
+      retries: 5
     ports:
       - '3306:3306'
     volumes:
@@ -37,6 +44,11 @@ services:
     restart: unless-stopped
     env_file:
       - .env
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 15s
+      timeout: 10s
+      retries: 5
     ports:
       - '6379:6379'
     volumes:
