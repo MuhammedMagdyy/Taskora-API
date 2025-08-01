@@ -1,6 +1,15 @@
 import rateLimit from 'express-rate-limit';
 import { MAGIC_NUMBERS, TOO_MANY_REQUESTS } from '../utils';
 
+/**
+ * Creates an Express rate limiter middleware with the specified configuration.
+ *
+ * @param {number} windowMs - The time frame for which requests are checked/remembered (in milliseconds).
+ * @param {number} max - The maximum number of allowed requests within the windowMs period.
+ * @param {string} message - The message to send when the rate limit is exceeded.
+ * @returns {RateLimitRequestHandler} - An Express middleware function that applies the rate limiting.
+ */
+
 export const createRateLimiter = (
   windowMs: number,
   max: number,
