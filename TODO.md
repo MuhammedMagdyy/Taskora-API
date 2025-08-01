@@ -46,5 +46,5 @@
 ## Deployment
 
 - [x] Set up CI/CD pipeline
-- [ ] Containerize application with Docker
+- [x] Containerize application with Docker
 - [x] Deploy to cloud provider (e.g., AWS, Azure, GCP)
