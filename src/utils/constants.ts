@@ -40,6 +40,7 @@ export const SERVER = {
   DEVELOPMENT: 'development',
   PRODUCTION: 'production',
   TRUST_PROXY: 'trust proxy',
+  DEFAULT_HOST: '127.0.0.1',
   DEFAULT_PORT_NUMBER: 8080,
   LOCALHOST_URLS: ['http://localhost:3000', 'http://localhost:5174'],
 };
