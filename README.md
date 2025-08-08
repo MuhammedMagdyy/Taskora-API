@@ -9,11 +9,11 @@ Taskora API built using **Node.js**, **Express.js**, **TypeScript**, **Prisma OR
 
 ---
 
-**[Alert ⚠️]** Taskora now has `+200` active users! 🎉
+**[⚠️ Alert]** Taskora now has `+200` active users! 🎉
 
 ---
 
-**[Alert ⚠️]** I have created a [Node.js script](https://github.com/MuhammedMagdyy/taskora-user-tracker) to monitor new user registrations passionately and celebrate every new member of the Taskora community.
+**[⚠️ Alert]** I have created a [Node.js script](https://github.com/MuhammedMagdyy/taskora-user-tracker) to monitor new user registrations passionately and celebrate every new member of the Taskora community.
 
 ---
 
@@ -27,6 +27,7 @@ Taskora API built using **Node.js**, **Express.js**, **TypeScript**, **Prisma OR
 - [🛠️ Getting Started](#️-getting-started)
   - [⚡ Prerequisites](#-prerequisites)
   - [📦 Installing](#-installing)
+    - [🐳 Docker](#-docker)
 - [🤝 Contributing](#-contributing)
 
 ---
@@ -40,7 +41,7 @@ Taskora API built using **Node.js**, **Express.js**, **TypeScript**, **Prisma OR
 - 🔄 **Token Refresh** & Password Reset via Email.
 - 📥 **Redis Caching** for Improved Performance.
 - 📧 **Email Notifications** for Verification & Password Reset.
-- 🌐 **Deployed on Azure** with **Nginx** as Reverse Proxy.
+- 🌐 [Previously] **Deployed on Azure**, [Currently] running on a **VPS** with **Nginx** as Reverse Proxy.
 - 🔄️ **CI/CD** using GitHub Actions.
 - 🌙 **Ramadan Challenge** A special feature for Ramadan, allowing users to set daily goals and track their progress.
 - 🥳 **Eid Competition** A fun competition feature for Eid, where users can participate in challenges and win prizes.
@@ -76,10 +77,11 @@ These instructions will get you a copy of the project up and running on your loc
 
 ### ⚡ Prerequisites
 
-- 🟢 [Node.js](https://nodejs.org/en)
-- 🐬 [MySQL](https://www.mysql.com/downloads/) using 🐳 [Docker](https://www.docker.com/) from [Docker Hub](https://hub.docker.com/_/mysql)
-- 🌐 A web browser like [Google Chrome](https://www.google.com/intl/ar_eg/chrome/)
-- 💻 A text editor (_recommended_: [Visual Studio Code](https://code.visualstudio.com/download))
+Before you begin, ensure you have met the following requirements:
+
+- 🐳 [Docker](https://www.docker.com/) and [Docker Compose](https://docs.docker.com/compose/)
+- 🌐 Web browser like [Google Chrome](https://www.google.com/intl/ar_eg/chrome/)
+- 💻 Text editor (_recommended_: [Visual Studio Code](https://code.visualstudio.com/download))
 - 🧪 API Testing Tool — [Postman](https://www.postman.com/downloads/)
 - 🐘 Database Engine — [DBeaver](https://dbeaver.io/download/)
 
@@ -87,46 +89,54 @@ These instructions will get you a copy of the project up and running on your loc
 
 ## 📦 Installing
 
-1. **Clone the repository** 🔗:
+### 🐳 Docker
+
+1. 🔗 **Clone the repository** :
 
    ```bash
    git clone https://github.com/MuhammedMagdyy/Taskora-API.git
    ```
 
-2. **Navigate to the project directory** 📁:
+2. 📁 **Navigate to the project directory** :
 
    ```bash
    cd Taskora-API
    ```
 
-3. **Install required packages** 📦:
+3. 🛡️ Configure Environment Variables :
 
    ```bash
-   npm install
+   # Update the `.env` file with your environment variables.
+   cp .env.example .env
    ```
 
-4. **Configure Environment Variables** 🛡️:
-
-   - Rename `.env.example` ➔ `.env`
-   - Add your environment variables based on [`.env.example`](https://github.com/MuhammedMagdyy/Taskora-API/blob/main/.env.example)
-
-5. **Run Database Migrations** 🗄️:
+4. 🚀 Build and start the Docker containers :
 
    ```bash
-   npm run db:migrate
-   npm run db:generate
-   npm run db:push
+   docker compose up -d --build
    ```
 
-6. **Start the Application** ⚡:
-   - **Production** 🏆: `npm start`
-   - **Development** 🧑‍💻: `npm run dev`
+5. 🖥️ Useful commands :
+
+   ```bash
+   # Start containers
+   docker compose up -d
+
+   # Follow logs
+   docker compose logs -f app
+
+   # Stop, and remove containers
+   docker compose down
+
+   # Stop, remove containers, and volumes
+   docker compose down -v
+   ```
 
 ---
 
 ## 🤝 Contributing
 
-💡 **Found a bug?** Have an idea for a new feature? Contributions are welcome!
+💡 Found a **bug**? Have an **idea** for a new feature? Contributions are welcome!
 
 1. **Fork the repository** 🚀
 2. **Create a new branch** `git checkout -b feature/awesome-feature` 🌟
