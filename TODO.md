@@ -36,7 +36,7 @@
 - [x] Enhance API documentation
   - [x] Postman
   - [x] Swagger
-- [x] Close port 3000 in production `app.listen(PORT, '127.0.0.1');`
+- [x] Close port 3000 in production
 
 ## Testing
 
