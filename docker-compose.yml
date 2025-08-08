@@ -27,9 +27,10 @@ services:
       MYSQL_DATABASE: ${MYSQL_DATABASE}
     command: --default-authentication-plugin=mysql_native_password
     healthcheck:
-      test: ['CMD', 'mysqladmin', 'ping', '-h', 'localhost']
-      interval: 15s
-      timeout: 10s
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 2s
+      start_period: 2s
       retries: 5
     ports:
       - '3306:3306'
@@ -45,9 +46,10 @@ services:
     env_file:
       - .env
     healthcheck:
-      test: ['CMD', 'redis-cli', 'ping']
-      interval: 15s
-      timeout: 10s
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 2s
+      start_period: 2s
       retries: 5
     ports:
       - '6379:6379'
