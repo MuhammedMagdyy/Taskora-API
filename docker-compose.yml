@@ -28,7 +28,7 @@ services:
     command: --default-authentication-plugin=mysql_native_password
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      interval: 1s
+      interval: 10s
       timeout: 2s
       start_period: 2s
       retries: 5
@@ -47,7 +47,7 @@ services:
       - .env
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
-      interval: 1s
+      interval: 10s
       timeout: 2s
       start_period: 2s
       retries: 5
