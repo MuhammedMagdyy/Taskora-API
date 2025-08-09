@@ -9,12 +9,15 @@
     "dev": "concurrently \"tsc-watch --onSuccess 'node ./dist/index.js'\" \"rm -rf dist\" \"npm run build\"",
     "start": "NODE_ENV=production node dist/index.js",
     "format": "prettier --write \"src/**/*.ts\"",
+    "format:check": "prettier --check \"src/**/*.ts\"",
     "lint": "eslint \"src/**/*.ts\" --fix",
+    "lint:check": "eslint \"src/**/*.ts\"",
     "db:migrate": "prisma migrate dev --schema=src/database/prisma/schema.prisma",
     "db:generate": "prisma generate --schema=src/database/prisma/schema.prisma",
     "db:push": "prisma db push --schema=src/database/prisma/schema.prisma",
     "db:studio": "prisma studio --schema=src/database/prisma/schema.prisma",
-    "clean:logs": "rm -rf logs/*"
+    "db:validate": "prisma validate --schema=src/database/prisma/schema.prisma",
+    "clean": "rm -rf dist logs/*"
   },
   "keywords": [
     "taskora",
