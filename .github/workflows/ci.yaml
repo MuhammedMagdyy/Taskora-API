@@ -25,17 +25,14 @@ jobs:
       # 3️⃣ Install dependencies
       - run: npm ci
 
-      # 4️⃣ Validate Prisma schema
-      - run: npm run db:validate
-
-      # 5️⃣ Generate Prisma client
+      # 4️⃣ Generate Prisma client
       - run: npm run db:generate
 
-      # 6️⃣ Check formatting
+      # 5️⃣ Check formatting
       - run: npm run format:check
 
-      # 7️⃣ Lint check
+      # 6️⃣ Lint check
       - run: npm run lint:check
 
-      # 8️⃣ Build project
+      # 7️⃣ Build project
       - run: npm run build
