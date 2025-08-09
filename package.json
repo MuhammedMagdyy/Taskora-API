@@ -16,7 +16,6 @@
     "db:generate": "prisma generate --schema=src/database/prisma/schema.prisma",
     "db:push": "prisma db push --schema=src/database/prisma/schema.prisma",
     "db:studio": "prisma studio --schema=src/database/prisma/schema.prisma",
-    "db:validate": "prisma validate --schema=src/database/prisma/schema.prisma",
     "clean": "rm -rf dist logs/*"
   },
   "keywords": [
