@@ -37,6 +37,7 @@
   - [x] Postman
   - [x] Swagger
 - [x] Close port 3000 in production
+- [x] Fix GitHub Actions workflow [ci.yaml]
 
 ## Testing
 
