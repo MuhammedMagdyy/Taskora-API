@@ -1,6 +1,5 @@
 import { Prisma, PrismaClient } from '@prisma/client';
 import { prismaClient } from '../database';
-import { ISortQuery } from '../types';
 
 export class ProjectRepository {
   constructor(private readonly dbClient: PrismaClient) {}
@@ -13,8 +12,11 @@ export class ProjectRepository {
     return this.dbClient.project.findUnique({ where: query });
   }
 
-  async findMany(query: Prisma.ProjectWhereInput, orderBy?: ISortQuery) {
-    return this.dbClient.project.findMany({ where: query, orderBy });
+  async findMany(query: Prisma.ProjectWhereInput) {
+    return this.dbClient.project.findMany({
+      where: query,
+      orderBy: { createdAt: 'asc' },
+    });
   }
 
   async updateOne(

@@ -1,6 +1,5 @@
 import { Prisma } from '@prisma/client';
 import { projectRepository } from '../repositories';
-import { ISortQuery } from '../types';
 import { ApiError, NOT_FOUND } from '../utils';
 
 export class ProjectService {
@@ -14,8 +13,8 @@ export class ProjectService {
     return this.projectDataSource.findOne(query);
   }
 
-  async findMany(query: Prisma.ProjectWhereInput, sort?: ISortQuery) {
-    return this.projectDataSource.findMany(query, sort);
+  async findMany(query: Prisma.ProjectWhereInput) {
+    return this.projectDataSource.findMany(query);
   }
 
   async updateOne(
