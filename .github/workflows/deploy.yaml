@@ -11,9 +11,12 @@ jobs:
     environment: production
 
     steps:
-      - name: Checkout code
+      # 🔄 Checkout source code
+      - name: Checkout source code
         uses: actions/checkout@v3
-      - name: Execute commands on remote server
+
+      # 🚀 Deploy to production server
+      - name: Deploy to production VPS
         uses: appleboy/ssh-action@v1.2.1
         with:
           host: ${{ secrets.VM_HOST }}
