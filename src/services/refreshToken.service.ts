@@ -1,10 +1,10 @@
 import { Prisma } from '@prisma/client';
-import cron from 'node-cron';
+import cron, { ScheduledTask } from 'node-cron';
 import { refreshTokenRepository } from '../repositories';
 import { ApiError, logger, UNAUTHORIZED } from '../utils';
 
 export class RefreshTokenService {
-  private cleanupTask: any = null;
+  private cleanupTask: ScheduledTask | null = null;
 
   constructor(
     private readonly refreshTokenDataSource = refreshTokenRepository,

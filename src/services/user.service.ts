@@ -1,5 +1,5 @@
 import { Prisma } from '@prisma/client';
-import cron from 'node-cron';
+import cron, { ScheduledTask } from 'node-cron';
 import { userRepository } from '../repositories';
 import { cloudinaryService, HashingService } from '../services';
 import {
@@ -9,7 +9,7 @@ import {
 import { ApiError, BAD_REQUEST, FORBIDDEN, logger, NOT_FOUND } from '../utils';
 
 export class UserService {
-  private cleanupTask: any = null;
+  private cleanupTask: ScheduledTask | null = null;
 
   constructor(private readonly userDataSource = userRepository) {}
 
@@ -71,10 +71,7 @@ export class UserService {
           }
         })();
       },
-      {
-        scheduled: true,
-        timezone: 'UTC',
-      },
+      { scheduled: true, timezone: 'UTC' },
     );
   }
 
