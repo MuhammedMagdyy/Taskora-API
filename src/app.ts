@@ -53,7 +53,7 @@ app.use(cors(corsConfig));
 app.use(compression());
 app.use(express.json({ limit: '1mb' }));
 app.use(xss);
-if (process.env.NODE_ENV !== SERVER.PRODUCTION) {
+if (nodeEnv !== SERVER.PRODUCTION) {
   app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 }
 app.use('/api/v1', routes);
@@ -78,7 +78,12 @@ export const up = async () => {
     refreshTokenService.scheduleTokenCleanupTask();
     userService.scheduleUserCleanupTask();
 
-    MemoryMonitor.start(parseInt(memoryMonitorIntervalMs, 10));
+    const intervalMs = Number.parseInt(memoryMonitorIntervalMs, 10);
+    MemoryMonitor.start(
+      Number.isNaN(intervalMs)
+        ? SERVER.DEFAULT_MEMORY_MONITOR_INTERVAL_MS
+        : intervalMs,
+    );
 
     const server = app.listen(Number(port), host || SERVER.DEFAULT_HOST, () => {
       logger.info(
