@@ -1,9 +1,11 @@
 import { Prisma } from '@prisma/client';
-import cron from 'node-cron';
+import cron, { ScheduledTask } from 'node-cron';
 import { refreshTokenRepository } from '../repositories';
 import { ApiError, logger, UNAUTHORIZED } from '../utils';
 
 export class RefreshTokenService {
+  private cleanupTask: ScheduledTask | null = null;
+
   constructor(
     private readonly refreshTokenDataSource = refreshTokenRepository,
   ) {}
@@ -61,16 +63,36 @@ export class RefreshTokenService {
   }
 
   scheduleTokenCleanupTask() {
-    cron.schedule('0 0 * * *', () => {
-      logger.info('Cleanup tokens cron job started 🕛');
-      this.deleteExpiredTokens()
-        .then(() => {
-          logger.info('Cleanup tokens cron job completed ✅');
-        })
-        .catch((error) => {
-          logger.error('Cleanup tokens cron job failed ❌', error);
-        });
-    });
+    if (this.cleanupTask) {
+      return;
+    }
+
+    this.cleanupTask = cron.schedule(
+      '0 0 * * *',
+      () => {
+        (async () => {
+          try {
+            logger.info('Cleanup tokens cron job started 🕛');
+            await this.deleteExpiredTokens();
+            logger.info('Cleanup tokens cron job completed ✅');
+
+            if (global.gc) {
+              global.gc();
+            }
+          } catch (error) {
+            logger.error('Cleanup tokens cron job failed ❌', error);
+          }
+        })();
+      },
+      { scheduled: true, timezone: 'UTC' },
+    );
+  }
+
+  stopCleanupTask() {
+    if (this.cleanupTask) {
+      this.cleanupTask.stop();
+      this.cleanupTask = null;
+    }
   }
 }
 

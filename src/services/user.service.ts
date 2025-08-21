@@ -1,5 +1,5 @@
 import { Prisma } from '@prisma/client';
-import cron from 'node-cron';
+import cron, { ScheduledTask } from 'node-cron';
 import { userRepository } from '../repositories';
 import { cloudinaryService, HashingService } from '../services';
 import {
@@ -9,6 +9,8 @@ import {
 import { ApiError, BAD_REQUEST, FORBIDDEN, logger, NOT_FOUND } from '../utils';
 
 export class UserService {
+  private cleanupTask: ScheduledTask | null = null;
+
   constructor(private readonly userDataSource = userRepository) {}
 
   async createOne(data: Prisma.UserUncheckedCreateInput) {
@@ -47,17 +49,37 @@ export class UserService {
   }
 
   scheduleUserCleanupTask() {
-    cron.schedule('0 0 * * *', () => {
-      logger.info(`Running user cleanup task... 🧹`);
-      this.userDataSource
-        .softDeleteInactiveUsers()
-        .then(({ totalUsers }) => {
-          logger.info(`Soft deleted ${totalUsers} inactive users ✅`);
-        })
-        .catch((error) => {
-          logger.error(`Error deleting inactive users ❌: ${error}`);
-        });
-    });
+    if (this.cleanupTask) {
+      return;
+    }
+
+    this.cleanupTask = cron.schedule(
+      '0 0 * * *',
+      () => {
+        (async () => {
+          try {
+            logger.info('Running user cleanup task... 🧹');
+            const { totalUsers } =
+              await this.userDataSource.softDeleteInactiveUsers();
+            logger.info(`Soft deleted ${totalUsers} inactive users ✅`);
+
+            if (global.gc) {
+              global.gc();
+            }
+          } catch (error) {
+            logger.error(`Error deleting inactive users ❌: ${error}`);
+          }
+        })();
+      },
+      { scheduled: true, timezone: 'UTC' },
+    );
+  }
+
+  stopCleanupTask() {
+    if (this.cleanupTask) {
+      this.cleanupTask.stop();
+      this.cleanupTask = null;
+    }
   }
 
   async getUserInfo(userUuid: string) {

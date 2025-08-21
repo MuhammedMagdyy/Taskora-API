@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { isVerified } from '../middlewares';
-import { OK } from '../utils';
+import { MemoryMonitor, OK } from '../utils';
 import { authRouter } from './auth.routes';
 import { competitionRouter } from './competition.routes';
 import { projectRouter } from './project.routes';
@@ -13,11 +13,19 @@ const router = Router();
 
 router.get('/health', (_req, res) => {
   const uptime = process.uptime();
+  const memoryUsage = MemoryMonitor.getMemoryUsage();
 
   res.status(OK).json({
     message: `I'm healthy 🏋️‍♂️`,
     uptime: `${Math.floor(uptime / 60)} minutes`,
     timestamp: new Date().toISOString(),
+    memory: {
+      heapUsed: `${memoryUsage.heapUsed}MB`,
+      heapTotal: `${memoryUsage.heapTotal}MB`,
+      heapUsedPercent: `${memoryUsage.heapUsedPercent}%`,
+      external: `${memoryUsage.external}MB`,
+      rss: `${memoryUsage.rss}MB`,
+    },
   });
 });
 
