@@ -6,7 +6,13 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import swaggerUi from 'swagger-ui-express';
 import swaggerDocument from '../swagger.json';
-import { corsConfig, host, nodeEnv, port } from './config';
+import {
+  corsConfig,
+  host,
+  memoryMonitorIntervalMs,
+  nodeEnv,
+  port,
+} from './config';
 import {
   createStatusIfNotExists,
   PrismaDatabaseClient,
@@ -19,6 +25,7 @@ import {
   ApiError,
   INTERNAL_SERVER_ERROR,
   logger,
+  MemoryMonitor,
   NOT_FOUND,
   SERVER,
 } from './utils';
@@ -44,9 +51,11 @@ app.use(morganLogger);
 app.use(helmet());
 app.use(cors(corsConfig));
 app.use(compression());
-app.use(express.json({ limit: '5mb' }));
+app.use(express.json({ limit: '1mb' }));
 app.use(xss);
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+if (process.env.NODE_ENV !== SERVER.PRODUCTION) {
+  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+}
 app.use('/api/v1', routes);
 app.all('*', (req, _res, next) => {
   logger.error(`${req.method} ${req.originalUrl} not found`);
@@ -69,6 +78,8 @@ export const up = async () => {
     refreshTokenService.scheduleTokenCleanupTask();
     userService.scheduleUserCleanupTask();
 
+    MemoryMonitor.start(parseInt(memoryMonitorIntervalMs, 10));
+
     const server = app.listen(Number(port), host || SERVER.DEFAULT_HOST, () => {
       logger.info(
         `Server is running on ${port || SERVER.DEFAULT_PORT_NUMBER} 🚀`,
@@ -78,6 +89,10 @@ export const up = async () => {
     process.on('SIGINT', () => {
       logger.warn('Shutting down gracefully...');
 
+      refreshTokenService.stopCleanupTask();
+      userService.stopCleanupTask();
+
+      MemoryMonitor.stop();
       Promise.all([prismaClient.disconnect(), redisClient.disconnect()])
         .then(() => {
           server.close(() => {

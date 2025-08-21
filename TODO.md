@@ -39,6 +39,7 @@
 - [x] Close port 3000 in production
 - [x] Fix GitHub Actions workflow [ci.yaml]
 - [x] Enhance deployment process using PM2
+- [x] Fix Memory Leak
 
 ## Testing
 
