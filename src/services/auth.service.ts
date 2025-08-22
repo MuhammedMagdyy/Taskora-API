@@ -294,7 +294,7 @@ export class AuthService extends BaseAuthService {
         throw new ApiError('Invalid OTP', GONE);
       }
 
-      const otpRecord = await otpService.findOneByOtp(hashedOtpFromRedis);
+      const otpRecord = await otpService.findOneByHashedOtp(hashedOtpFromRedis);
 
       const now = new Date();
 

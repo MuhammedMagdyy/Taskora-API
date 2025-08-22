@@ -8,7 +8,7 @@ export class OtpService {
     return this.otpDataSource.createOne(data);
   }
 
-  async findOneByOtp(otp: string) {
+  async findOneByHashedOtp(otp: string) {
     return this.otpDataSource.findOne({ otp });
   }
 }
