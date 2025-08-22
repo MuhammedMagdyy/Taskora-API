@@ -285,6 +285,13 @@ export class AuthService extends BaseAuthService {
         throw new ApiError('Invalid or expired OTP', GONE);
       }
 
+      const otpRecord = await otpService.findOneByHashedOtp(hashedOtpFromRedis);
+      const now = new Date();
+
+      if (!otpRecord || otpRecord.expiresAt < now) {
+        throw new ApiError('Invalid or expired OTP', GONE);
+      }
+
       const isOtpValid = await HashingService.compare(
         otpInfo.otp,
         hashedOtpFromRedis,
@@ -292,14 +299,6 @@ export class AuthService extends BaseAuthService {
 
       if (!isOtpValid) {
         throw new ApiError('Invalid OTP', GONE);
-      }
-
-      const otpRecord = await otpService.findOneByHashedOtp(hashedOtpFromRedis);
-
-      const now = new Date();
-
-      if (!otpRecord || otpRecord.expiresAt < now) {
-        throw new ApiError('Invalid or expired OTP', GONE);
       }
 
       const user = await userService.findUserByUUID(otpRecord.userUuid);
