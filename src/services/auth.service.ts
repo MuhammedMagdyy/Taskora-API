@@ -243,7 +243,8 @@ export class AuthService extends BaseAuthService {
 
       if (user) {
         const otp = generateCode();
-        await this.storeAndSendOTP(user as IUserInfo, otp);
+        const hashedOtp = await HashingService.hash(otp);
+        await this.storeAndSendOTP(user as IUserInfo, otp, hashedOtp);
       }
     } catch (error) {
       logger.error('OTP generation failed:', error);
@@ -251,18 +252,22 @@ export class AuthService extends BaseAuthService {
     }
   }
 
-  private async storeAndSendOTP(user: IUserInfo, otp: string) {
+  private async storeAndSendOTP(
+    user: IUserInfo,
+    otp: string,
+    hashedOtp: string,
+  ) {
     await Promise.all([
       otpService.createOne({
-        otp,
+        otp: hashedOtp,
         userUuid: user.uuid,
         expiresAt: new Date(
           Date.now() + MAGIC_NUMBERS.FIVE_MINUTES_IN_MILLISECONDS,
         ),
       }),
       redisService.set(
-        `otp:${otp}`,
-        otp,
+        `otp:${user.email}`,
+        hashedOtp,
         MAGIC_NUMBERS.FIVE_MINUTES_IN_SECONDS,
       ),
     ]);
@@ -272,19 +277,29 @@ export class AuthService extends BaseAuthService {
 
   async verifyOTP(otpInfo: IVerifyOtp) {
     try {
-      const otpRecord = await otpService.findOneByOtp(otpInfo.otp);
-      const otpFromRedis = await redisService.get<string>(`otp:${otpInfo.otp}`);
+      const hashedOtpFromRedis = await redisService.get<string>(
+        `otp:${otpInfo.email}`,
+      );
+
+      if (!hashedOtpFromRedis) {
+        throw new ApiError('Invalid or expired OTP', GONE);
+      }
+
+      const isOtpValid = await HashingService.compare(
+        otpInfo.otp,
+        hashedOtpFromRedis,
+      );
+
+      if (!isOtpValid) {
+        throw new ApiError('Invalid OTP', GONE);
+      }
+
+      const otpRecord = await otpService.findOneByOtp(hashedOtpFromRedis);
+
       const now = new Date();
 
       if (!otpRecord || otpRecord.expiresAt < now) {
         throw new ApiError('Invalid or expired OTP', GONE);
-      }
-
-      if (
-        !otpFromRedis ||
-        otpFromRedis.toString() !== otpRecord?.otp?.toString()
-      ) {
-        throw new ApiError('Invalid OTP', GONE);
       }
 
       const user = await userService.findUserByUUID(otpRecord.userUuid);
@@ -300,12 +315,12 @@ export class AuthService extends BaseAuthService {
         );
       }
 
-      await redisService.delete(`otp:${otpInfo.otp}`);
+      await redisService.delete(`otp:${otpInfo.email}`);
 
       await this.resetPassword({
         userUuid: user.uuid,
         password: otpInfo.password,
-        otp: otpInfo.otp,
+        otp: hashedOtpFromRedis,
       });
     } catch (error) {
       logger.error('OTP verification failed:', error);
@@ -319,7 +334,6 @@ export class AuthService extends BaseAuthService {
     );
 
     await Promise.all([
-      redisService.delete(`otp:${resetPasswordInfo.otp}`),
       userService.updateOne(
         { uuid: resetPasswordInfo.userUuid },
         { password: hashedPassword },
