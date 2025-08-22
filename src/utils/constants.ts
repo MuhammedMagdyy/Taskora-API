@@ -43,6 +43,11 @@ export const SERVER = {
   DEFAULT_HOST: '127.0.0.1',
   DEFAULT_PORT_NUMBER: 8080,
   DEFAULT_MEMORY_MONITOR_INTERVAL_MS: 60000,
+  HTML_RESPONSE: `
+    <div style="text-align: center; margin-top: 20px;">
+      <h1>Welcome to Taskora API 🚀</h1>
+    </div>
+  `,
   LOCALHOST_URLS: ['http://localhost:3000', 'http://localhost:5174'],
 };
 export const API_INTEGRATION = {

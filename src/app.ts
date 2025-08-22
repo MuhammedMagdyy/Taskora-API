@@ -40,12 +40,6 @@ const morganLogger =
         skip: (_, res) => res.statusCode < INTERNAL_SERVER_ERROR,
       });
 
-app.get('/', (_, res) => {
-  res.send(
-    '<div style="text-align: center; margin-top: 20px;"><h1>Welcome to Taskora API 🚀</h1></div>',
-  );
-});
-
 app.set('trust proxy', 1);
 app.use(morganLogger);
 app.use(helmet());
@@ -56,6 +50,9 @@ app.use(xss);
 if (nodeEnv !== SERVER.PRODUCTION) {
   app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 }
+app.get('/', (_, res) => {
+  res.send(SERVER.HTML_RESPONSE);
+});
 app.use('/api/v1', routes);
 app.all('*', (req, _res, next) => {
   logger.error(`${req.method} ${req.originalUrl} not found`);
