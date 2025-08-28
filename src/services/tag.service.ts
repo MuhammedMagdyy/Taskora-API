@@ -1,11 +1,13 @@
 import { Prisma } from '@prisma/client';
 import { tagRepository } from '../repositories';
-import { ApiError, NOT_FOUND } from '../utils';
+import { ApiError, MAGIC_NUMBERS, NOT_FOUND } from '../utils';
+import { redisService } from './redis.service';
 
 export class TagService {
   constructor(private readonly tagDataSource = tagRepository) {}
 
   async createOne(data: Prisma.TagUncheckedCreateInput) {
+    await redisService.delete(`tags:${data.userUuid}`);
     return this.tagDataSource.createOne(data);
   }
 
@@ -14,17 +16,32 @@ export class TagService {
   }
 
   async findMany(query: Prisma.TagWhereInput) {
-    return this.tagDataSource.findMany(query);
+    const cacheKey = `tags:${query.userUuid as string}`;
+    const cached = await redisService.get<string[]>(cacheKey);
+    if (cached) return cached;
+
+    const tags = await this.tagDataSource.findMany(query);
+    await redisService.set(
+      cacheKey,
+      tags,
+      MAGIC_NUMBERS.FIVE_MINUTES_IN_SECONDS,
+    );
+
+    return tags;
   }
 
   async updateOne(
     query: Prisma.TagWhereUniqueInput,
     data: Prisma.TagUpdateInput,
+    userUuid: string,
   ) {
-    return this.tagDataSource.updateOne(query, data);
+    const tag = await this.tagDataSource.updateOne(query, data);
+    await redisService.delete(`tags:${userUuid}`);
+    return tag;
   }
 
-  async deleteOne(query: Prisma.TagWhereUniqueInput) {
+  async deleteOne(query: Prisma.TagWhereUniqueInput, userUuid: string) {
+    await redisService.delete(`tags:${userUuid}`);
     return this.tagDataSource.deleteOne(query);
   }
 
@@ -42,12 +59,12 @@ export class TagService {
     userUuid: string,
   ) {
     await this.isTagExists(uuid, userUuid);
-    return this.updateOne({ uuid }, data);
+    return this.updateOne({ uuid }, data, userUuid);
   }
 
   async deleteTagByUuid(uuid: string, userUuid: string) {
     await this.isTagExists(uuid, userUuid);
-    return this.deleteOne({ uuid, userUuid });
+    return this.deleteOne({ uuid, userUuid }, userUuid);
   }
 }
 
