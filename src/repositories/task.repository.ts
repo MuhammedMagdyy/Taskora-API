@@ -1,6 +1,5 @@
 import { Prisma, PrismaClient } from '@prisma/client';
 import { prismaClient } from '../database';
-import { ISortQuery } from '../types';
 
 export class TaskRepository {
   constructor(private readonly dbClient: PrismaClient) {}
@@ -13,8 +12,8 @@ export class TaskRepository {
     return await this.dbClient.task.findUnique({ where: query });
   }
 
-  async findMany(query: Prisma.TaskWhereInput, orderBy?: ISortQuery) {
-    return await this.dbClient.task.findMany({ where: query, orderBy });
+  async findMany(query: Prisma.TaskWhereInput) {
+    return await this.dbClient.task.findMany({ where: query });
   }
 
   async updateOne(

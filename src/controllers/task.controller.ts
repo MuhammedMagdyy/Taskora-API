@@ -5,15 +5,11 @@ import {
   tagService,
   taskService,
 } from '../services';
-import { ISortQuery } from '../types';
 import {
-  BAD_REQUEST,
   CREATED,
-  DB_COLUMNS,
   NO_CONTENT,
   OK,
   paramsSchema,
-  sortSchema,
   taskSchema,
   taskUpdateSchema,
 } from '../utils';
@@ -51,29 +47,9 @@ export const getTask = asyncHandler(async (req, res) => {
 });
 
 export const getAllTasks = asyncHandler(async (req, res) => {
-  const { sortBy, order } = sortSchema.parse(req.query);
-  const validColumns = Object.values(DB_COLUMNS.TASK);
-  const sortFields = sortBy?.split(',') || [];
-  const sortOrders = order?.split(',') || [];
-
-  const invalidFields = sortFields.filter(
-    (field) => !validColumns.includes(field),
-  );
-  if (invalidFields.length > 0) {
-    res.status(BAD_REQUEST).json({
-      message: `Invalid sort field(s): ${invalidFields.join(', ')}. Allowed fields: ${validColumns.join(', ')}`,
-    });
-    return;
-  }
-
-  const orderBy: ISortQuery = sortFields.map((field, index) => ({
-    [field]: sortOrders[index] === 'desc' ? 'desc' : 'asc',
-  }));
-
-  const tasks = await taskService.findMany(
-    { userUuid: req.user?.uuid as string },
-    orderBy.length > 0 ? orderBy : undefined,
-  );
+  const tasks = await taskService.findMany({
+    userUuid: req.user?.uuid as string,
+  });
 
   res
     .status(OK)

@@ -1,6 +1,5 @@
 import { Prisma } from '@prisma/client';
 import { taskRepository } from '../repositories';
-import { ISortQuery } from '../types';
 import { ApiError, NOT_FOUND } from '../utils';
 
 export class TaskService {
@@ -14,8 +13,8 @@ export class TaskService {
     return this.taskDataSource.findOne(query);
   }
 
-  async findMany(query: Prisma.TaskWhereInput, orderBy?: ISortQuery) {
-    return this.taskDataSource.findMany(query, orderBy);
+  async findMany(query: Prisma.TaskWhereInput) {
+    return this.taskDataSource.findMany(query);
   }
 
   async updateOne(
