@@ -1,12 +1,16 @@
 import { Prisma } from '@prisma/client';
 import { statusRepository } from '../repositories';
-import { ISortQuery } from '../types';
 import { ApiError, NOT_FOUND } from '../utils';
+import { redisService } from './redis.service';
 
 export class StatusService {
+  private readonly cacheKey = 'statuses';
+
   constructor(private readonly statusDataSource = statusRepository) {}
 
   async createMany(data: Prisma.StatusCreateManyInput[]) {
+    await redisService.delete(this.cacheKey);
+
     return this.statusDataSource.createMany(data);
   }
 
@@ -14,8 +18,14 @@ export class StatusService {
     return this.statusDataSource.findOne(query);
   }
 
-  async findMany(orderBy?: ISortQuery) {
-    return this.statusDataSource.findMany(orderBy);
+  async findMany() {
+    const cached = await redisService.get<string[]>(this.cacheKey);
+    if (cached) return cached;
+
+    const statuses = await this.statusDataSource.findMany();
+    await redisService.set(this.cacheKey, statuses);
+
+    return statuses;
   }
 
   async isStatusExists(uuid: string) {
