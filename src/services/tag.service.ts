@@ -1,6 +1,5 @@
 import { Prisma } from '@prisma/client';
 import { tagRepository } from '../repositories';
-import { ISortQuery } from '../types';
 import { ApiError, NOT_FOUND } from '../utils';
 
 export class TagService {
@@ -14,8 +13,8 @@ export class TagService {
     return this.tagDataSource.findOne(query);
   }
 
-  async findMany(query: Prisma.TagWhereInput, orderBy?: ISortQuery) {
-    return this.tagDataSource.findMany(query, orderBy);
+  async findMany(query: Prisma.TagWhereInput) {
+    return this.tagDataSource.findMany(query);
   }
 
   async updateOne(
