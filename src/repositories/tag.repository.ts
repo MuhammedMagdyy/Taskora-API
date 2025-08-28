@@ -13,7 +13,10 @@ export class TagRepository {
   }
 
   async findMany(query: Prisma.TagWhereInput) {
-    return await this.dbClient.tag.findMany({ where: query });
+    return await this.dbClient.tag.findMany({
+      where: query,
+      orderBy: { createdAt: 'asc' },
+    });
   }
 
   async updateOne(
