@@ -1,11 +1,13 @@
 import { Prisma } from '@prisma/client';
 import { taskRepository } from '../repositories';
-import { ApiError, NOT_FOUND } from '../utils';
+import { ApiError, MAGIC_NUMBERS, NOT_FOUND } from '../utils';
+import { redisService } from './redis.service';
 
 export class TaskService {
   constructor(private readonly taskDataSource = taskRepository) {}
 
   async createOne(data: Prisma.TaskUncheckedCreateInput) {
+    await redisService.delete(`tasks:${data.userUuid}`);
     return this.taskDataSource.createOne(data);
   }
 
@@ -14,17 +16,32 @@ export class TaskService {
   }
 
   async findMany(query: Prisma.TaskWhereInput) {
-    return this.taskDataSource.findMany(query);
+    const cacheKey = `tasks:${query.userUuid as string}`;
+    const cached = await redisService.get<string[]>(cacheKey);
+    if (cached) return cached;
+
+    const tasks = await this.taskDataSource.findMany(query);
+    await redisService.set(
+      cacheKey,
+      tasks,
+      MAGIC_NUMBERS.FIVE_MINUTES_IN_SECONDS,
+    );
+
+    return tasks;
   }
 
   async updateOne(
     query: Prisma.TaskWhereUniqueInput,
     data: Prisma.TaskUncheckedUpdateInput,
+    userUuid: string,
   ) {
-    return this.taskDataSource.updateOne(query, data);
+    const task = await this.taskDataSource.updateOne(query, data);
+    await redisService.delete(`tasks:${userUuid}`);
+    return task;
   }
 
-  async deleteOne(query: Prisma.TaskWhereUniqueInput) {
+  async deleteOne(query: Prisma.TaskWhereUniqueInput, userUuid: string) {
+    await redisService.delete(`tasks:${userUuid}`);
     return this.taskDataSource.deleteOne(query);
   }
 
@@ -38,7 +55,7 @@ export class TaskService {
 
   async deleteTaskByUUID(uuid: string, userUuid: string) {
     await this.isTaskExists(uuid, userUuid);
-    await this.deleteOne({ uuid });
+    await this.deleteOne({ uuid }, userUuid);
   }
 }
 

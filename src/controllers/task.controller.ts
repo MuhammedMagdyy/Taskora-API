@@ -63,7 +63,7 @@ export const updateTask = asyncHandler(async (req, res) => {
 
   await taskService.isTaskExists(uuid, userUuid);
 
-  const updatedTask = await taskService.updateOne({ uuid }, schema);
+  const updatedTask = await taskService.updateOne({ uuid }, schema, userUuid);
 
   res
     .status(OK)
