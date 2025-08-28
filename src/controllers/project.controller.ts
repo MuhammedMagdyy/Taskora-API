@@ -57,7 +57,11 @@ export const updateProject = asyncHandler(async (req, res) => {
 
   await projectService.isProjectExists(uuid, userUuid);
 
-  const updatedProject = await projectService.updateOne({ uuid }, schema);
+  const updatedProject = await projectService.updateOne(
+    { uuid },
+    schema,
+    userUuid,
+  );
 
   res
     .status(OK)
