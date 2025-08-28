@@ -13,7 +13,10 @@ export class TaskRepository {
   }
 
   async findMany(query: Prisma.TaskWhereInput) {
-    return await this.dbClient.task.findMany({ where: query });
+    return await this.dbClient.task.findMany({
+      where: query,
+      orderBy: { createdAt: 'asc' },
+    });
   }
 
   async updateOne(
