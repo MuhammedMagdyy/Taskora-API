@@ -6,7 +6,6 @@ export * from './github.service';
 export * from './google.service';
 export * from './hashing.service';
 export * from './otp.service';
-export * from './pagination.service';
 export * from './project.service';
 export * from './redis.service';
 export * from './refreshToken.service';
