@@ -42,6 +42,7 @@
 - [x] Fix Memory Leak
 - [x] Add caching for getMany endpoints
 - [x] Add CONTRIBUTING.md
+- [x] Add issue templates
 
 ## Testing
 
