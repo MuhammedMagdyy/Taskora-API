@@ -39,7 +39,7 @@ export class EmailService {
     });
   }
 
-  async sendNotifyWinnerEmail(email: string, name: string) {
+  async notifyWinnerViaEmail(email: string, name: string) {
     const html = getWinnersTemplate().replace(/{{name}}/g, name);
 
     await this.mailProvider.sendEmail({
