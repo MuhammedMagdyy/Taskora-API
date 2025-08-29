@@ -22,7 +22,10 @@ export class SmtpMailProvider implements IMailProvider {
   }
 
   async sendEmail(options: nodemailer.SendMailOptions): Promise<void> {
-    await this.transporter.sendMail({ from: mailAuthUser, ...options });
+    await this.transporter.sendMail({
+      from: `Taskora support <${mailAuthUser}>`,
+      ...options,
+    });
   }
 }
 

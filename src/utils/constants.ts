@@ -1,41 +1,3 @@
-// TODO: Need to make DB_COLUMNS a type
-export const DB_COLUMNS = {
-  PROJECT: {
-    UUID: 'uuid',
-    NAME: 'name',
-    DESCRIPTION: 'description',
-    DUE_DATE: 'dueDate',
-    COLOR: 'color',
-    CREATED_AT: 'createdAt',
-    UPDATED_AT: 'updatedAt',
-    STATUS_UUID: 'statusUuid',
-  },
-  TASK: {
-    UUID: 'uuid',
-    NAME: 'name',
-    DESCRIPTION: 'description',
-    DUE_DATE: 'dueDate',
-    CREATED_AT: 'createdAt',
-    UPDATED_AT: 'updatedAt',
-    PROJECT_UUID: 'projectUuid',
-    TAG_UUID: 'tagUuid',
-    STATUS_UUID: 'statusUuid',
-  },
-  TAG: {
-    UUID: 'uuid',
-    NAME: 'name',
-    COLOR: 'color',
-    CREATED_AT: 'createdAt',
-    UPDATED_AT: 'updatedAt',
-  },
-  STATUS: {
-    UUID: 'uuid',
-    NAME: 'name',
-    COLOR: 'color',
-    CREATED_AT: 'createdAt',
-    UPDATED_AT: 'updatedAt',
-  },
-};
 export const SERVER = {
   DEVELOPMENT: 'development',
   PRODUCTION: 'production',
@@ -50,6 +12,7 @@ export const SERVER = {
   `,
   LOCALHOST_URLS: ['http://localhost:3000', 'http://localhost:5174'],
 };
+
 export const API_INTEGRATION = {
   GOOGLE: {
     USER_INFO_SCOPES: [
@@ -66,6 +29,7 @@ export const API_INTEGRATION = {
       `https://api.github.com/applications/${clientId}/token`,
   },
 };
+
 export const MAGIC_NUMBERS = {
   ONE_MINUTE_IN_MILLISECONDS: 60 * 1000,
   ONE_DAY_IN_MILLISECONDS: 24 * 60 * 60 * 1000,
@@ -85,6 +49,7 @@ export const MAGIC_NUMBERS = {
     TEN: 10,
   },
 };
+
 export const DEFAULT_VALUES = {
   PROJECTS: {
     name: '🚀 First Launch',
