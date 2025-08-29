@@ -40,6 +40,8 @@
 - [x] Fix GitHub Actions workflow [ci.yaml]
 - [x] Enhance deployment process using PM2
 - [x] Fix Memory Leak
+- [x] Add caching for getMany endpoints
+- [x] Add CONTRIBUTING.md
 - [x] Add issue templates
 
 ## Testing

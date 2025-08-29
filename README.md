@@ -138,11 +138,7 @@ Before you begin, ensure you have met the following requirements:
 
 💡 Found a **bug**? Have an **idea** for a new feature? Contributions are welcome!
 
-1. **Fork the repository** 🚀
-2. **Create a new branch** `git checkout -b feature/awesome-feature` 🌟
-3. **Commit your changes** `git commit -m 'Add some awesome feature'` 🔥
-4. **Push to your branch** `git push origin feature/awesome-feature` 🚀
-5. **Create a Pull Request** 🎉
+Please read the [CONTRIBUTING.md](CONTRIBUTING.md) file for details on how to contribute to this project.
 
 ---
 
