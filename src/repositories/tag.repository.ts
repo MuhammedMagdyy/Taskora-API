@@ -1,6 +1,5 @@
 import { Prisma, PrismaClient } from '@prisma/client';
 import { prismaClient } from '../database';
-import { ISortQuery } from '../types';
 
 export class TagRepository {
   constructor(private readonly dbClient: PrismaClient) {}
@@ -13,8 +12,11 @@ export class TagRepository {
     return await this.dbClient.tag.findUnique({ where: query });
   }
 
-  async findMany(query: Prisma.TagWhereInput, orderBy?: ISortQuery) {
-    return await this.dbClient.tag.findMany({ where: query, orderBy });
+  async findMany(query: Prisma.TagWhereInput) {
+    return await this.dbClient.tag.findMany({
+      where: query,
+      orderBy: { createdAt: 'asc' },
+    });
   }
 
   async updateOne(

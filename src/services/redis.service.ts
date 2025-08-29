@@ -2,12 +2,16 @@ import { redisClient } from '../database';
 import { ApiError, INTERNAL_SERVER_ERROR } from '../utils';
 
 export class RedisService {
-  async set(key: string, value: string, expiryInSeconds: number) {
+  async set(key: string, value: any, expiryInSeconds?: number) {
     try {
       const serializedValue =
         typeof value === 'string' ? value : JSON.stringify(value);
 
-      await redisClient.setEx(key, expiryInSeconds, serializedValue);
+      if (expiryInSeconds) {
+        await redisClient.setEx(key, expiryInSeconds, serializedValue);
+      } else {
+        await redisClient.set(key, serializedValue);
+      }
     } catch {
       throw new ApiError('Failed to set value in Redis', INTERNAL_SERVER_ERROR);
     }

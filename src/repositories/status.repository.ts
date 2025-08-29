@@ -1,6 +1,5 @@
 import { Prisma, PrismaClient } from '@prisma/client';
 import { prismaClient } from '../database';
-import { ISortQuery } from '../types';
 
 export class StatusRepository {
   constructor(private readonly dbClient: PrismaClient) {}
@@ -13,8 +12,8 @@ export class StatusRepository {
     return await this.dbClient.status.findUnique({ where: query });
   }
 
-  async findMany(orderBy?: ISortQuery) {
-    return await this.dbClient.status.findMany({ orderBy });
+  async findMany() {
+    return await this.dbClient.status.findMany();
   }
 
   async getStatusCount() {

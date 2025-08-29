@@ -1,14 +1,10 @@
 import asyncHandler from 'express-async-handler';
 import { tagService } from '../services';
-import { ISortQuery } from '../types';
 import {
-  BAD_REQUEST,
   CREATED,
-  DB_COLUMNS,
   NO_CONTENT,
   OK,
   paramsSchema,
-  sortSchema,
   tagSchema,
   updateTagSchema,
 } from '../utils';
@@ -33,29 +29,9 @@ export const getTag = asyncHandler(async (req, res) => {
 });
 
 export const getAllTags = asyncHandler(async (req, res) => {
-  const { sortBy, order } = sortSchema.parse(req.query);
-  const validColumns = Object.values(DB_COLUMNS.TAG);
-  const sortFields = sortBy?.split(',') || [];
-  const sortOrders = order?.split(',') || [];
-
-  const invalidFields = sortFields.filter(
-    (field) => !validColumns.includes(field),
-  );
-  if (invalidFields.length > 0) {
-    res.status(BAD_REQUEST).json({
-      message: `Invalid sort field(s): ${invalidFields.join(', ')}. Allowed fields: ${validColumns.join(', ')}`,
-    });
-    return;
-  }
-
-  const orderBy: ISortQuery = sortFields.map((field, index) => ({
-    [field]: sortOrders[index] === 'desc' ? 'desc' : 'asc',
-  }));
-
-  const tags = await tagService.findMany(
-    { userUuid: req.user?.uuid as string },
-    orderBy.length > 0 ? orderBy : undefined,
-  );
+  const tags = await tagService.findMany({
+    userUuid: req.user?.uuid as string,
+  });
 
   res.status(OK).json({ message: 'Retrieved tags successfully!', data: tags });
 });

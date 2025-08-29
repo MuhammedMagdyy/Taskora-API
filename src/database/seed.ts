@@ -16,6 +16,8 @@ export async function createStatusIfNotExists() {
       await statusService.createMany(defaultStatuses);
 
       logger.info('Default statuses created successfully ✅');
+    } else {
+      logger.info('Default statuses already exist, skipping seeding ⚠️');
     }
   } catch (error) {
     logger.error(`Error creating default statuses ❌ - ${error}`);
