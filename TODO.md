@@ -43,6 +43,7 @@
 - [x] Add caching for getMany endpoints
 - [x] Add CONTRIBUTING.md
 - [x] Add issue templates
+- [x] Enhance email service to use Strategy pattern
 
 ## Testing
 
