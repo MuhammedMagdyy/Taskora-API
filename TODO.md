@@ -29,6 +29,7 @@
 - [x] OTP expiration must be less than 15m. Decide on the exact duration (e.g., 5m)
 - [ ] Add middleware to check if user is deleted
 - [ ] Centralize error messages
+- [x] Integrate with BullMQ for background job processing
 
 ## Improvements
 
