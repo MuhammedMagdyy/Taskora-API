@@ -62,7 +62,7 @@ export class EmailJob {
       jobId,
       attempts: MAGIC_NUMBERS.MAX_NUMBER_OF_RETRIES,
       backoff: {
-        type: 'fixed',
+        type: 'exponential',
         delay: MAGIC_NUMBERS.FIVE_SECONDS_IN_MILLISECONDS,
       },
       removeOnComplete: MAGIC_NUMBERS.MAX_COUNT_FOR_REMOVE_ON_COMPLETE,
