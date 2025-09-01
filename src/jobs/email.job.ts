@@ -54,8 +54,8 @@ export class EmailJob {
         type: 'fixed',
         delay: MAGIC_NUMBERS.FIVE_SECONDS_IN_MILLISECONDS,
       },
-      removeOnComplete: 100,
-      removeOnFail: 100,
+      removeOnComplete: MAGIC_NUMBERS.MAX_COUNT_FOR_REMOVE_ON_COMPLETE,
+      removeOnFail: MAGIC_NUMBERS.MAX_COUNT_FOR_REMOVE_ON_FAILURE,
     };
   }
 }
