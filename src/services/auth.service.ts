@@ -1,6 +1,5 @@
 import { Provider } from '@prisma/client';
 import {
-  emailService,
   HashingService,
   JwtService,
   otpService,
@@ -9,6 +8,7 @@ import {
   userService,
 } from '.';
 import { IAuth, IResetPassword, IUser, IVerifyOtp } from '../interfaces';
+import { EmailJob } from '../jobs';
 import { IUserInfo } from '../types';
 import {
   ApiError,
@@ -82,11 +82,11 @@ export class AuthService extends BaseAuthService {
       MAGIC_NUMBERS.ONE_DAY_IN_SECONDS,
     );
 
-    emailService.sendVerificationEmail(
-      user.email,
-      user.name,
-      verificationToken,
-    );
+    await EmailJob.addVerificationEmailJob({
+      email: user.email,
+      name: user.name,
+      token: verificationToken,
+    });
   }
 
   async login(userLoginInfo: IAuth) {
@@ -272,7 +272,11 @@ export class AuthService extends BaseAuthService {
       ),
     ]);
 
-    emailService.sendForgetPasswordEmail(user.email, user.name, otp);
+    await EmailJob.addForgetPasswordEmailJob({
+      email: user.email,
+      name: user.name,
+      otp,
+    });
   }
 
   async verifyOTP(otpInfo: IVerifyOtp) {
