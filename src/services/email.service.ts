@@ -29,7 +29,7 @@ export class EmailService {
 
       logger.info(`Verification email sent to ${email}`);
     } catch (error) {
-      logger.error(`Failed to send verification email: ${error}`);
+      logger.error(`Failed to send verification email to ${email}: ${error}`);
       throw error;
     }
   }
@@ -49,7 +49,9 @@ export class EmailService {
 
       logger.info(`Forget password email sent to ${email}`);
     } catch (error) {
-      logger.error(`Failed to send forget password email: ${error}`);
+      logger.error(
+        `Failed to send forget password email to ${email}: ${error}`,
+      );
       throw error;
     }
   }
@@ -67,7 +69,9 @@ export class EmailService {
 
       logger.info(`Winner notification email sent to ${email}`);
     } catch (error) {
-      logger.error(`Failed to send winner notification email: ${error}`);
+      logger.error(
+        `Failed to send winner notification email to ${email}: ${error}`,
+      );
       throw error;
     }
   }
