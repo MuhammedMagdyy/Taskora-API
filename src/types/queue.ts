@@ -1,3 +1,5 @@
+import { WORKERS } from '../utils';
+
 export type SendEmailVerificationJob = {
   email: string;
   name: string;
@@ -12,6 +14,4 @@ export type SendForgetPasswordJob = {
 
 export type EmailJobData = SendEmailVerificationJob | SendForgetPasswordJob;
 
-export type EmailJobName =
-  | 'SEND_VERIFICATION_EMAIL'
-  | 'SEND_FORGET_PASSWORD_EMAIL';
+export type EmailJobName = (typeof WORKERS)[keyof typeof WORKERS];
