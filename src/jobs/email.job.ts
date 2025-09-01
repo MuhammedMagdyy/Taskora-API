@@ -1,5 +1,6 @@
 import { JobsOptions } from 'bullmq';
 import { emailQueue } from '../queues';
+import { HashingService } from '../services';
 import { SendEmailVerificationJob, SendForgetPasswordJob } from '../types';
 import { logger, MAGIC_NUMBERS, WORKERS } from '../utils';
 
@@ -8,7 +9,8 @@ export class EmailJob {
     verificationJobDetails: SendEmailVerificationJob,
   ) {
     try {
-      const key = `verify-${verificationJobDetails.email}-${Date.now()}`;
+      const hashedEmail = this.hashEmail(verificationJobDetails.email);
+      const key = `verify-${hashedEmail}`;
       const jobOptions = this.createJobOptions(key);
       await emailQueue.add(
         WORKERS.SEND_VERIFICATION_EMAIL,
@@ -18,6 +20,10 @@ export class EmailJob {
           token: verificationJobDetails.token,
         },
         jobOptions,
+      );
+
+      logger.info(
+        `Verification email job scheduled for ${verificationJobDetails.email} with key ${key}`,
       );
     } catch (error) {
       logger.error(`Failed to add verification email job: ${error}`);
@@ -29,7 +35,8 @@ export class EmailJob {
     forgetPasswordDetails: SendForgetPasswordJob,
   ) {
     try {
-      const key = `forget-${forgetPasswordDetails.email}-${Date.now()}`;
+      const hashedEmail = this.hashEmail(forgetPasswordDetails.email);
+      const key = `forget-${hashedEmail}`;
       const jobOptions = this.createJobOptions(key);
       await emailQueue.add(
         WORKERS.SEND_FORGET_PASSWORD_EMAIL,
@@ -39,6 +46,10 @@ export class EmailJob {
           otp: forgetPasswordDetails.otp,
         },
         jobOptions,
+      );
+
+      logger.info(
+        `Forget password email job scheduled for ${forgetPasswordDetails.email} with key ${key}`,
       );
     } catch (error) {
       logger.error(`Failed to add forget password email job: ${error}`);
@@ -57,5 +68,9 @@ export class EmailJob {
       removeOnComplete: MAGIC_NUMBERS.MAX_COUNT_FOR_REMOVE_ON_COMPLETE,
       removeOnFail: MAGIC_NUMBERS.MAX_COUNT_FOR_REMOVE_ON_FAILURE,
     };
+  }
+
+  private static hashEmail(email: string): string {
+    return HashingService.generateHashWithHmac(email);
   }
 }

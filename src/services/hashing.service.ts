@@ -1,4 +1,5 @@
 import { compare, hash } from 'bcryptjs';
+import crypto from 'crypto';
 import { bcryptSaltRounds } from '../config';
 import { ApiError, BAD_REQUEST } from '../utils';
 
@@ -9,10 +10,18 @@ export class HashingService {
     }
     return await hash(text, Number(bcryptSaltRounds));
   }
+
   static compare(text: string, hashedText: string): Promise<boolean> {
     if (!text || !hashedText) {
       throw new ApiError('Missing information to compare', BAD_REQUEST);
     }
     return compare(text, hashedText);
+  }
+
+  static generateHashWithHmac(text: string) {
+    return crypto
+      .createHmac('sha256', bcryptSaltRounds)
+      .update(text)
+      .digest('hex');
   }
 }
