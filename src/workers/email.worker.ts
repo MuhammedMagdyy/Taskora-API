@@ -37,10 +37,9 @@ export const emailWorker = new Worker<EmailJobData, void, EmailJobName>(
         break;
 
       default:
-        logger.warn(
+        throw new Error(
           `Unknown job name: ${job.name}. Expected: ${Object.values(WORKERS).join(', ')}`,
         );
-        break;
     }
   },
   {
