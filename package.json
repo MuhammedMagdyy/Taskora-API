@@ -8,6 +8,7 @@
     "post:build": "cpy src/templates/**/*.html dist/templates",
     "dev": "concurrently \"tsc-watch --onSuccess 'node ./dist/index.js'\" \"rm -rf dist\" \"npm run build\"",
     "start": "NODE_ENV=production node dist/index.js",
+    "start:worker": "node dist/workers/email.worker.js",
     "format": "prettier --write \"src/**/*.ts\"",
     "format:check": "prettier --check \"src/**/*.ts\"",
     "lint": "eslint \"src/**/*.ts\" --fix",

@@ -15,13 +15,21 @@ npx prisma generate --schema=src/database/prisma/schema.prisma
 echo "🏗 Building the app..."
 npm run build
 
-echo "🚀 Restarting app with PM2..."
+echo "🚀 Restarting apps with PM2..."
 if pm2 describe taskora-api > /dev/null 2>&1; then
-    echo "📍 Restarting existing process..."
+    echo "📍 Restarting taskora-api..."
     pm2 restart taskora-api
 else
-    echo "🆕 Starting new process with ecosystem config..."
-    pm2 start ecosystem.config.js
+    echo "🆕 Starting taskora-api from ecosystem config..."
+    pm2 start ecosystem.config.js --only taskora-api
+fi
+
+if pm2 describe taskora-email-worker > /dev/null 2>&1; then
+    echo "📍 Restarting taskora-email-worker..."
+    pm2 restart taskora-email-worker
+else
+    echo "🆕 Starting taskora-email-worker from ecosystem config..."
+    pm2 start ecosystem.config.js --only taskora-email-worker
 fi
 
 echo "💾 Saving PM2 process list..."

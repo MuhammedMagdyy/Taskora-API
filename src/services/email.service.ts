@@ -4,6 +4,7 @@ import {
   getOTPTemplate,
   getVerifyEmailTemplate,
   getWinnersTemplate,
+  logger,
 } from '../utils';
 import { smtpMailProvider } from './providers';
 
@@ -11,43 +12,68 @@ export class EmailService {
   constructor(private readonly mailProvider: IMailProvider) {}
 
   async sendVerificationEmail(email: string, name: string, token: string) {
-    const verifyEmailTemplate = getVerifyEmailTemplate();
-    const verifyEmailUrl = `${frontendUrl}/verify-email?token=${token}`;
+    try {
+      const verifyEmailTemplate = getVerifyEmailTemplate();
+      const verifyEmailUrl = `${frontendUrl}/verify-email?token=${token}`;
 
-    const html = verifyEmailTemplate
-      .replace(/{{verifyEmailUrl}}/g, verifyEmailUrl)
-      .replace(/{{name}}/g, name);
+      const html = verifyEmailTemplate
+        .replace(/{{verifyEmailUrl}}/g, verifyEmailUrl)
+        .replace(/{{name}}/g, name);
 
-    await this.mailProvider.sendEmail({
-      to: email,
-      subject: 'Verify your email',
-      text: 'Verify your email',
-      html,
-    });
+      await this.mailProvider.sendEmail({
+        to: email,
+        subject: 'Verify your email',
+        text: 'Verify your email',
+        html,
+      });
+
+      logger.info(`Verification email sent to ${email}`);
+    } catch (error) {
+      logger.error(`Failed to send verification email to ${email}: ${error}`);
+      throw error;
+    }
   }
 
   async sendForgetPasswordEmail(email: string, name: string, otp: string) {
-    const html = getOTPTemplate()
-      .replace(/{{otp}}/g, otp)
-      .replace(/{{name}}/g, name);
+    try {
+      const html = getOTPTemplate()
+        .replace(/{{otp}}/g, otp)
+        .replace(/{{name}}/g, name);
 
-    await this.mailProvider.sendEmail({
-      to: email,
-      subject: 'Reset your password',
-      text: 'Reset your password',
-      html,
-    });
+      await this.mailProvider.sendEmail({
+        to: email,
+        subject: 'Reset your password',
+        text: 'Reset your password',
+        html,
+      });
+
+      logger.info(`Forget password email sent to ${email}`);
+    } catch (error) {
+      logger.error(
+        `Failed to send forget password email to ${email}: ${error}`,
+      );
+      throw error;
+    }
   }
 
   async notifyWinnerViaEmail(email: string, name: string) {
-    const html = getWinnersTemplate().replace(/{{name}}/g, name);
+    try {
+      const html = getWinnersTemplate().replace(/{{name}}/g, name);
 
-    await this.mailProvider.sendEmail({
-      to: email,
-      subject: 'Congratulations! You are a winner',
-      text: 'Congratulations! You are a winner',
-      html,
-    });
+      await this.mailProvider.sendEmail({
+        to: email,
+        subject: 'Congratulations! You are a winner',
+        text: 'Congratulations! You are a winner',
+        html,
+      });
+
+      logger.info(`Winner notification email sent to ${email}`);
+    } catch (error) {
+      logger.error(
+        `Failed to send winner notification email to ${email}: ${error}`,
+      );
+      throw error;
+    }
   }
 }
 
