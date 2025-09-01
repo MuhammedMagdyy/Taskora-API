@@ -66,20 +66,20 @@ emailWorker.on('error', (err) => {
   logger.error(`Email worker encountered an error: ${err?.message ?? err}`);
 });
 
-const shutdown = (signal: string) => {
-  logger.info(`Received ${signal}. Shutting down email worker...`);
-  emailWorker
-    .close()
-    .then(() => {
-      process.exit(0);
-    })
-    .catch((err) => {
-      logger.error(
-        `Error while shutting down email worker: ${err?.message ?? err}`,
-      );
-      process.exit(1);
-    });
+const shutdown = async (signal: string) => {
+  logger.info(`Received ${signal}. Shutting down email worker gracefully...`);
+
+  try {
+    await emailWorker.pause(true);
+    logger.info('Worker paused. Waiting for active jobs to finish...');
+
+    await emailWorker.close();
+    logger.info('Email worker shutdown complete ✅');
+  } catch (err) {
+    logger.error(`Error during graceful shutdown: ${err}`);
+    process.exit(1);
+  }
 };
 
-process.on('SIGINT', () => shutdown('SIGINT'));
-process.on('SIGTERM', () => shutdown('SIGTERM'));
+process.on('SIGINT', () => void shutdown('SIGINT'));
+process.on('SIGTERM', () => void shutdown('SIGTERM'));
