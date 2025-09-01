@@ -1,6 +1,6 @@
 import { compare, hash } from 'bcryptjs';
 import crypto from 'crypto';
-import { bcryptSaltRounds } from '../config';
+import { bcryptSaltRounds, hmacSecret } from '../config';
 import { ApiError, BAD_REQUEST } from '../utils';
 
 export class HashingService {
@@ -19,9 +19,6 @@ export class HashingService {
   }
 
   static generateHashWithHmac(text: string) {
-    return crypto
-      .createHmac('sha256', bcryptSaltRounds)
-      .update(text)
-      .digest('hex');
+    return crypto.createHmac('sha256', hmacSecret).update(text).digest('hex');
   }
 }

@@ -14,3 +14,4 @@ export const mailPort = env('MAIL_PORT');
 export const mailAuthUser = env('MAIL_AUTH_USER');
 export const mailAuthPassword = env('MAIL_AUTH_PASSWORD');
 export const correctAnswer = env('CORRECT_ANSWER');
+export const hmacSecret = env('HMAC_SECRET');
