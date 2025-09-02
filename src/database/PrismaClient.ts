@@ -1,6 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import { IDatabaseClient } from '../interfaces';
 import { logger } from '../utils';
+import { retryAndBackoff } from '../utils/functions';
 
 export class PrismaDatabaseClient implements IDatabaseClient {
   private static instance: PrismaDatabaseClient;
@@ -22,28 +23,8 @@ export class PrismaDatabaseClient implements IDatabaseClient {
     return this.client;
   }
 
-  async connect(maxRetries = 10, baseDelay = 500): Promise<void> {
-    let attempt = 0;
-
-    while (attempt < maxRetries) {
-      try {
-        await this.getClient().$connect();
-        logger.info(`Prisma connected successfully! ✅`);
-        return;
-      } catch (error) {
-        attempt++;
-        logger.error(`Prisma connection attempt ${attempt} failed: ${error}`);
-
-        if (attempt >= maxRetries) {
-          logger.error(`Max retries reached. Exiting... ❌`);
-          process.exit(1);
-        }
-
-        const delay = baseDelay * Math.pow(2, attempt - 1);
-        logger.info(`Retrying in ${delay} ms...`);
-        await new Promise((resolve) => setTimeout(resolve, delay));
-      }
-    }
+  async connect(): Promise<void> {
+    await retryAndBackoff(() => this.getClient().$connect(), 'Prisma');
   }
 
   async disconnect(): Promise<void> {
