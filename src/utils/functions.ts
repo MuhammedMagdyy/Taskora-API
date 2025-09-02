@@ -24,12 +24,13 @@ export async function retryAndBackoff<T>(
         process.exit(1);
       }
 
-      const delay = baseDelay * Math.pow(2, attempt);
+      const delay = baseDelay * Math.pow(2, attempt - 1);
       logger.info(`Retrying ${serviceName} in ${delay} ms...`);
       await new Promise((resolve) => setTimeout(resolve, delay));
     }
   }
 
+  // Will not reach here, just for type safety | TODO: Maybe remove this in the future
   throw new Error(
     `${serviceName} connection failed after ${maxRetries} retries`,
   );
