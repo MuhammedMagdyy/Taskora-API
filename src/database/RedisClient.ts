@@ -23,13 +23,27 @@ export class RedisDatabaseClient implements IDatabaseClient {
     return this.client;
   }
 
-  async connect(): Promise<void> {
-    try {
-      await this.getClient().connect();
-      logger.info(`Redis connected successfully! ✅`);
-    } catch (error) {
-      logger.error(`Redis connection failed - ${error} ❌`);
-      process.exit(1);
+  async connect(maxRetries = 10, baseDelay = 500): Promise<void> {
+    let attempt = 0;
+
+    while (attempt < maxRetries) {
+      try {
+        await this.getClient().connect();
+        logger.info(`Redis connected successfully! ✅`);
+        return;
+      } catch (error) {
+        attempt++;
+        logger.error(`Redis connection attempt ${attempt} failed: ${error}`);
+
+        if (attempt >= maxRetries) {
+          logger.error(`Max retries reached. Exiting... ❌`);
+          process.exit(1);
+        }
+
+        const delay = baseDelay * Math.pow(2, attempt - 1);
+        logger.info(`Retrying in ${delay} ms...`);
+        await new Promise((resolve) => setTimeout(resolve, delay));
+      }
     }
   }
 
