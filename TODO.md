@@ -30,6 +30,8 @@
 - [ ] Add middleware to check if user is deleted
 - [ ] Centralize error messages
 - [x] Integrate with BullMQ for background job processing
+- [x] Add BullMQ dashboard
+- [ ] Integrate with Monitoring tools (eg. Prometheus, Grafana, Datadog)
 
 ## Improvements
 
@@ -45,6 +47,7 @@
 - [x] Add CONTRIBUTING.md
 - [x] Add issue templates
 - [x] Enhance email service to use Strategy pattern
+- [ ] Enhance BullMQ dashboard, and add more metrics.
 
 ## Testing
 
