@@ -29,7 +29,6 @@ const app = express();
 const prismaClient = PrismaDatabaseClient.getInstance();
 const redisClient = RedisDatabaseClient.getInstance();
 
-app.use(morganLogger);
 app.set('trust proxy', 1);
 app.use(morganLogger);
 app.use(helmet());
