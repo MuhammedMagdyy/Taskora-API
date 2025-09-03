@@ -3,13 +3,14 @@ import cors from 'cors';
 import 'dotenv/config';
 import express from 'express';
 import helmet from 'helmet';
-import morgan from 'morgan';
 import swaggerUi from 'swagger-ui-express';
 import swaggerDocument from '../swagger.json';
 import {
+  bullBoardQueuePath,
   corsConfig,
   host,
   memoryMonitorIntervalMs,
+  morganLogger,
   nodeEnv,
   port,
 } from './config';
@@ -19,27 +20,16 @@ import {
   RedisDatabaseClient,
 } from './database';
 import { errorHandler, xss } from './middlewares';
+import { serverAdapter } from './monitoring';
 import routes from './routes';
 import { refreshTokenService, userService } from './services';
-import {
-  ApiError,
-  INTERNAL_SERVER_ERROR,
-  logger,
-  MemoryMonitor,
-  NOT_FOUND,
-  SERVER,
-} from './utils';
+import { ApiError, logger, MemoryMonitor, NOT_FOUND, SERVER } from './utils';
 
 const app = express();
 const prismaClient = PrismaDatabaseClient.getInstance();
 const redisClient = RedisDatabaseClient.getInstance();
-const morganLogger =
-  nodeEnv === SERVER.DEVELOPMENT
-    ? morgan('dev')
-    : morgan('combined', {
-        skip: (_, res) => res.statusCode < INTERNAL_SERVER_ERROR,
-      });
 
+app.use(morganLogger);
 app.set('trust proxy', 1);
 app.use(morganLogger);
 app.use(helmet());
@@ -54,6 +44,7 @@ app.get('/', (_, res) => {
   res.send(SERVER.HTML_RESPONSE);
 });
 app.use('/api/v1', routes);
+app.use(bullBoardQueuePath, serverAdapter.getRouter());
 app.all('*', (req, _res, next) => {
   logger.error(`${req.method} ${req.originalUrl} not found`);
   return next(
