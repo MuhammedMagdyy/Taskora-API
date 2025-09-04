@@ -1,5 +1,18 @@
 #!/bin/bash
 
+echo "🔍 Checking changed files..."
+CHANGED_FILES=$(git diff --name-only HEAD~1 HEAD)
+
+IGNORED_PATTERNS='(\.md$|^docs/|\.gitignore$|\.dockerignore$|^\.vscode/|^LICENSE$|^swagger\.json$)'
+
+if echo "$CHANGED_FILES" | grep -qvE "$IGNORED_PATTERNS"; then
+  echo "💡 Code-related changes detected → running full deploy process"
+else
+  echo "📝 Docs-only or ignored changes detected → syncing without build"
+  git pull origin main
+  exit 0
+fi
+
 echo "🔄 Pulling latest code..."
 git pull origin main
 
