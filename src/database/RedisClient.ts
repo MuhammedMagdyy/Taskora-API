@@ -2,6 +2,7 @@ import { createClient, RedisClientType } from 'redis';
 import { redisUrl } from '../config';
 import { IDatabaseClient } from '../interfaces';
 import { logger } from '../utils';
+import { retryAndBackoff } from '../utils/functions';
 
 export class RedisDatabaseClient implements IDatabaseClient {
   private static instance: RedisDatabaseClient;
@@ -24,13 +25,7 @@ export class RedisDatabaseClient implements IDatabaseClient {
   }
 
   async connect(): Promise<void> {
-    try {
-      await this.getClient().connect();
-      logger.info(`Redis connected successfully! ✅`);
-    } catch (error) {
-      logger.error(`Redis connection failed - ${error} ❌`);
-      process.exit(1);
-    }
+    await retryAndBackoff(() => this.getClient().connect(), 'Redis');
   }
 
   async disconnect(): Promise<void> {
