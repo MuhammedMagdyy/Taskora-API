@@ -4,6 +4,14 @@ on:
   pull_request:
     branches:
       - main
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - '.gitignore'
+      - '.dockerignore'
+      - 'LICENSE'
+      - '.vscode/**'
+      - 'swagger.json'
 
 jobs:
   build:
