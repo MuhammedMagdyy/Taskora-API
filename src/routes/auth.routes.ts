@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { auth } from '../controllers';
-import { authLimiter, isAuth, twentyFourHourLimiter } from '../middlewares';
+import { defaultLimiter, isAuth, twentyFourHourLimiter } from '../middlewares';
 import { githubRouter } from './github.routes';
 import { googleRouter } from './google.routes';
 
@@ -9,7 +9,7 @@ const router = Router();
 router.use('/google', googleRouter);
 router.use('/github', githubRouter);
 
-router.use(authLimiter, twentyFourHourLimiter);
+router.use(defaultLimiter, twentyFourHourLimiter);
 router.post('/register', auth.localRegister);
 router.post('/login', auth.localLogin);
 router.post('/logout', isAuth, auth.logout);

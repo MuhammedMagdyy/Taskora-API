@@ -46,8 +46,8 @@ export const MAGIC_NUMBERS = {
   MAX_COUNT_FOR_REMOVE_ON_FAILURE: 100,
   MAX_NUMBER_OF_ALLOWED_REQUESTS: {
     ONE: 1,
-    THREE: 3,
     TEN: 10,
+    TWENTY: 20,
   },
 };
 

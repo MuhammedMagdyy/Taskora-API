@@ -29,20 +29,14 @@ export const createRateLimiter = (
   });
 };
 
-export const oneMinuteLimiter = createRateLimiter(
+export const defaultLimiter = createRateLimiter(
   MAGIC_NUMBERS.ONE_MINUTE_IN_MILLISECONDS,
-  MAGIC_NUMBERS.MAX_NUMBER_OF_ALLOWED_REQUESTS.ONE,
+  MAGIC_NUMBERS.MAX_NUMBER_OF_ALLOWED_REQUESTS.TEN,
   'Too many requests, please try again after a minute',
 );
 
 export const twentyFourHourLimiter = createRateLimiter(
   MAGIC_NUMBERS.ONE_DAY_IN_MILLISECONDS,
-  MAGIC_NUMBERS.MAX_NUMBER_OF_ALLOWED_REQUESTS.TEN,
+  MAGIC_NUMBERS.MAX_NUMBER_OF_ALLOWED_REQUESTS.TWENTY,
   'Too many requests, please try again after a day',
-);
-
-export const authLimiter = createRateLimiter(
-  MAGIC_NUMBERS.ONE_MINUTE_IN_MILLISECONDS,
-  MAGIC_NUMBERS.MAX_NUMBER_OF_ALLOWED_REQUESTS.THREE,
-  'Too many requests, please try again after a minute',
 );
