@@ -1,7 +1,6 @@
 # Taskora 🚀
 
-![NodeJS](https://img.shields.io/badge/Node.js-6DA55F?logo=node.js&logoColor=white) ![Express.js](https://img.shields.io/badge/Express.js-%23404d59.svg?logo=express&logoColor=%2361DAFB) ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=fff) ![Docker](https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=fff) ![MySQL](https://img.shields.io/badge/MySQL-4479A1?logo=mysql&logoColor=fff) ![Prisma](https://img.shields.io/badge/Prisma-2D3748?logo=prisma&logoColor=white) ![Redis](https://img.shields.io/badge/Redis-%23DD0031.svg?logo=redis&logoColor=white) ![Nginx](https://img.shields.io/badge/Nginx-009639.svg?logo=nginx&logoColor=white)
-![Postman](https://img.shields.io/badge/Postman-FF6C37?logo=postman&logoColor=white) ![Swagger](https://img.shields.io/badge/Swagger-<SWAGGER_COLOR>?logo=swagger&logoColor=white) ![Microsoft Azure](https://custom-icon-badges.demolab.com/badge/Microsoft%20Azure-0089D6?logo=msazure&logoColor=white)
+![NodeJS](https://img.shields.io/badge/Node.js-6DA55F?logo=node.js&logoColor=white) ![Express.js](https://img.shields.io/badge/Express.js-%23404d59.svg?logo=express&logoColor=%2361DAFB) ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=fff) ![Docker](https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=fff) ![MySQL](https://img.shields.io/badge/MySQL-4479A1?logo=mysql&logoColor=fff) ![Prisma](https://img.shields.io/badge/Prisma-2D3748?logo=prisma&logoColor=white) ![Redis](https://img.shields.io/badge/Redis-%23DD0031.svg?logo=redis&logoColor=white) ![BullMQ](https://img.shields.io/badge/BullMQ-FF3D00.svg?logo=bull&logoColor=white) ![Nginx](https://img.shields.io/badge/Nginx-009639.svg?logo=nginx&logoColor=white) ![Postman](https://img.shields.io/badge/Postman-FF6C37?logo=postman&logoColor=white) ![Swagger](https://img.shields.io/badge/Swagger-<SWAGGER_COLOR>?logo=swagger&logoColor=white) ![Microsoft Azure](https://custom-icon-badges.demolab.com/badge/Microsoft%20Azure-0089D6?logo=msazure&logoColor=white)
 
 Taskora API built using **Node.js**, **Express.js**, **TypeScript**, **Prisma ORM**, and **Redis**. It allows users to **create**, **read**, **update**, and **delete** projects & tasks while following RESTful API design principles.
 
@@ -9,11 +8,11 @@ Taskora API built using **Node.js**, **Express.js**, **TypeScript**, **Prisma OR
 
 ---
 
-**[⚠️ Alert]** Taskora now has `+250` active users! 🎉
+**[⚠️ Alert]** Taskora now has `+300` active users! 🎉
 
 ---
 
-**[⚠️ Alert]** I have created a [Node.js script](https://github.com/MuhammedMagdyy/taskora-user-tracker) to monitor new user registrations passionately and celebrate every new member of the Taskora community by sending me an email notification.
+**[⚠️ Alert]** I have created a [Node.js script](https://github.com/MuhammedMagdyy/taskora-user-tracker) to monitor new user registrations passionately and celebrate every new member of the Taskora community by sending me an email notification. 🥳
 
 ---
 
@@ -41,6 +40,7 @@ Taskora API built using **Node.js**, **Express.js**, **TypeScript**, **Prisma OR
 - 🔄 **Token Refresh** & Password Reset via Email.
 - 📥 **Redis Caching** for Improved Performance.
 - 📧 **Email Notifications** for Verification & Password Reset.
+- 🕒 **Background Jobs** using BullMQ for sending emails asynchronously.
 - 🌐 [Previously] **Deployed on Azure**, [Currently] running on a **VPS** with **Nginx** as Reverse Proxy.
 - 🔄️ **CI/CD** using GitHub Actions.
 - 🌙 **Ramadan Challenge** A special feature for Ramadan, allowing users to set daily goals and track their progress.
