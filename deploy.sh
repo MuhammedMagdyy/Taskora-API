@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo "🔍 Checking changed files..."
-CHANGED_FILES=$(git diff --name-only HEAD@{1} HEAD)
+CHANGED_FILES=$(git diff --name-only HEAD~1 HEAD)
 
 IGNORED_PATTERNS='(\.md$|^docs/|\.gitignore$|\.dockerignore$|^\.vscode/|^LICENSE$|^swagger\.json$)'
 
