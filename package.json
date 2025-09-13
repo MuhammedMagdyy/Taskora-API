@@ -40,7 +40,7 @@
     "@bull-board/api": "^6.12.7",
     "@bull-board/express": "^6.12.7",
     "@prisma/client": "^6.3.1",
-    "axios": "^1.8.4",
+    "axios": "^1.12.1",
     "bcryptjs": "^2.4.3",
     "bullmq": "^5.45.2",
     "cloudinary": "^2.5.1",
