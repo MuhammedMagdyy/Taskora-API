@@ -18,6 +18,21 @@ services:
       - taskora-api-network
     command: sh -c "npx prisma db push --schema=src/database/prisma/schema.prisma && npm start"
 
+  email-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: taskora-email-worker
+    restart: unless-stopped
+    env_file:
+      - .env
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - taskora-api-network
+    command: npm run start:worker
+
   mysql:
     image: mysql:8.0
     container_name: taskora-mysql-db
