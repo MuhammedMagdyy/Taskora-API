@@ -8,7 +8,7 @@ Taskora API built using **Node.js**, **Express.js**, **TypeScript**, **Prisma OR
 
 ---
 
-**[⚠️ Alert]** Taskora now has `+300` active users! 🎉
+**[⚠️ Alert]** Taskora now has `+400` active users! 🎉
 
 ---
 
