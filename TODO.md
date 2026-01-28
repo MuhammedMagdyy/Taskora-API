@@ -48,6 +48,7 @@
 - [x] Add issue templates
 - [x] Enhance email service to use Strategy pattern
 - [ ] Enhance BullMQ dashboard, and add more metrics.
+- [ ] Fix bounced emails issue
 
 ## Testing
 
