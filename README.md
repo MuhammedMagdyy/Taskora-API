@@ -4,7 +4,7 @@
 
 Taskora API built using **Node.js**, **Express.js**, **TypeScript**, **Prisma ORM**, and **Redis**. It allows users to **create**, **read**, **update**, and **delete** projects & tasks while following RESTful API design principles.
 
-🌐 **[Frontend Repository](https://github.com/amatter23/Taskora)** | 🚀 **[Live Preview](https://Taskora.live)**
+🌐 **[Frontend Repository](https://github.com/amatter23/Taskora)**
 
 ---
 
